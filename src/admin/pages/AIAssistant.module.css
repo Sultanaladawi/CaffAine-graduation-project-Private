@@ -1,0 +1,99 @@
+.page { 
+    max-width: 1000px; 
+    margin: 0 auto;
+    display: flex; 
+    flex-direction: column; 
+    height: calc(100vh - 120px); 
+    padding: 20px;
+    background-color: #120a05 !important;
+}
+
+.header { 
+    border-bottom: 2px solid #2d2926;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.title { 
+    color: #ffffff !important; 
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+.sub { 
+    color: #c4a484 !important;
+    font-weight: 600;
+}
+
+.quickPrompts { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 10px; 
+    margin-bottom: 20px; 
+}
+
+.quickBtn {
+    background-color: #1c1917 !important;
+    border: 1px solid #c4a484 !important;
+    color: #e7d7c1 !important;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.chatWindow {
+    flex: 1; 
+    background-color: #12100e !important;
+    border: 1px solid #2d2926 !important;
+    border-radius: 15px;
+    padding: 20px; 
+    overflow-y: auto; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 15px;
+}
+
+.msgBot .bubble { 
+    background-color: #1c1917 !important; 
+    color: #e7d7c1 !important; 
+    border: 1px solid #2d2926 !important;
+    padding: 12px;
+    border-radius: 12px;
+}
+
+.msgUser .bubble { 
+    background-color: #c4a484 !important; 
+    color: #120a05 !important;
+    font-weight: 700;
+    padding: 12px;
+    border-radius: 12px;
+}
+
+.inputRow {
+    display: flex; 
+    gap: 12px; 
+    background-color: #1c1917 !important; 
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #2d2926 !important;
+    margin-top: 15px;
+}
+
+.input {
+    flex: 1; 
+    background: transparent !important; 
+    border: none !important;
+    color: #ffffff !important; 
+    outline: none !important;
+}
+
+.sendBtn {
+    background-color: #c4a484 !important; 
+    color: #120a05 !important;
+    border: none;
+    border-radius: 10px;
+    width: 45px;
+    height: 45px;
+    cursor: pointer;
+}

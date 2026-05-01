@@ -1,0 +1,9 @@
+[
+  { "id": 9, "name": "British Hot Chocolate", "available": 1 },
+  { "id": 14, "name": "Vegan Pastry", "available": 1 },
+  { "id": 15, "name": "Mug of Peppermint Tea", "available": 1 },
+  { "id": 22, "name": "Raspberry & Custard laminated pastry.", "available": 1 },
+  { "id": 23, "name": "Mug of English Breakfast Tea", "available": 1 },
+  { "id": 24, "name": "Pot of Peppermint Tea", "available": 1 },
+  { "id": 25, "name": "Pot of Breakfast Tea", "available": 1 }
+]

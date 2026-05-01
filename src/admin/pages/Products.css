@@ -1,0 +1,199 @@
+/* Products.css - Premium glassmorphism styling */
+
+/* Root variables for theme (can be overridden in global CSS) */
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  --row-bg: rgba(255, 255, 255, 0.03);
+  --row-hover-bg: rgba(255, 255, 255, 0.06);
+  --row-radius: 12px;
+}
+
+/* Fade‑in animation for the dashboard container */
+.dashboard-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+/* Glassmorphic card for the header box */
+.header-box {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 12px;
+  padding: 12px 20px;
+}
+
+/* Table row styling */
+.product-row {
+  background: var(--row-bg);
+  border-radius: var(--row-radius);
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.product-row:hover {
+  background: var(--row-hover-bg);
+  transform: translateY(-2px);
+}
+
+/* Cell padding – tighten for high‑density look */
+.product-row td {
+  padding: 10px 12px;
+}
+
+/* Badge for row index */
+.product-row td:first-child span {
+  background: rgba(196, 164, 132, 0.15);
+  border: 1px solid rgba(196, 164, 132, 0.33);
+  border-radius: 8px;
+  color: var(--gold, #c4a484);
+  font-weight: 800;
+  font-size: 0.7rem;
+  padding: 4px 10px;
+}
+
+/* Tag and Add‑on chips – unified look */
+.tag-chip, .addon-chip {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: 6px;
+  padding: 3px 8px;
+  margin: 2px;
+  display: inline-block;
+}
+
+.tag-chip {
+  background: linear-gradient(135deg, #c7a57a 0%, #e0d0b8 100%);
+  color: #120a05;
+}
+
+.addon-chip {
+  color: var(--crema, #d5c5b5);
+  opacity: 0.8;
+}
+
+/* Status badge */
+.status-badge {
+  border-radius: 20px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.status-badge.available {
+  background: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+}
+
+.status-badge.unavailable {
+  background: rgba(231, 74, 59, 0.1);
+  color: #e74a3b;
+}
+
+/* Action icons hover effect */
+.action-icon {
+  transition: color 0.2s ease;
+}
+
+.action-icon:hover {
+  color: var(--gold, #c4a484);
+}
+
+/* Scrollbar styling for the table container */
+::-webkit-scrollbar {
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.02);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+  border-radius: 4px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .product-row td {
+    padding: 8px 6px;
+    font-size: 0.85rem;
+  }
+  .header-box {
+    padding: 8px 12px;
+  }
+}
+
+.id-badge-premium {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(145deg, #2a241f, #1a1612);
+  border: 1px solid rgba(196, 164, 132, 0.3);
+  border-radius: 10px;
+  padding: 4px 8px;
+  min-width: 45px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.id-prefix {
+  font-size: 0.5rem;
+  color: #c4a484;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.id-number {
+  font-size: 0.8rem;
+  color: #fff;
+  font-weight: 900;
+}
+
+/* Premium Toast Notification */
+.premium-toast {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  z-index: 9999;
+  padding: 16px 24px;
+  border-radius: 16px;
+  background: rgba(28, 25, 23, 0.9);
+  border: 1px solid rgba(196, 164, 132, 0.2);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.premium-toast.error {
+  border-color: rgba(231, 74, 59, 0.3);
+  color: #e74a3b;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

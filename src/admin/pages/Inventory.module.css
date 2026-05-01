@@ -1,0 +1,115 @@
+.page {
+  padding: 30px;
+  background-color: #0e0c0a;
+  min-height: 100vh;
+  color: #e7d7c1;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.title {
+  font-size: 2.2rem;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 0;
+}
+
+.icon { color: #c4a484; }
+
+.sub { color: #888; margin-top: 5px; font-size: 1rem; }
+
+.addBtn {
+  background-color: #c4a484;
+  color: #1a1612;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: 0.3s;
+}
+
+.addBtn:hover { background-color: #fff; transform: translateY(-2px); }
+
+.tableCard {
+  background-color: #1a1612;
+  border-radius: 15px;
+  border: 1px solid #2d2926;
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  background-color: #241f1c;
+  color: #c4a484;
+  text-align: left;
+  padding: 20px;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+}
+
+.table td {
+  padding: 20px;
+  border-bottom: 1px solid #2d2926;
+}
+
+.itemName {
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.qtyOk { color: #38ef7d; font-weight: bold; }
+.qtyLow { color: #f87171; font-weight: bold; }
+
+.muted { color: #6a6a6a; }
+
+.statusBox {
+  padding: 100px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.noDataText {
+  font-size: 1.4rem;
+  color: #c4a484;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.spin {
+  animation: spin 2s linear infinite;
+  color: #c4a484;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.actions { display: flex; gap: 10px; }
+.actionBtn { background: none; border: 1px solid #333; color: #888; padding: 8px; border-radius: 6px; cursor: pointer; }
+.actionBtn:hover { border-color: #c4a484; color: #c4a484; }
+.deleteBtn { background: none; border: 1px solid #333; color: #888; padding: 8px; border-radius: 6px; cursor: pointer; }
+.deleteBtn:hover { border-color: #f87171; color: #f87171; }

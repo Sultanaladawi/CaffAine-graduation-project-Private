@@ -1,0 +1,35 @@
+.page  { max-width: 1200px; }
+.header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
+.title  { font-size:1.6rem; font-weight:700; color:#e0e4f0; margin:0 0 4px; }
+.sub    { font-size:0.85rem; color:#5a6078; margin:0; }
+.rangeToggle { display:flex; gap:4px; }
+.rangeBtn {
+  background:#13161f; border:1px solid rgba(255,255,255,0.07); border-radius:8px;
+  padding:6px 14px; color:#5a6078; cursor:pointer; font-size:0.82rem; transition:all 0.15s;
+}
+.rangeBtn:hover { border-color:rgba(201,169,110,0.3); color:#c9a96e; }
+.rangeActive    { background:rgba(201,169,110,0.1); border-color:rgba(201,169,110,0.4); color:#c9a96e; }
+.loadMsg { padding:60px; text-align:center; color:#5a6078; }
+.statsRow {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px;
+}
+.statCard {
+  background:#13161f; border:1px solid rgba(255,255,255,0.07); border-radius:14px;
+  padding:18px 20px; text-align:center;
+}
+.statIcon  { font-size:1.6rem; margin-bottom:8px; }
+.statValue { font-size:1.4rem; font-weight:700; color:#e0e4f0; }
+.statLabel { font-size:0.78rem; color:#5a6078; margin-top:3px; }
+.chartCard {
+  background:#13161f; border:1px solid rgba(255,255,255,0.07); border-radius:14px;
+  padding:20px 22px; margin-bottom:20px;
+}
+.twoCol { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
+.cardTitle { font-size:0.95rem; font-weight:600; color:#c9a96e; margin:0 0 18px; }
+.tableCard { background:#13161f; border:1px solid rgba(255,255,255,0.07); border-radius:14px; padding:20px 22px; }
+.table { width:100%; border-collapse:collapse; }
+.table th { padding:10px 14px; text-align:left; font-size:0.72rem; text-transform:uppercase; letter-spacing:1.2px; color:#5a6078; border-bottom:1px solid rgba(255,255,255,0.06); }
+.table td { padding:12px 14px; font-size:0.86rem; color:#e0e4f0; border-bottom:1px solid rgba(255,255,255,0.03); }
+.status { padding:4px 10px; border-radius:20px; font-size:0.65rem; font-weight:700; text-transform:uppercase; }
+.success { background:rgba(34,197,94,0.1); color:#22c55e; }
+.warning { background:rgba(234,179,8,0.1); color:#eab308; }

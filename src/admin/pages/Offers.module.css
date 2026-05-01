@@ -1,0 +1,68 @@
+.offers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.offer-card {
+    background: #1c1917;
+    border: 1px solid #2d2926;
+    border-radius: 25px;
+    padding: 30px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.offer-card:hover {
+    border-color: #c4a484;
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.5);
+    transform: translateY(-8px);
+}
+
+.offer-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background: #c4a484;
+}
+
+.offer-discount {
+    font-size: 24px;
+    font-weight: 800;
+    color: #c4a484;
+    margin-bottom: 5px;
+}
+
+.offer-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #ffffff;
+    line-height: 1.4;
+}
+
+.offer-description {
+    color: #aaa;
+    font-size: 1rem;
+    line-height: 1.8;
+    margin-bottom: 20px;
+}
+
+.offer-expiry {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-top: 1px solid #2d2926;
+    padding-top: 15px;
+}

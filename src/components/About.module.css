@@ -1,0 +1,93 @@
+.about {
+  padding: 7rem 0;
+  background: var(--cappuccino-light);
+}
+
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+  margin-bottom: 5rem;
+}
+
+.imgWrap {
+  position: relative;
+  height: 520px;
+}
+.imgMain {
+  position: absolute;
+  top: 0; left: 0;
+  width: 80%; height: 84%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px var(--shadow-lg);
+}
+.imgAccent {
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 52%; height: 50%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 12px 36px var(--shadow-md);
+  border: 6px solid var(--cream);
+}
+.badge {
+  position: absolute;
+  top: 40%;
+  left: -2rem;
+  background: var(--coffee);
+  color: #fff;
+  padding: 1.1rem 1.4rem;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+  box-shadow: 0 8px 28px rgba(74, 48, 28, 0.35);
+  z-index: 5;
+  max-width: 160px;
+  text-align: center;
+}
+.badgeText { font-size: .68rem; letter-spacing: .06em; color: rgba(255,246,238,.75); }
+.badgeMain { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: var(--gold); line-height: 1.2; }
+
+.body {
+  color: var(--espresso-mid);
+  line-height: 1.8;
+  font-size: .95rem;
+  margin-bottom: .9rem;
+}
+
+.pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  padding-top: 3rem;
+  border-top: 1px solid var(--cream-dark);
+}
+.pillar { text-align: center; }
+.pillarIcon {
+  width: 52px; height: 52px;
+  background: var(--tea-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  color: var(--coffee-dark);
+  font-size: 1.2rem;
+  border: 1px solid var(--border);
+  transition: background var(--tr), color var(--tr), border-color var(--tr);
+}
+.pillar:hover .pillarIcon { background: var(--coffee-dark); color: #fff; border-color: var(--coffee-dark); }
+.pillarTitle { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: var(--espresso); margin-bottom: .5rem; }
+.pillarDesc  { font-size: .83rem; color: var(--espresso-mid); line-height: 1.65; }
+
+@media (max-width: 900px) {
+  .twoCol { grid-template-columns: 1fr; gap: 3rem; }
+  .imgWrap { height: 380px; }
+  .badge   { left: 0; }
+  .pillars { grid-template-columns: 1fr; gap: 1.5rem; }
+  .pillar  { text-align: left; display: flex; align-items: flex-start; gap: 1rem; }
+  .pillarIcon { flex-shrink: 0; margin: 0; }
+}

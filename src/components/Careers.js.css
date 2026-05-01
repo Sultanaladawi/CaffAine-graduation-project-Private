@@ -1,0 +1,167 @@
+.careers {
+  padding: 100px 0;
+  background-color: var(--crema-light, #f5f1ed);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.body {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 80px;
+  align-items: flex-start;
+}
+
+.intro {
+  font-size: 1.2rem;
+  line-height: 1.7;
+  color: var(--espresso);
+  margin-bottom: 30px;
+}
+
+.applyBox {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.applyText {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  color: var(--crema);
+}
+
+.applyEmail {
+  font-size: 1.5rem;
+  color: var(--espresso);
+  text-decoration: none;
+  font-weight: 800;
+  transition: color 0.3s;
+}
+
+.applyEmail:hover {
+  color: var(--crema);
+}
+
+/* Form Styles */
+.formContainer {
+  background: #fff;
+  padding: 40px;
+  border-radius: 30px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.05);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form input, .form textarea {
+  width: 100%;
+  padding: 15px 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.05);
+  background-color: #f9f9f9;
+  font-family: inherit;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s;
+}
+
+.form input:focus, .form textarea:focus {
+  border-color: var(--crema);
+  background-color: #fff;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+}
+
+.form textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+/* Right Side - Roles */
+.rolesLabel {
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 2px;
+  color: var(--crema);
+  margin-bottom: 25px;
+}
+
+.roleCard {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #fff;
+  padding: 20px 30px;
+  border-radius: 20px;
+  margin-bottom: 15px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+}
+
+.roleCard:hover {
+  transform: translateX(10px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  border-color: var(--crema);
+}
+
+.activeCard {
+  border-color: var(--crema);
+  background-color: #fff;
+  transform: translateX(10px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.roleIcon {
+  width: 50px;
+  height: 50px;
+  background-color: var(--crema-light, #f5f1ed);
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--crema);
+  font-size: 1.2rem;
+}
+
+.roleTitle {
+  font-weight: 800;
+  color: var(--espresso);
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+
+.roleType {
+  font-size: 0.85rem;
+  color: #777;
+  font-weight: 600;
+}
+
+.roleBtn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 1.1rem;
+  transition: color 0.3s;
+}
+
+.roleCard:hover .roleBtn {
+  color: var(--crema);
+}
+
+@media (max-width: 992px) {
+  .body {
+    grid-template-columns: 1fr;
+    gap: 50px;
+  }
+}

@@ -1,0 +1,178 @@
+.hero {
+  min-height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
+.left {
+  flex: 0 0 58%;
+  background: var(--latte);
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.left::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 10%; bottom: 10%;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, var(--border), transparent);
+}
+
+.content {
+  padding: 9rem 3rem 5rem 4rem;
+  width: 100%;
+  max-width: 640px;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  animation: fadeSlideDown .7s ease both;
+}
+.eyebrowDot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex-shrink: 0;
+  box-shadow: 0 0 12px var(--gold), 0 0 24px rgba(201,146,75,0.4);
+}
+
+.headline {
+  color: var(--espresso);
+  margin: 1rem 0 1.6rem;
+  line-height: 0.95;
+  animation: fadeSlideDown .85s .12s ease both;
+}
+.headline em {
+  color: var(--gold);
+  font-style: italic;
+  font-weight: 500;
+  text-shadow: 0 0 40px rgba(201,146,75,0.25);
+}
+
+.sub {
+  max-width: 420px;
+  color: var(--espresso-mid);
+  font-size: 1rem;
+  line-height: 1.8;
+  margin-bottom: 2.4rem;
+  font-weight: 300;
+  animation: fadeSlideDown 1s .24s ease both;
+}
+
+.ctas {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  animation: fadeSlideDown 1s .36s ease both;
+}
+
+.hoursStrip {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-top: 4rem;
+  flex-wrap: wrap;
+  animation: fadeSlideDown 1s .5s ease both;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(47,42,38,0.08);
+}
+.hoursItem { font-size: .76rem; color: var(--text-muted); display: flex; align-items: center; gap: .4rem; }
+.hoursItem span { color: var(--text-secondary); font-weight: 500; }
+.hoursItem i    { color: var(--gold); }
+.hoursDivider   { width: 1px; height: 16px; background: var(--divider); }
+
+.right {
+  flex: 0 0 40%;
+  position: relative;
+  overflow: hidden;
+}
+
+.right::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, var(--bg-base) 0%, rgba(247,241,232,0.7) 30%, transparent 60%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.right::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(44,31,22,0.35) 0%, transparent 50%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.windowImg {
+  position: absolute;
+  inset: -5%;
+  width: 110%;
+  height: 110%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.12s ease-out;
+  will-change: transform;
+}
+
+.heroBadge {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 2rem;
+  z-index: 2;
+  background: rgba(253, 250, 246, 0.85);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(120,80,40,0.15);
+  border-radius: 16px;
+  padding: 1rem 1.5rem;
+  color: var(--text-primary);
+  animation: fadeSlideUp 1s 0.7s ease both;
+  opacity: 0;
+  box-shadow: 0 8px 32px rgba(100,60,20,0.12);
+}
+.heroBadge.vis { opacity: 1; }
+.heroBadgeLabel {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.4rem;
+  font-weight: 700;
+}
+.heroBadgeName {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+.heroBadgeSub {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+@media (max-width: 900px) {
+  .hero { flex-direction: column; min-height: auto; }
+  .left { flex: none; width: 100%; }
+  .left::after { display: none; }
+  .content { padding: 8rem 2rem 3rem; }
+  .right {
+    flex: none; width: 100%;
+    height: 55vw; min-height: 280px; max-height: 420px;
+    position: relative;
+  }
+  .windowImg { inset: 0; width: 100%; height: 100%; }
+  .heroBadge { left: 1.5rem; bottom: 1.5rem; }
+}
+
+@media (max-width: 600px) {
+  .hoursStrip { flex-direction: column; align-items: flex-start; gap: .5rem; }
+  .hoursDivider { display: none; }
+  .content { padding: 7rem 1.5rem 2.5rem; }
+  .right { height: 60vw; }
+}
