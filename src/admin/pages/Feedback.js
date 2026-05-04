@@ -141,7 +141,40 @@ const Feedback = () => {
   );
 
   return (
-    <div style={{ padding: '40px', backgroundColor: colors.espresso, minHeight: '100vh' }} className="dashboard-fade-in">
+    <div className="dashboard-fade-in" style={{ 
+      color: colors.latte, 
+      backgroundColor: colors.espresso, 
+      minHeight: '100vh', 
+      padding: '40px 10px 40px 5px',
+      position: 'relative'
+    }}>
+      {/* Premium Background Elements */}
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: `radial-gradient(circle at 50% -20%, #2a1b10 0%, #070504 70%)` }} />
+        <div className="orb orb-1" />
+        <div className="orb orb-2" />
+      </div>
+      <style>{`
+        .orb { position: absolute; border-radius: 50%; filter: blur(100px); z-index: 0; opacity: 0.05; animation: float 25s infinite alternate ease-in-out; }
+        .orb-1 { width: 600px; height: 600px; background: ${colors.crema}; top: -200px; right: -100px; }
+        .orb-2 { width: 500px; height: 500px; background: #2a1b10; bottom: -100px; left: -100px; }
+        @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 50px) scale(1.1); } }
+        .page-badge { background: #1b130e; border: 1px solid ${colors.border}; padding: 12px 25px; border-radius: 18px; display: inline-flex; align-items: center; gap: 12px; margin: 20px 0; }
+        .page-badge span { font-family: 'Inter', sans-serif; font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: -0.5px; }
+        /* Premium Row Hover Animation */
+        .premium-row {
+          transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+          cursor: pointer;
+        }
+        .premium-row:hover {
+          background-color: rgba(196, 164, 132, 0.12) !important;
+          transform: translateY(-5px) scale(1.005) !important;
+          box-shadow: 0 15px 35px rgba(0,0,0,0.4) !important;
+          border-color: rgba(196, 164, 132, 0.5) !important;
+          position: relative;
+          z-index: 10;
+        }
+      `}</style>
       {/* Elegant Notification Toast */}
       {notification && (
         <div className={`premium-toast ${notification.type}`}>
@@ -150,26 +183,32 @@ const Feedback = () => {
         </div>
       )}
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px' }}>
+      <div style={{ 
+        position: 'relative',
+        zIndex: 1,
+        width: '100%', 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'flex-start', 
+        marginBottom: '40px'
+      }}>
         <div>
-          <div style={{ 
-            fontFamily: "'DM Serif Display', serif", 
-            fontSize: '1.8rem', 
-            color: colors.crema, 
-            lineHeight: '1',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px',
-            marginBottom: '15px'
-          }}>
-            Faculty<span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
+          <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: colors.crema, lineHeight: 1 }}>
+            Faculty <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
           </div>
-          <h1 style={{ color: colors.text, fontSize: '2.5rem', fontFamily: 'serif', margin: 0 }}>Feedback & Reviews</h1>
-          <p style={{ color: colors.crema, marginTop: '10px' }}>Monitor customer satisfaction and product ratings</p>
+
+          <div className="page-badge">
+            <MessageSquare size={28} color={colors.crema} />
+            <span>Feedback & Reviews</span>
+          </div>
+
+          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '1rem', fontWeight: 500, marginTop: '5px' }}>
+            Faculty Coffee | Monitoring Customer Satisfaction & Product Ratings
+          </p>
           <button 
             onClick={exportPDF}
             style={{ 
-              marginTop: '15px',
+              marginTop: '20px',
               backgroundColor: 'rgba(196, 164, 132, 0.1)', 
               color: colors.crema, 
               border: `1px solid ${colors.crema}`, 
@@ -188,19 +227,19 @@ const Feedback = () => {
       </div>
 
       {loading ? (
-        <div style={{ color: colors.crema, textAlign: 'center', padding: '50px' }}>Loading feedback...</div>
+        <div style={{ position: 'relative', zIndex: 1, color: colors.crema, textAlign: 'center', padding: '50px' }}>Loading feedback...</div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '25px' }}>
+        <div style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '25px' }}>
           
           {activeTab === 'general' && data.general.length === 0 && (
             <div style={{ color: colors.muted, gridColumn: '1 / -1' }}>No store feedback received yet.</div>
           )}
           
           {activeTab === 'general' && data.general.map(item => (
-            <div key={`gen-${item.id}`} style={{ 
+            <div key={`gen-${item.id}`} className="premium-row" style={{ 
               background: 'rgba(255,255,255,0.02)', padding: '35px', borderRadius: '28px', 
               border: `1px solid rgba(255,255,255,0.06)`, position: 'relative',
-              backdropFilter: 'blur(10px)', transition: '0.3s'
+              backdropFilter: 'blur(10px)'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '25px' }}>
                 <div>
@@ -222,7 +261,7 @@ const Feedback = () => {
           )}
 
           {activeTab === 'products' && data.products.map(item => (
-            <div key={`prod-${item.id}`} style={{ 
+            <div key={`prod-${item.id}`} className="premium-row" style={{ 
               backgroundColor: colors.bean, padding: '30px', borderRadius: '20px', 
               border: `1px solid ${colors.border}`, position: 'relative'
             }}>

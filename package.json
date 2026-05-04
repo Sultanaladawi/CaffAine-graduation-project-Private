@@ -15,6 +15,7 @@
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
     "lucide-react": "^1.8.0",
+    "multer": "^2.1.1",
     "mysql": "^2.18.1",
     "mysql2": "^3.22.2",
     "nodemon": "^3.1.14",
@@ -41,5 +42,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:5000"
+  "proxy": "http://127.0.0.1:5000"
 }

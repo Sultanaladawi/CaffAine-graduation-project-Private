@@ -122,27 +122,63 @@ const Messages = () => {
   };
 
   return (
-    <div style={{ backgroundColor: colors.espresso, minHeight: '100vh', padding: '40px', color: colors.latte }}>
+    <div className="dashboard-fade-in" style={{ 
+      color: colors.latte, 
+      backgroundColor: colors.espresso, 
+      minHeight: '100vh', 
+      padding: '40px 10px 40px 5px',
+      position: 'relative'
+    }}>
+      {/* Premium Background Elements */}
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: `radial-gradient(circle at 50% -20%, #2a1b10 0%, #070504 70%)` }} />
+        <div className="orb orb-1" />
+        <div className="orb orb-2" />
+      </div>
+      <style>{`
+        .orb { position: absolute; border-radius: 50%; filter: blur(100px); z-index: 0; opacity: 0.05; animation: float 25s infinite alternate ease-in-out; }
+        .orb-1 { width: 600px; height: 600px; background: ${colors.crema}; top: -200px; right: -100px; }
+        .orb-2 { width: 500px; height: 500px; background: #2a1b10; bottom: -100px; left: -100px; }
+        @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 50px) scale(1.1); } }
+        .page-badge { background: #1b130e; border: 1px solid ${colors.border}; padding: 12px 25px; border-radius: 18px; display: inline-flex; align-items: center; gap: 12px; margin: 20px 0; }
+        .page-badge span { font-family: 'Inter', sans-serif; font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: -0.5px; }
+        /* Premium Row Hover Animation */
+        .premium-row {
+          transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+          cursor: pointer;
+        }
+        .premium-row:hover {
+          background-color: rgba(196, 164, 132, 0.12) !important;
+          transform: translateY(-2px) scale(1.005);
+          box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+          position: relative;
+          z-index: 10;
+        }
+      `}</style>
       
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
+      <div style={{ 
+        position: 'relative',
+        zIndex: 1,
+        width: '100%', 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'flex-start', 
+        marginBottom: '40px'
+      }}>
         <div>
-          <div style={{ 
-            fontFamily: "'DM Serif Display', serif", 
-            fontSize: '1.8rem', 
-            color: colors.crema, 
-            lineHeight: '1',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px',
-            marginBottom: '15px'
-          }}>
-            Faculty<span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
+          <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: colors.crema, lineHeight: 1 }}>
+            Faculty <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
           </div>
-          <h1 style={{ color: '#fff', margin: 0, fontSize: '2.5rem', fontFamily: 'serif', display: 'flex', alignItems: 'center', gap: '15px' }}>
-            <Mail size={36} color={colors.crema} /> Customer Inquiries
-          </h1>
-          <p style={{ color: colors.crema, marginTop: '10px' }}>Read and reply to messages from your customers.</p>
+
+          <div className="page-badge">
+            <Mail size={28} color={colors.crema} />
+            <span>Customer Messages</span>
+          </div>
+
+          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '1rem', fontWeight: 500, marginTop: '5px' }}>
+            Faculty Coffee | Customer Support & Feedback Inquiries
+          </p>
         </div>
         <button 
           onClick={exportPDF}
@@ -159,28 +195,24 @@ const Messages = () => {
       </div>
 
       {loading ? (
-        <div style={{ textAlign: 'center', color: colors.crema, padding: '100px' }}>
+        <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', color: colors.crema, padding: '100px' }}>
           <div className="loader-spinner"></div>
           <p>Loading messages...</p>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {messages.length > 0 ? messages.map((msg) => (
-            <div key={msg.id} style={{ 
-              backgroundColor: msg.is_read ? colors.bean : 'rgba(196,164,132,0.08)', 
+            <div key={msg.id} className="premium-row" style={{ 
+              backgroundColor: msg.is_read ? colors.bean : 'rgba(196,164,132,0.1)', 
               borderRadius: '20px', 
               border: `1px solid ${msg.is_read ? colors.border : colors.crema}`,
               padding: '25px',
               display: 'flex',
               flexDirection: 'column',
               gap: '20px',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
-              position: 'relative',
-              transition: 'transform 0.2s',
-            }}
-            onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.01)'}
-            onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
-            >
+              boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+              position: 'relative'
+            }}>
               
               {/* Message Header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: `1px solid ${colors.border}`, paddingBottom: '15px' }}>

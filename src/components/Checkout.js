@@ -6,10 +6,12 @@ export default function Checkout({ onClose, onBack }) {
   const { items, totalPrice, clearCart } = useCart();
   const [step, setStep] = useState('form');
   const [orderId, setOrderId] = useState(null);
+  const [orderStatus, setOrderStatus] = useState('preparing');
   const [timeRemaining, setTimeRemaining] = useState(120);
   const [form, setForm] = useState({
     name: '', email: '',
-    cardNumber: '', expiry: '', cvc: '', address: ''
+    cardNumber: '', expiry: '', cvc: '', address: '', phone: '',
+    postcode: '', location: '', deliveryType: 'postcode'
   });
   const [orderType, setOrderType] = useState('dine-in');
   const [errors, setErrors] = useState({});
@@ -22,6 +24,11 @@ export default function Checkout({ onClose, onBack }) {
   const [selectedOffer, setSelectedOffer] = useState(null);
 
   const formatPrice = (n) => `£${n.toFixed(2)}`;
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   useEffect(() => {
     // Fetch active offers from backend
@@ -33,27 +40,39 @@ export default function Checkout({ onClose, onBack }) {
       .catch(err => console.error('Error fetching offers:', err));
   }, []);
 
-  // Filter applicable offers based on cart items and customer type
-  const applicableOffers = offers.filter(offer => {
-    // 1. Check if the cart contains the target product (e.g. 'Cappuccino', 'Pastry')
-    const hasItem = items.some(item => item.name.toLowerCase().includes(offer.product_name.toLowerCase()) || offer.product_name.toLowerCase() === 'all');
-    
-    // 2. Check customer category (Student vs Employee) based on offer description
+  const handleOfferClick = (offer) => {
+    if (selectedOffer?.id === offer.id) {
+      setSelectedOffer(null);
+      return;
+    }
+
+    // Validation
+    const hasItem = items.some(item => {
+      const itemName = item.name.toLowerCase();
+      const offerProd = offer.product_name.toLowerCase();
+      return itemName.includes(offerProd) || offerProd.includes(itemName) || offerProd === 'all';
+    });
+
     const isStudentOffer = offer.reason.toLowerCase().includes('student');
     const isEmployeeOffer = offer.reason.toLowerCase().includes('corporate') || offer.reason.toLowerCase().includes('employee') || offer.reason.toLowerCase().includes('faculty');
-    
-    if (isStudentOffer && customerType !== 'Student') return false;
-    if (isEmployeeOffer && customerType !== 'Employee') return false;
-    
-    return hasItem;
-  });
 
-  // Automatically clear selected offer if it's no longer applicable after category change
-  useEffect(() => {
-    if (selectedOffer && !applicableOffers.some(o => o.id === selectedOffer.id)) {
-      setSelectedOffer(null);
+    if (!hasItem) {
+      alert(`This offer doesn't work for you because the product '${offer.product_name}' is not in your cart.`);
+      return;
     }
-  }, [applicableOffers, selectedOffer]);
+
+    if (isStudentOffer && customerType !== 'Student') {
+      alert("This offer doesn't work for you because this offer is for students and you are not a student.");
+      return;
+    }
+
+    if (isEmployeeOffer && customerType !== 'Employee') {
+      alert("This offer doesn't work for you because this offer is for faculty/employees and you are not one.");
+      return;
+    }
+
+    setSelectedOffer(offer);
+  };
 
   const discountMultiplier = selectedOffer ? (1 - (selectedOffer.discount_percent / 100)) : 1;
   const DELIVERY_FEE = 3.00;
@@ -64,6 +83,34 @@ export default function Checkout({ onClose, onBack }) {
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = ''; };
   }, []);
+
+  useEffect(() => {
+    let interval;
+    if (step === 'success' && orderId) {
+      // ✅ Set immediately to 120s so timer starts before server responds
+      setTimeRemaining(prev => prev === 0 ? 120 : prev);
+
+      const syncWithServer = async () => {
+        try {
+          const res = await fetch(`/api/order-status/${orderId}`);
+          const data = await res.json();
+          if (data.status) setOrderStatus(data.status);
+
+          // ✅ Always accept server value (covers both countdown AND admin extensions)
+          if (typeof data.seconds_left === 'number'
+              && data.status !== 'ready' && data.status !== 'completed') {
+            setTimeRemaining(data.seconds_left > 0 ? data.seconds_left : 0);
+          }
+        } catch (err) {
+          console.error('Sync Error:', err);
+        }
+      };
+
+      syncWithServer();
+      interval = setInterval(syncWithServer, 2000); // ✅ Every 2s for fast extension response
+    }
+    return () => clearInterval(interval);
+  }, [step, orderId]);
 
   useEffect(() => {
     if (step === 'success' && timeRemaining > 0) {
@@ -86,21 +133,59 @@ export default function Checkout({ onClose, onBack }) {
   function handleChange(e) {
     let { name, value } = e.target;
     if (name === 'cardNumber') value = formatCardNumber(value);
-    if (name === 'expiry')     value = formatExpiry(value);
-    if (name === 'cvc')         value = value.replace(/\D/g, '').slice(0, 4);
+    if (name === 'expiry') value = formatExpiry(value);
+    if (name === 'cvc') value = value.replace(/\D/g, '').slice(0, 4);
     setForm(f => ({ ...f, [name]: value }));
     setErrors(err => ({ ...err, [name]: '' }));
   }
 
   function validate() {
     const e = {};
-    if (!form.name.trim()) e.name = 'Name is required';
-    if (!form.email.includes('@')) e.email = 'Valid email required';
-    const rawCard = form.cardNumber.replace(/\s/g, '');
+    const safeName = (form.name || '').trim();
+    const safeEmail = (form.email || '').trim();
+    const safePhone = (form.phone || '').trim();
+
+    if (!safeName) e.name = 'Name is required';
+
+    // Email is optional
+    if (safeEmail && !safeEmail.includes('@')) {
+      e.email = 'Invalid email format';
+    }
+
+    // Phone is MANDATORY
+    if (!safePhone) {
+      e.phone = 'Phone number is required';
+    }
+
+    const rawCard = (form.cardNumber || '').replace(/\s/g, '');
     if (rawCard.length < 16) e.cardNumber = 'Enter 16 digits';
-    if (form.expiry.length < 5) e.expiry = 'MM/YY required';
-    if (form.cvc.length < 3) e.cvc = 'CVC required';
-    if (orderType === 'delivery' && !form.address.trim()) e.address = 'Delivery address is required';
+    // Expiry Validation
+    const expiryMatch = (form.expiry || '').match(/^(\d{2})\/(\d{2})$/);
+    if (!expiryMatch) {
+      e.expiry = 'Use MM/YY format';
+    } else {
+      const month = parseInt(expiryMatch[1]);
+      const year  = parseInt(expiryMatch[2]);
+      const currentYear  = new Date().getFullYear() % 100; // e.g. 26
+      const currentMonth = new Date().getMonth() + 1;
+      if (month < 1 || month > 12) {
+        e.expiry = 'Month must be 01–12';
+      } else if (year < currentYear || (year === currentYear && month < currentMonth)) {
+        e.expiry = 'Card has expired';
+      } else if (year > currentYear + 10) {
+        e.expiry = 'Invalid expiry year';
+      }
+    }
+    if ((form.cvc || '').length < 3) e.cvc = 'CVC required';
+
+    if (orderType === 'delivery') {
+      if (form.deliveryType === 'postcode' && !(form.postcode || '').trim()) {
+        e.postcode = 'Postcode is required';
+      }
+      if (form.deliveryType === 'location' && !(form.location || '').trim()) {
+        e.location = 'Please share your location';
+      }
+    }
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -111,17 +196,28 @@ export default function Checkout({ onClose, onBack }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customer_name: form.name.trim(),
-          email: form.email.trim(),
-          total_amount: finalPrice, // Sent discounted price
-          cartItems: items.map(item => ({
-            id: item.id,
-            name: item.name,
-            qty: item.qty,
-            priceNum: item.priceNum
-          })),
+          customer_name: (form.name || '').trim(),
+          email: (form.email || '').trim() || null,
+          total_amount: finalPrice,
+          cartItems: items.map(item => {
+            let finalName = item.name;
+            if (item.addons && item.addons.length > 0) {
+              const addonNames = item.addons.map(a => a.name).join(', ');
+              finalName = `${item.name} (+ ${addonNames})`;
+            }
+            return {
+              id: item.id,
+              name: finalName,
+              qty: item.qty,
+              priceNum: item.priceNum,
+              addons: item.addons || []
+            };
+          }),
           order_type: orderType,
-          delivery_address: orderType === 'delivery' ? form.address : null
+          delivery_address: orderType === 'delivery'
+            ? (form.deliveryType === 'postcode' ? `Postcode: ${form.postcode}` : `GPS: ${form.location}`)
+            : null,
+          phone: form.phone.trim() // Always send phone
         }),
       });
 
@@ -142,10 +238,10 @@ export default function Checkout({ onClose, onBack }) {
     if (!validate()) return;
 
     setStep('processing');
-    
-    await new Promise(r => setTimeout(r, 1500)); 
+
+    await new Promise(r => setTimeout(r, 1500));
     const success = await saveOrderToBackend();
-    
+
     // Submit feedback if a rating was given
     if (storeRating > 0 || storeComment.trim()) {
       await fetch('/api/feedback/general', {
@@ -158,30 +254,115 @@ export default function Checkout({ onClose, onBack }) {
         })
       });
     }
-    
+
     if (success) {
       clearCart();
       setStep('success');
+
+      // Submit feedback after success
+      if (storeRating > 0 || storeComment.trim()) {
+        fetch('/api/feedback/general', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            reviewer_name: form.name.trim() || 'Customer',
+            comment: storeComment,
+            rating: storeRating
+          })
+        }).catch(err => console.error('Feedback error:', err));
+      }
     } else {
       setStep('error');
     }
   }
 
   if (step === 'success') {
-    const minutes = Math.floor(timeRemaining / 60);
-    const seconds = timeRemaining % 60;
     return (
       <div className={styles.overlay} onClick={onClose}>
+        <div className={styles.modal} onClick={e => e.stopPropagation()} style={{ borderRadius: '30px', overflow: 'hidden' }}>
+          <div className={styles.modalBody} style={{ padding: '40px 30px', textAlign: 'center' }}>
+            
+            {(orderStatus === 'ready' || orderStatus === 'completed') ? (
+              /* LUXURY READY CARD */
+              <div className={styles.readyCard} style={{ animation: 'fadeIn 0.5s ease' }}>
+                <div className={styles.successRing}>
+                  <div className={styles.ringInner} />
+                  <div className={styles.ringOuter} />
+                  <div style={{ 
+                    width: '80px', height: '80px', borderRadius: '50%', 
+                    background: 'linear-gradient(135deg, #38ef7d 0%, #11998e 100%)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    boxShadow: '0 10px 25px rgba(56, 239, 125, 0.4)', zIndex: 2
+                  }}>
+                    <i className="fas fa-check" style={{ color: '#fff', fontSize: '2.5rem' }} />
+                  </div>
+                </div>
+                <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.5rem', color: '#2c1810', margin: '20px 0 10px', fontWeight: '900' }}>Perfectly Ready!</h2>
+                <p style={{ color: '#666', fontSize: '1.1rem', marginBottom: '30px' }}>Your exquisite order is prepared and waiting at the counter.</p>
+              </div>
+            ) : (
+              /* LUXURY COUNTDOWN CARD */
+              <div style={{ animation: 'fadeIn 0.5s ease' }}>
+                <div className={styles.successIcon} style={{
+                  margin: '0 auto 25px', width: '80px', height: '80px',
+                  backgroundColor: 'rgba(56, 239, 125, 0.1)', borderRadius: '50%',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '3rem', color: '#38ef7d', boxShadow: '0 0 30px rgba(56, 239, 125, 0.2)'
+                }}>
+                  <i className="fas fa-magic" />
+                </div>
+                <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.2rem', color: '#2c1810', marginBottom: '10px' }}>Order Placed!</h2>
+                <p style={{ color: '#888', marginBottom: '30px' }}>Your order <strong>#{orderId}</strong> is being prepared.</p>
+                
+                <div style={{ 
+                  background: '#fcf6ef', padding: '30px', borderRadius: '25px', 
+                  border: '1px solid rgba(196, 164, 132, 0.2)', marginBottom: '20px'
+                }}>
+                  <div style={{ fontSize: '3rem', fontWeight: '900', color: '#2c1810', letterSpacing: '-1px' }}>
+                    {formatTime(timeRemaining)}
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: '#c4a484', fontWeight: '800', textTransform: 'uppercase', marginTop: '5px' }}>
+                    Estimated Prep Time
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', justifyContent: 'center', marginBottom: '30px', color: '#c4a484', fontSize: '0.9rem', fontWeight: 'bold' }}>
+              <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: (orderStatus === 'ready' || orderStatus === 'completed') ? '#38ef7d' : '#f59e0b', animation: 'pulse 1.5s infinite' }} />
+              Live Status: <span style={{ color: '#2c1810' }}>{orderStatus.toUpperCase()}</span>
+            </div>
+
+            <button className="btn btn-primary" onClick={onClose} style={{
+              width: '100%', padding: '20px', borderRadius: '18px',
+              background: 'linear-gradient(135deg, #2c1810, #5a3500)', color: '#fff', border: 'none',
+              fontWeight: 'bold', fontSize: '1.1rem', cursor: 'pointer',
+              boxShadow: '0 10px 25px rgba(44, 24, 16, 0.2)'
+            }}>
+              Return to Menu
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (step === 'error') {
+    return (
+      <div className={styles.overlay} onClick={() => setStep('form')}>
         <div className={styles.modal} onClick={e => e.stopPropagation()}>
-          <div className={styles.successScreen} style={{ padding: '20px' }}>
-            <div className={styles.successIcon} style={{ margin: '0 auto 20px', fontSize: '3rem', color: 'green' }}><i className="fas fa-check-circle" /></div>
-            <h2 style={{ fontFamily: 'serif', fontSize: '2rem', color: '#2c1810', marginBottom: '10px' }}>Order placed!</h2>
-            <p>Your order is being prepared. Thank you!</p>
-            <p style={{ fontSize: '0.95rem', color: '#666', marginTop: '10px', marginBottom: '30px' }}>
-              Order <strong>#{orderId}</strong> will be ready in approximately {minutes}:{seconds.toString().padStart(2, '0')}
-            </p>
-            <button className="btn btn-olive" onClick={onClose} style={{ width: '100%', padding: '15px', borderRadius: '12px', background: '#2c1810', color: '#fff', border: 'none', fontWeight: 'bold', fontSize: '1.1rem', cursor: 'pointer' }}>
-              Back to Menu
+          <div className={styles.errorScreen} style={{ padding: '40px 20px', textAlign: 'center' }}>
+            <div style={{ fontSize: '4rem', color: '#e74a3b', marginBottom: '20px' }}>
+              <i className="fas fa-exclamation-circle" />
+            </div>
+            <h2 style={{ fontFamily: 'serif', fontSize: '2rem', color: '#2c1810', marginBottom: '10px' }}>Oops! Payment Failed</h2>
+            <p style={{ color: '#666', marginBottom: '30px' }}>Something went wrong while processing your order. Please check your details and try again.</p>
+            <button
+              className="btn btn-primary"
+              onClick={() => setStep('form')}
+              style={{ width: '100%', padding: '15px', borderRadius: '12px', background: '#2c1810', color: '#fff', border: 'none', fontWeight: 'bold', fontSize: '1.1rem', cursor: 'pointer' }}
+            >
+              Try Again
             </button>
           </div>
         </div>
@@ -209,43 +390,58 @@ export default function Checkout({ onClose, onBack }) {
           <button className={styles.closeBtn} onClick={onClose}><i className="fas fa-times" /></button>
         </div>
 
-        <div className={styles.modalBody}>
-          <div className={styles.orderSummary}>
-            <div className={styles.summaryLabel}>Order summary</div>
+        <div className={styles.modalBody} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* 1. Order Summary Section */}
+          <div className={styles.orderSummary} style={{ marginBottom: '0', padding: '20px', backgroundColor: '#fcf6ef', borderRadius: '20px', border: '1px solid rgba(196, 164, 132, 0.1)' }}>
+            <div className={styles.summaryLabel} style={{ marginBottom: '15px', color: '#2c1810', fontWeight: '900' }}>Order Summary</div>
             {items.map(item => (
-              <div key={item.id} className={styles.sumItem}>
-                <span>{item.name} × {item.qty}</span>
-                <span>{formatPrice(item.priceNum * item.qty)}</span>
+              <div key={item.id} className={styles.sumItem} style={{ marginBottom: '8px' }}>
+                <span style={{ color: '#555' }}>{item.name} × {item.qty}</span>
+                <span style={{ fontWeight: 'bold' }}>{formatPrice(item.priceNum * item.qty)}</span>
               </div>
             ))}
             
+            {/* Slim Estimated Timer */}
+            <div style={{ 
+              marginTop: '15px', padding: '12px', background: '#fff', 
+              borderRadius: '12px', border: '1px solid rgba(196, 164, 132, 0.2)',
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+            }}>
+              <div style={{ fontSize: '0.75rem', fontWeight: '800', color: '#c4a484', textTransform: 'uppercase' }}>
+                <i className="fas fa-clock" style={{ marginRight: '6px' }} /> Est. Prep Time
+              </div>
+              <div style={{ fontSize: '1.1rem', fontWeight: '900', color: '#2c1810' }}>
+                {formatTime(timeRemaining)}
+              </div>
+            </div>
+
             {selectedOffer && (
-              <div className={styles.sumItem} style={{ color: '#c4a484', fontWeight: 'bold' }}>
+              <div className={styles.sumItem} style={{ color: '#c4a484', fontWeight: 'bold', marginTop: '10px' }}>
                 <span>Discount ({selectedOffer.discount_percent}%)</span>
                 <span>-{formatPrice(totalPrice * (selectedOffer.discount_percent / 100))}</span>
               </div>
             )}
 
             {orderType === 'delivery' && (
-              <div className={styles.sumItem}>
+              <div className={styles.sumItem} style={{ marginTop: '5px' }}>
                 <span>Delivery Fee</span>
                 <span>{formatPrice(DELIVERY_FEE)}</span>
               </div>
             )}
 
-            <div className={styles.sumTotal}>
-              <span>Total</span>
-              <span className={styles.sumTotalAmt}>{formatPrice(finalPrice)}</span>
+            <div className={styles.sumTotal} style={{ marginTop: '15px', borderTop: '1px dashed #c4a484', paddingTop: '15px' }}>
+              <span style={{ fontWeight: 'bold', color: '#2c1810' }}>Total</span>
+              <span className={styles.sumTotalAmt} style={{ color: '#c4a484' }}>{formatPrice(finalPrice)}</span>
             </div>
           </div>
 
-          <form className={styles.form} onSubmit={handleSubmit} noValidate>
-            
+          <form className={styles.form} onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
             {/* Order Type Selection */}
             <div className={styles.formSection} style={{ backgroundColor: '#fff', padding: '25px', borderRadius: '20px', border: '1px solid #eee', marginBottom: '25px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
               <label className={styles.label} style={{ fontSize: '1.2rem', color: '#2c1810', marginBottom: '20px', display: 'block', fontWeight: '800', fontFamily: "'DM Serif Display', serif", textAlign: 'center' }}>How would you like to receive your order?</label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
-                <div 
+                <div
                   onClick={() => setOrderType('dine-in')}
                   style={{
                     padding: '20px 10px', textAlign: 'center', borderRadius: '16px', cursor: 'pointer', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -260,7 +456,7 @@ export default function Checkout({ onClose, onBack }) {
                   <div style={{ fontSize: '0.75rem', color: '#999', marginTop: '6px', fontWeight: '500' }}>Enjoy at Cafe</div>
                 </div>
 
-                <div 
+                <div
                   onClick={() => setOrderType('takeaway')}
                   style={{
                     padding: '20px 10px', textAlign: 'center', borderRadius: '16px', cursor: 'pointer', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -275,7 +471,7 @@ export default function Checkout({ onClose, onBack }) {
                   <div style={{ fontSize: '0.75rem', color: '#999', marginTop: '6px', fontWeight: '500' }}>Grab & Go</div>
                 </div>
 
-                <div 
+                <div
                   onClick={() => setOrderType('delivery')}
                   style={{
                     padding: '20px 10px', textAlign: 'center', borderRadius: '16px', cursor: 'pointer', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -292,22 +488,101 @@ export default function Checkout({ onClose, onBack }) {
               </div>
 
               {orderType === 'delivery' && (
-                <div style={{ marginTop: '25px', padding: '20px', backgroundColor: '#fdfdfd', borderRadius: '12px', border: '1px solid rgba(196,164,132,0.4)', animation: 'fadeIn 0.4s ease' }}>
-                  <label className={styles.label} style={{ color: '#2c1810', fontWeight: '700' }}>Delivery Address</label>
-                  <input name="address" value={form.address} onChange={handleChange} className={styles.input} placeholder="123 Coffee Street, London" style={{ borderColor: errors.address ? 'red' : '#e0e0e0', marginTop: '8px' }} />
-                  {errors.address && <p className={styles.errorMsg} style={{ marginTop: '5px' }}>{errors.address}</p>}
+                <div style={{ marginTop: '25px', padding: '25px', backgroundColor: '#fff', borderRadius: '18px', border: '1px solid rgba(196,164,132,0.3)', boxShadow: '0 8px 30px rgba(0,0,0,0.04)', animation: 'fadeIn 0.4s ease' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                    <h4 style={{ margin: 0, color: '#2c1810', fontSize: '1rem', fontWeight: '800' }}>DELIVERY DETAILS</h4>
+                    <span style={{ fontSize: '0.7rem', color: '#c4a484', fontWeight: 'bold', background: 'rgba(196,164,132,0.1)', padding: '4px 10px', borderRadius: '20px' }}>REQUIRED</span>
+                  </div>
+
+
+                  <label className={styles.label} style={{ color: '#2c1810', fontWeight: '700', fontSize: '0.9rem', marginBottom: '12px', display: 'block' }}>How should we find you?</label>
+
+                  {/* Delivery Type Selector (Premium Segment Control) */}
+                  <div style={{ display: 'flex', background: '#f8f9fa', padding: '5px', borderRadius: '12px', marginBottom: '20px' }}>
+                    <button
+                      type="button"
+                      onClick={() => setForm(f => ({ ...f, deliveryType: 'postcode' }))}
+                      style={{
+                        flex: 1, padding: '10px', border: 'none', borderRadius: '8px', cursor: 'pointer', transition: '0.3s',
+                        backgroundColor: form.deliveryType === 'postcode' ? '#fff' : 'transparent',
+                        color: form.deliveryType === 'postcode' ? '#2c1810' : '#888',
+                        fontWeight: '700', fontSize: '0.85rem',
+                        boxShadow: form.deliveryType === 'postcode' ? '0 4px 10px rgba(0,0,0,0.05)' : 'none'
+                      }}
+                    >
+                      Postcode
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setForm(f => ({ ...f, deliveryType: 'location' }))}
+                      style={{
+                        flex: 1, padding: '10px', border: 'none', borderRadius: '8px', cursor: 'pointer', transition: '0.3s',
+                        backgroundColor: form.deliveryType === 'location' ? '#fff' : 'transparent',
+                        color: form.deliveryType === 'location' ? '#2c1810' : '#888',
+                        fontWeight: '700', fontSize: '0.85rem',
+                        boxShadow: form.deliveryType === 'location' ? '0 4px 10px rgba(0,0,0,0.05)' : 'none'
+                      }}
+                    >
+                      Live Location
+                    </button>
+                  </div>
+
+                  {form.deliveryType === 'postcode' ? (
+                    <div style={{ animation: 'fadeIn 0.3s ease' }}>
+                      <input
+                        name="postcode"
+                        value={form.postcode}
+                        onChange={handleChange}
+                        className={styles.input}
+                        placeholder="Enter Postcode (e.g. B2 4HD)"
+                        style={{ borderColor: errors.postcode ? 'red' : '#eee' }}
+                      />
+                      {errors.postcode && <p className={styles.errorMsg} style={{ marginTop: '5px' }}>{errors.postcode}</p>}
+                    </div>
+                  ) : (
+                    <div style={{ animation: 'fadeIn 0.3s ease' }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (navigator.geolocation) {
+                            setForm(f => ({ ...f, location: 'Locating...' }));
+                            navigator.geolocation.getCurrentPosition((pos) => {
+                              setForm(f => ({ ...f, location: `${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}` }));
+                            }, (err) => {
+                              alert("Could not get location. Please enter postcode instead.");
+                              setForm(f => ({ ...f, deliveryType: 'postcode', location: '' }));
+                            });
+                          }
+                        }}
+                        style={{
+                          width: '100%', padding: '15px', borderRadius: '12px', border: '1px dashed #c4a484',
+                          background: 'rgba(196,164,132,0.05)', color: '#2c1810', cursor: 'pointer',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', fontWeight: '700'
+                        }}
+                      >
+                        <i className="fas fa-map-marker-alt" style={{ color: '#c4a484' }} />
+                        {form.location || 'Share My GPS Location'}
+                      </button>
+                      {errors.location && <p className={styles.errorMsg} style={{ marginTop: '5px' }}>{errors.location}</p>}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
 
             <div className={styles.formSection}>
               <div className={styles.field}>
-                <label className={styles.label}>Full name</label>
-                <input name="name" value={form.name} onChange={handleChange} className={styles.input} placeholder="John Britain" />
+                <label className={styles.label}>Full Name <span style={{ color: 'red' }}>*</span></label>
+                <input name="name" value={form.name} onChange={handleChange} className={styles.input} placeholder="e.g. John Doe" />
                 {errors.name && <p className={styles.errorMsg}>{errors.name}</p>}
               </div>
               <div className={styles.field}>
-                <label className={styles.label}>Email</label>
+                <label className={styles.label}>Phone Number <span style={{ color: 'red' }}>*</span></label>
+                <input name="phone" value={form.phone} onChange={handleChange} className={styles.input} placeholder="e.g. 07123 456789" />
+                {errors.phone && <p className={styles.errorMsg}>{errors.phone}</p>}
+              </div>
+              <div className={styles.field}>
+                <label className={styles.label}>Email <span style={{ fontSize: '0.7rem', color: '#888' }}>(Optional - for offers)</span></label>
                 <input name="email" type="email" value={form.email} onChange={handleChange} className={styles.input} placeholder="john@email.com" />
                 {errors.email && <p className={styles.errorMsg}>{errors.email}</p>}
               </div>
@@ -322,7 +597,8 @@ export default function Checkout({ onClose, onBack }) {
               <div className={styles.fieldRow}>
                 <div className={styles.field}>
                   <label className={styles.label}>Expiry</label>
-                  <input name="expiry" value={form.expiry} onChange={handleChange} className={styles.input} placeholder="MM/YY" />
+                  <input name="expiry" value={form.expiry} onChange={handleChange} className={styles.input} placeholder="MM / YY" />
+                  {errors.expiry && <p className={styles.errorMsg}>{errors.expiry}</p>}
                 </div>
                 <div className={styles.field}>
                   <label className={styles.label}>CVC</label>
@@ -334,9 +610,9 @@ export default function Checkout({ onClose, onBack }) {
             {/* Smart Offers Section */}
             <div className={styles.formSection} style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '16px', border: '1px solid #eee' }}>
               <label className={styles.label} style={{ fontSize: '1.1rem', color: '#2c1810', marginBottom: '10px' }}>Select Customer Category</label>
-              <select 
-                className={styles.input} 
-                value={customerType} 
+              <select
+                className={styles.input}
+                value={customerType}
                 onChange={e => { setCustomerType(e.target.value); setSelectedOffer(null); }}
                 style={{ backgroundColor: '#f9f9f9', cursor: 'pointer' }}
               >
@@ -345,21 +621,21 @@ export default function Checkout({ onClose, onBack }) {
                 <option value="Employee">Faculty / Employee</option>
               </select>
 
-              {applicableOffers.length > 0 && (
+              {offers.length > 0 && (
                 <div style={{ marginTop: '20px' }}>
                   <label className={styles.label} style={{ color: '#c4a484', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <i className="fas fa-tags" /> Available Offers For You!
                   </label>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
-                    {applicableOffers.map(offer => (
-                      <div 
-                        key={offer.id} 
-                        onClick={() => setSelectedOffer(selectedOffer?.id === offer.id ? null : offer)}
-                        style={{ 
-                          padding: '15px', 
-                          border: selectedOffer?.id === offer.id ? '2px solid #c4a484' : '1px solid #e0e0e0', 
-                          borderRadius: '12px', 
-                          cursor: 'pointer', 
+                    {offers.map(offer => (
+                      <div
+                        key={offer.id}
+                        onClick={() => handleOfferClick(offer)}
+                        style={{
+                          padding: '15px',
+                          border: selectedOffer?.id === offer.id ? '2px solid #c4a484' : '1px solid #e0e0e0',
+                          borderRadius: '12px',
+                          cursor: 'pointer',
                           backgroundColor: selectedOffer?.id === offer.id ? 'rgba(196,164,132,0.1)' : '#fdfdfd',
                           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                           transition: 'all 0.2s ease'
@@ -384,15 +660,15 @@ export default function Checkout({ onClose, onBack }) {
               <h4 style={{ margin: '0 0 10px 0', color: '#2c1810', fontFamily: 'serif', fontSize: '1.2rem' }}>How was your experience?</h4>
               <div style={{ display: 'flex', gap: '8px', fontSize: '1.5rem', marginBottom: '15px' }}>
                 {[1, 2, 3, 4, 5].map(star => (
-                  <i 
-                    key={star} 
+                  <i
+                    key={star}
                     className={`fas fa-star`}
                     style={{ color: star <= storeRating ? '#FFD700' : '#ccc', cursor: 'pointer', transition: '0.2s' }}
                     onClick={() => setStoreRating(star)}
                   />
                 ))}
               </div>
-              <textarea 
+              <textarea
                 placeholder="Leave an order note or general feedback..."
                 value={storeComment}
                 onChange={(e) => setStoreComment(e.target.value)}
@@ -400,10 +676,46 @@ export default function Checkout({ onClose, onBack }) {
               />
             </div>
 
-            <button type="submit" className={`btn btn-primary ${styles.payBtn}`}>
-              Pay {formatPrice(finalPrice)}
-              {selectedOffer && <span style={{ fontSize: '0.85rem', opacity: 0.9, marginLeft: '8px', fontWeight: 'normal' }}>(Discount Applied)</span>}
+            <button type="submit" className={`btn btn-primary ${styles.payBtn}`} style={{
+              background: 'linear-gradient(135deg, #2c1810, #5a3500)',
+              padding: '20px',
+              borderRadius: '15px',
+              fontSize: '1.2rem',
+              fontWeight: '800',
+              boxShadow: '0 10px 25px rgba(44, 24, 16, 0.3)',
+              border: 'none',
+              cursor: 'pointer',
+              color: '#fff',
+              width: '100%',
+              transition: 'all 0.3s'
+            }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+            >
+              Confirm & Pay {formatPrice(finalPrice)}
+              {selectedOffer && <span style={{ fontSize: '0.85rem', opacity: 0.9, marginLeft: '8px', fontWeight: 'normal' }}>(Offer Applied)</span>}
             </button>
+
+            {/* Security Badges */}
+            <div style={{
+              marginTop: '25px',
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '20px',
+              opacity: 0.6,
+              borderTop: '1px solid #eee',
+              paddingTop: '20px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.75rem', fontWeight: 'bold', color: '#666' }}>
+                <i className="fas fa-lock" style={{ color: '#38ef7d' }} /> SSL SECURE
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.75rem', fontWeight: 'bold', color: '#666' }}>
+                <i className="fas fa-shield-alt" style={{ color: '#4facfe' }} /> ENCRYPTED
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.75rem', fontWeight: 'bold', color: '#666' }}>
+                <i className="fas fa-check-circle" style={{ color: '#c4a484' }} /> VERIFIED
+              </div>
+            </div>
           </form>
         </div>
       </div>

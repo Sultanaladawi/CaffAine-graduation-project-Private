@@ -23,24 +23,24 @@ export default function Footer() {
             </div>
           </a>
           <p className={styles.brandDesc}>
-            Independent specialty coffee at 14 Piccadilly Arcade, Birmingham.
-            Brewed with care. Always welcoming.
+            Independent specialty coffee located in the heart of Birmingham. 
+            Crafting moments of perfection in every cup since 2014.
           </p>
           <div className={styles.socialGroup}>
-            <a href="https://www.instagram.com/faculty.coffee/" target="_blank" rel="noopener noreferrer" className={styles.socialIcon} aria-label="Instagram">
+            <a href="https://www.instagram.com/faculty.coffee/" target="_blank" rel="noopener noreferrer" className={styles.socialIcon}>
               <i className="fab fa-instagram" />
             </a>
-            <a href="https://www.facebook.com/facultycoffee" target="_blank" rel="noopener noreferrer" className={styles.socialIcon} aria-label="Facebook">
+            <a href="https://www.facebook.com/facultycoffee" target="_blank" rel="noopener noreferrer" className={styles.socialIcon}>
               <i className="fab fa-facebook-f" />
             </a>
-            <a href="https://twitter.com/facultycoffee" target="_blank" rel="noopener noreferrer" className={styles.socialIcon} aria-label="Twitter">
+            <a href="https://twitter.com/facultycoffee" target="_blank" rel="noopener noreferrer" className={styles.socialIcon}>
               <i className="fab fa-twitter" />
             </a>
           </div>
         </div>
 
         <div className={styles.col}>
-          <h4>Opening Hours</h4>
+          <h4>Open Hours</h4>
           <ul>
             {openingHours.map(({ day, open, close }) => (
               <li key={day} className={styles.hoursRow}>
@@ -61,15 +61,21 @@ export default function Footer() {
         </div>
 
         <div className={styles.col}>
-          <h4>Visit Us</h4>
-          <a
-            href={shopInfo.mapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.address}
-          >
+          <h4>Find Us</h4>
+          <div className={styles.mapContainer}>
+            <iframe 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2429.932454522434!2d-1.9009841233159392!3d52.47941013995899!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4870bc8eb488950d%3A0xe5432d561d50c765!2sFaculty%20Coffee!5e0!3m2!1sen!2suk!4v1714838400000!5m2!1sen!2suk" 
+              width="100%" 
+              height="100%" 
+              style={{ border: 0 }} 
+              allowFullScreen="" 
+              loading="lazy" 
+              referrerPolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
+          <a href={shopInfo.mapsUrl} target="_blank" rel="noopener noreferrer" className={styles.address}>
             <i className="fas fa-map-marker-alt" />
-            <span>{shopInfo.address}<br />{shopInfo.city}<br />{shopInfo.country}</span>
+            <span>{shopInfo.address}, {shopInfo.city}</span>
           </a>
           <a href={`mailto:${shopInfo.email}`} className={styles.emailLink}>
             <i className="fas fa-envelope" /> {shopInfo.email}
@@ -78,18 +84,8 @@ export default function Footer() {
       </div>
 
       <div className={styles.bottom}>
-        <span>© {new Date().getFullYear()} Faculty Coffee. All rights reserved.</span>
-        <div className={styles.socialGroupBottom}>
-          <a href="https://www.instagram.com/faculty.coffee/" target="_blank" rel="noopener noreferrer" className={styles.socialIconBottom}>
-            <i className="fab fa-instagram" />
-          </a>
-          <a href="https://www.facebook.com/facultycoffee" target="_blank" rel="noopener noreferrer" className={styles.socialIconBottom}>
-            <i className="fab fa-facebook-f" />
-          </a>
-          <a href="https://twitter.com/facultycoffee" target="_blank" rel="noopener noreferrer" className={styles.socialIconBottom}>
-            <i className="fab fa-twitter" />
-          </a>
-        </div>
+        <span>© {new Date().getFullYear()} Faculty Coffee. Crafted with Passion.</span>
+        <span>Independent & Locally Roasted.</span>
       </div>
     </footer>
   );

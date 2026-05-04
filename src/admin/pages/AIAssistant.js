@@ -84,28 +84,53 @@ const AIAssistant = () => {
   };
 
   return (
-    <div style={{ backgroundColor: theme.espresso, minHeight: '80vh', padding: '30px', display: 'flex', gap: '25px', borderRadius: '20px' }}>
+    <div className="dashboard-fade-in" style={{ 
+      color: theme.latte, 
+      backgroundColor: theme.espresso, 
+      minHeight: '100vh', 
+      padding: '40px 10px 40px 5px',
+      position: 'relative',
+      display: 'flex', gap: '25px'
+    }}>
+      {/* Premium Background Elements */}
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: `radial-gradient(circle at 50% -20%, #2a1b10 0%, #070504 70%)` }} />
+        <div className="orb orb-1" />
+        <div className="orb orb-2" />
+      </div>
+      <style>{`
+        .orb { position: absolute; border-radius: 50%; filter: blur(100px); z-index: 0; opacity: 0.05; animation: float 25s infinite alternate ease-in-out; }
+        .orb-1 { width: 600px; height: 600px; background: ${theme.crema}; top: -200px; right: -100px; }
+        .orb-2 { width: 500px; height: 500px; background: #2a1b10; bottom: -100px; left: -100px; }
+        @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 50px) scale(1.1); } }
+        .page-badge { background: #1b130e; border: 1px solid ${theme.border}; padding: 12px 25px; border-radius: 18px; display: inline-flex; align-items: center; gap: 12px; margin: 20px 0; }
+        .page-badge span { font-family: 'Inter', sans-serif; font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: -0.5px; }
+        /* Premium Row Hover Animation */
+        .premium-row {
+          transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+          cursor: pointer;
+        }
+        .premium-row:hover {
+          background-color: rgba(196, 164, 132, 0.12) !important;
+          transform: translateY(-2px) scale(1.005);
+          box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+          position: relative;
+          z-index: 10;
+        }
+      `}</style>
       
-      <div style={{ flex: 2, display: 'flex', flexDirection: 'column' }}>
-        <header style={{ borderBottom: `1px solid ${theme.border}`, paddingBottom: '20px', marginBottom: '25px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ position: 'relative', zIndex: 1, flex: 2, display: 'flex', flexDirection: 'column' }}>
+        <header style={{ borderBottom: `1px dashed ${theme.border}`, paddingBottom: '20px', marginBottom: '25px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            <div style={{ 
-              fontFamily: "'DM Serif Display', serif", 
-              fontSize: '1.8rem', 
-              color: theme.crema, 
-              lineHeight: '1',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '5px',
-              marginBottom: '15px'
-            }}>
-              Faculty<span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
+            <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: theme.crema, lineHeight: 1 }}>
+              Faculty <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
             </div>
-            <h1 style={{ color: '#fff', margin: 0, display: 'flex', alignItems: 'center', gap: '15px', fontSize: '1.8rem', fontWeight: '800', fontFamily: "'DM Serif Display', serif" }}>
-              <BrainCircuit color={theme.crema} size={32} /> AI Intelligence
-            </h1>
-            <p style={{ color: theme.crema, fontSize: '0.8rem', margin: '5px 0 0', letterSpacing: '1px', textTransform: 'uppercase', fontWeight: 'bold' }}>
-              Real-time Business Analysis
+            <div className="page-badge">
+              <BrainCircuit size={28} color={theme.crema} />
+              <span>AI Intelligence</span>
+            </div>
+            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '1rem', fontWeight: 500, marginTop: '5px' }}>
+              Faculty Coffee | Real-time Business Analytics & Data Insights
             </p>
           </div>
           <button onClick={() => setMessages([])} style={{ background: 'transparent', border: `1px solid ${theme.border}`, color: '#666', padding: '8px 18px', borderRadius: '10px', cursor: 'pointer' }}>
@@ -145,7 +170,7 @@ const AIAssistant = () => {
         </div>
       </div>
 
-      <div style={{ flex: 1, background: theme.bean, borderRadius: '20px', border: `1px solid ${theme.border}`, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div style={{ position: 'relative', zIndex: 1, flex: 1, background: 'rgba(255,255,255,0.02)', borderRadius: '20px', border: `1px solid rgba(255,255,255,0.06)`, backdropFilter: 'blur(10px)', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.4)' }}>
         <div style={{ padding: '20px', borderBottom: `1px solid ${theme.border}`, background: 'rgba(255,255,255,0.02)' }}>
           <h3 style={{ color: theme.crema, margin: 0, fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Customer Queries</h3>
           <p style={{ color: theme.latte, fontSize: '0.7rem', margin: '5px 0 0', opacity: 0.7 }}>Live logs from Client Chatbot</p>
@@ -155,7 +180,7 @@ const AIAssistant = () => {
             <div style={{ color: '#444', textAlign: 'center', marginTop: '50px', fontSize: '0.9rem' }}>No recent inquiries</div>
           ) : (
             customerQueries.map(q => (
-              <div key={q.id} style={{ padding: '15px', background: theme.espresso, borderRadius: '12px', border: `1px solid ${theme.border}` }}>
+              <div key={q.id} className="premium-row" style={{ padding: '15px', background: 'rgba(0,0,0,0.3)', borderRadius: '12px', border: `1px solid ${theme.border}` }}>
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '8px' }}>
                   <div style={{ background: theme.border, width: '24px', height: '24px', borderRadius: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <BsPerson size={14} color={theme.crema} />

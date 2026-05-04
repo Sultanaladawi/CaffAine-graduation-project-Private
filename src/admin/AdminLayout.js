@@ -3,8 +3,8 @@ import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useAdminContext } from './AdminContext';
 import { useStore } from '../context/StoreContext';
-import { 
-  LayoutGrid, ShoppingBag, ShoppingCart, Box, 
+import {
+  LayoutGrid, ShoppingBag, ShoppingCart, Box,
   BarChart3, MessageSquare, BotMessageSquare, LogOut, User, Coffee,
   FileText, MessagesSquare, Volume2, VolumeX, Briefcase, BellRing,
   Power, Store, Mail
@@ -26,7 +26,7 @@ const AdminLayout = () => {
         const res = await axios.get('/api/dashboard-stats');
         const data = res.data?.data || res.data;
         const count = data?.lowStock || 0;
-        
+
         if (count > 0 && count > lastLowStockCount.current) {
           setShowAudioBtn(true);
           if (audioRef.current) {
@@ -34,9 +34,9 @@ const AdminLayout = () => {
           }
         }
         lastLowStockCount.current = count;
-      } catch (err) {}
+      } catch (err) { }
     };
-    
+
     checkStock();
     const interval = setInterval(checkStock, 10000); // Check every 10 seconds for real-time feel
     return () => clearInterval(interval);
@@ -50,7 +50,7 @@ const AdminLayout = () => {
     }
   };
   useEffect(() => {
-    document.documentElement.style.zoom = "90%"; 
+    document.documentElement.style.zoom = "90%";
     document.body.style.backgroundColor = "var(--admin-bg)";
     document.documentElement.style.backgroundColor = "var(--admin-bg)";
 
@@ -82,38 +82,38 @@ const AdminLayout = () => {
   ];
 
   return (
-    <div style={{ 
-      display: 'flex', 
-      minHeight: '100vh', 
+    <div style={{
+      display: 'flex',
+      minHeight: '100vh',
       width: '100%',
-      backgroundColor: 'var(--admin-bg)', 
+      backgroundColor: 'var(--admin-bg)',
       fontFamily: "'Inter', sans-serif",
       margin: 0, padding: 0
     }}>
-      <div style={{ 
-        width: '260px', backgroundColor: 'var(--admin-card)', position: 'fixed', 
-        height: '100vh', borderRight: '1px solid var(--admin-border)', zIndex: 1000, 
+      <div style={{
+        width: '260px', backgroundColor: 'var(--admin-card)', position: 'fixed',
+        height: '100vh', borderRight: '1px solid var(--admin-border)', zIndex: 1000,
         display: 'flex', flexDirection: 'column', boxShadow: '4px 0 15px rgba(0,0,0,0.4)'
       }}>
         <div style={{ padding: '30px 20px', textAlign: 'center' }}>
           <div style={{ color: 'var(--admin-accent)', marginBottom: '12px', display: 'flex', justifyContent: 'center' }}>
             <Coffee size={36} />
           </div>
-          <h1 style={{ 
-            margin: 0, fontSize: '1.1rem', color: '#fff', fontWeight: '900', 
+          <h1 style={{
+            margin: 0, fontSize: '1.1rem', color: '#fff', fontWeight: '900',
             letterSpacing: '2px', textTransform: 'uppercase', fontFamily: "'DM Serif Display', serif"
           }}>
             Faculty <span style={{ color: 'var(--admin-accent)' }}>Coffee</span>
           </h1>
         </div>
-        
+
         <nav style={{ marginTop: '20px', flexGrow: 1, overflowY: 'auto', paddingBottom: '20px' }}>
           {menuItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
-              <Link key={item.path} to={item.path} style={{ 
-                display: 'flex', alignItems: 'center', gap: '14px', padding: '15px 25px', 
-                color: isActive ? '#fff' : 'var(--admin-text)', 
+              <Link key={item.path} to={item.path} style={{
+                display: 'flex', alignItems: 'center', gap: '14px', padding: '15px 25px',
+                color: isActive ? '#fff' : 'var(--admin-text)',
                 textDecoration: 'none',
                 backgroundColor: isActive ? 'rgba(196, 164, 132, 0.12)' : 'transparent',
                 borderLeft: isActive ? '4px solid var(--admin-accent)' : '4px solid transparent',
@@ -129,9 +129,9 @@ const AdminLayout = () => {
         </nav>
 
         <div style={{ padding: '25px', borderTop: '1px solid var(--admin-border)' }}>
-          <button onClick={handleLogout} style={{ 
-            display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--admin-accent)', 
-            cursor: 'pointer', border: 'none', backgroundColor: 'transparent', 
+          <button onClick={handleLogout} style={{
+            display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--admin-accent)',
+            cursor: 'pointer', border: 'none', backgroundColor: 'transparent',
             fontSize: '0.9rem', fontWeight: '700', width: '100%', transition: '0.3s'
           }}>
             <LogOut size={18} /> Logout Session
@@ -139,25 +139,25 @@ const AdminLayout = () => {
         </div>
       </div>
 
-      <div style={{ 
-        marginLeft: '260px', flex: 1, display: 'flex', flexDirection: 'column', 
-        minHeight: '100vh', backgroundColor: 'var(--admin-bg)' 
+      <div style={{
+        marginLeft: '260px', flex: 1, display: 'flex', flexDirection: 'column',
+        minHeight: '100vh', backgroundColor: 'var(--admin-bg)'
       }}>
-        <header style={{ 
-          height: '80px', backgroundColor: 'var(--admin-card)', borderBottom: '1px solid var(--admin-border)', 
-          display: 'flex', alignItems: 'center', justifyContent: 'flex-end', 
+        <header style={{
+          height: '80px', backgroundColor: 'var(--admin-card)', borderBottom: '1px solid var(--admin-border)',
+          display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
           padding: '0 40px', position: 'sticky', top: 0, zIndex: 999, gap: '20px'
         }}>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
             <audio ref={audioRef} src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" loop preload="auto" />
-            
+
             {showAudioBtn && (
-              <button 
+              <button
                 onClick={handleStopAudio}
-                style={{ 
-                  backgroundColor: '#ff4d4d', color: '#fff', border: '1px solid rgba(255, 77, 77, 0.5)', 
-                  padding: '6px 14px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '8px', 
+                style={{
+                  backgroundColor: '#ff4d4d', color: '#fff', border: '1px solid rgba(255, 77, 77, 0.5)',
+                  padding: '6px 14px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '8px',
                   cursor: 'pointer', boxShadow: '0 0 15px rgba(255, 77, 77, 0.4)', animation: 'alarmPulse 1s infinite',
                   fontWeight: '800', fontSize: '0.75rem', letterSpacing: '0.5px'
                 }}
@@ -167,45 +167,45 @@ const AdminLayout = () => {
             )}
 
             {/* Store Status Toggle Button - 3 States */}
-            <button 
+            <button
               onClick={toggleStatus}
               style={{
                 display: 'flex', alignItems: 'center', gap: '10px',
-                padding: '8px 18px', 
-                backgroundColor: manualStatus === 'auto' ? 'rgba(56, 239, 125, 0.1)' : 
-                               manualStatus === 'open' ? 'rgba(196, 164, 132, 0.15)' : 'rgba(255, 77, 77, 0.1)',
-                borderRadius: '25px', 
-                border: manualStatus === 'auto' ? '1px solid rgba(56, 239, 125, 0.3)' : 
-                        manualStatus === 'open' ? '1px solid var(--admin-accent)' : '1px solid rgba(255, 77, 77, 0.3)',
+                padding: '8px 18px',
+                backgroundColor: manualStatus === 'auto' ? 'rgba(56, 239, 125, 0.1)' :
+                  manualStatus === 'open' ? 'rgba(196, 164, 132, 0.15)' : 'rgba(255, 77, 77, 0.1)',
+                borderRadius: '25px',
+                border: manualStatus === 'auto' ? '1px solid rgba(56, 239, 125, 0.3)' :
+                  manualStatus === 'open' ? '1px solid var(--admin-accent)' : '1px solid rgba(255, 77, 77, 0.3)',
                 cursor: 'pointer',
                 transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                 boxShadow: '0 0 15px rgba(0,0,0,0.2)',
                 position: 'relative',
               }}
             >
-              <div style={{ 
-                width: '10px', height: '10px', borderRadius: '50%', 
-                backgroundColor: manualStatus === 'auto' ? '#38ef7d' : 
-                                manualStatus === 'open' ? 'var(--admin-accent)' : '#ff4d4d', 
+              <div style={{
+                width: '10px', height: '10px', borderRadius: '50%',
+                backgroundColor: manualStatus === 'auto' ? '#38ef7d' :
+                  manualStatus === 'open' ? 'var(--admin-accent)' : '#ff4d4d',
                 boxShadow: `0 0 12px ${manualStatus === 'auto' ? '#38ef7d' : manualStatus === 'open' ? 'var(--admin-accent)' : '#ff4d4d'}`,
                 animation: manualStatus === 'closed' ? 'alarmPulse 1.5s infinite' : 'none'
               }}></div>
-              <span style={{ 
-                color: manualStatus === 'auto' ? '#38ef7d' : 
-                       manualStatus === 'open' ? 'var(--admin-accent)' : '#ff4d4d', 
+              <span style={{
+                color: manualStatus === 'auto' ? '#38ef7d' :
+                  manualStatus === 'open' ? 'var(--admin-accent)' : '#ff4d4d',
                 fontSize: '0.8rem', fontWeight: '900', letterSpacing: '1.2px',
                 textTransform: 'uppercase',
                 display: 'flex', alignItems: 'center', gap: '6px'
               }}>
-                {manualStatus === 'auto' ? <><Store size={14} /> Auto (Open)</> : 
-                 manualStatus === 'open' ? <><Coffee size={14} /> Manual Open</> : 
-                 <><Power size={14} /> Manual Closed</>}
+                {manualStatus === 'auto' ? <><Store size={14} /> Auto (Open)</> :
+                  manualStatus === 'open' ? <><Coffee size={14} /> Manual Open</> :
+                    <><Power size={14} /> Manual Closed</>}
               </span>
             </button>
 
             {/* Admin Profile Details */}
-            <div style={{ 
-              display: 'flex', alignItems: 'center', gap: '15px', 
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '15px',
               backgroundColor: 'var(--admin-bg)', padding: '6px 18px', borderRadius: '12px',
               border: '1px solid var(--admin-border)',
               boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
@@ -216,10 +216,10 @@ const AdminLayout = () => {
                   {admin?.role || 'System Admin'}
                 </p>
               </div>
-              <div style={{ 
-                width: '42px', height: '42px', borderRadius: '10px', 
-                background: 'linear-gradient(135deg, var(--admin-accent) 0%, #a47c4f 100%)', 
-                display: 'flex', alignItems: 'center', 
+              <div style={{
+                width: '42px', height: '42px', borderRadius: '10px',
+                background: 'linear-gradient(135deg, var(--admin-accent) 0%, #a47c4f 100%)',
+                display: 'flex', alignItems: 'center',
                 justifyContent: 'center', color: 'var(--admin-bg)',
                 boxShadow: '0 0 15px rgba(196, 164, 132, 0.2)'
               }}>

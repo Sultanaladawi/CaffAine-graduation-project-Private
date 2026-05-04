@@ -182,7 +182,26 @@ const Inventory = () => {
   };
 
   return (
-    <div className="dashboard-fade-in" style={{ color: colors.latte, backgroundColor: colors.espresso, minHeight: '100vh', padding: '30px' }}>
+    <div className="dashboard-fade-in" style={{ 
+      color: colors.latte, 
+      backgroundColor: colors.espresso, 
+      minHeight: '100vh', 
+      padding: '40px 10px 40px 5px',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      {/* Premium Background Elements */}
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: `radial-gradient(circle at 50% -20%, #2a1b10 0%, #070504 70%)`, zIndex: 0 }} />
+      <div className="orb orb-1" />
+      <div className="orb orb-2" />
+      <style>{`
+        .orb { position: absolute; border-radius: 50%; filter: blur(100px); z-index: 0; opacity: 0.05; animation: float 25s infinite alternate ease-in-out; }
+        .orb-1 { width: 600px; height: 600px; background: ${colors.crema}; top: -200px; right: -100px; }
+        .orb-2 { width: 500px; height: 500px; background: #2a1b10; bottom: -100px; left: -100px; }
+        @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 50px) scale(1.1); } }
+        .page-badge { background: #1b130e; border: 1px solid ${colors.border}; padding: 12px 25px; border-radius: 18px; display: inline-flex; align-items: center; gap: 12px; margin: 20px 0; }
+        .page-badge span { font-family: 'Inter', sans-serif; font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: -0.5px; }
+      `}</style>
       {showModal && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', backdropFilter: 'blur(5px)' }}>
           <div style={{ backgroundColor: colors.bean, width: '100%', maxWidth: '500px', borderRadius: '30px', border: `1px solid ${colors.border}`, padding: '40px', position: 'relative', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}>
@@ -245,27 +264,28 @@ const Inventory = () => {
         </div>
       )}
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
+      <div style={{ 
+        position: 'relative',
+        zIndex: 1,
+        width: '100%', 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'flex-start', 
+        marginBottom: '40px'
+      }}>
         <div>
-          <div style={{ 
-            fontFamily: "'DM Serif Display', serif", 
-            fontSize: '1.8rem', 
-            color: colors.crema, 
-            lineHeight: '1',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px',
-            marginBottom: '15px'
-          }}>
-            Faculty<span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
+          <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: colors.crema, lineHeight: 1 }}>
+            Faculty <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
           </div>
-          <div style={headerBoxStyle}>
-            <h2 style={{ display: 'flex', alignItems: 'center', gap: '15px', margin: 0, ...headerTextStyle }}>
-              <Coffee size={32} color={colors.crema} /> 
-              Inventory Tracking
-            </h2>
+
+          <div className="page-badge">
+            <Coffee size={28} color={colors.crema} />
+            <span>Inventory Management</span>
           </div>
-          <p style={{ color: colors.crema, marginTop: '12px', opacity: 0.8 }}>Real-time stock monitoring and resource management.</p>
+
+          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '1rem', fontWeight: 500, marginTop: '5px' }}>
+            Faculty Coffee | Raw Materials & Stock Level Management
+          </p>
         </div>
         <div style={{ display: 'flex', gap: '15px' }}>
           <button 
@@ -301,6 +321,7 @@ const Inventory = () => {
 
       {inventory.some(item => item.quantity <= item.min_threshold) && (
         <div style={{ 
+          position: 'relative', zIndex: 1,
           backgroundColor: 'rgba(231, 74, 59, 0.1)', 
           border: '1px solid rgba(231, 74, 59, 0.3)', 
           borderRadius: '20px', 
@@ -321,11 +342,16 @@ const Inventory = () => {
       )}
 
       <div style={{ 
-        backgroundColor: colors.bean, 
-        borderRadius: '24px', 
-        border: `1px solid ${colors.border}`,
+        position: 'relative',
+        zIndex: 1,
+        width: '100%',
+        maxWidth: '1500px',
+        backgroundColor: 'rgba(255, 255, 255, 0.01)', 
+        borderRadius: '32px', 
+        border: `1px solid rgba(255, 255, 255, 0.06)`, 
         overflow: 'hidden',
-        boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
+        boxShadow: '0 30px 70px rgba(0,0,0,0.5)',
+        padding: '10px'
       }}>
         {loading ? (
           <div style={{ padding: '100px', textAlign: 'center', color: colors.crema }}>
@@ -350,9 +376,8 @@ const Inventory = () => {
                   const isLow = item.quantity <= item.min_threshold;
                   const inventoryNo = `INV-${String(item.id).padStart(3, '0')}`;
                   return (
-                    <tr key={item.id} style={{ 
+                    <tr key={item.id} className="premium-row" style={{ 
                       borderBottom: `1px solid ${colors.border}`, 
-                      transition: '0.3s',
                       backgroundColor: isLow ? 'rgba(231, 74, 59, 0.03)' : 'transparent'
                     }}>
                       <td style={{ padding: '25px' }}>
@@ -421,6 +446,21 @@ const Inventory = () => {
         @keyframes bounce {
           0%, 100% { transform: translateY(-5%); animation-timing-function: cubic-bezier(0.8,0,1,1); }
           50% { transform: none; animation-timing-function: cubic-bezier(0,0,0.2,1); }
+        }
+        /* Premium Row Hover Animation */
+        .premium-row {
+          transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+          cursor: pointer;
+        }
+        .premium-row:hover {
+          background-color: rgba(196, 164, 132, 0.08) !important;
+          transform: translateY(-2px) scale(1.002);
+          box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+          position: relative;
+          z-index: 10;
+        }
+        .premium-row:hover td {
+          border-bottom-color: transparent !important;
         }
       `}</style>
     </div>

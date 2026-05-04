@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { TrendingUp, ShoppingBag, DollarSign, ArrowUpRight, BarChart3 } from 'lucide-react';
-import styles from './Dashboard.module.css';
+
 
 const Analytics = () => {
   const [stats, setStats] = useState({
@@ -85,27 +85,68 @@ const Analytics = () => {
   if (loading) return <div style={{ color: theme.crema, padding: '40px', backgroundColor: theme.espresso, minHeight: '100vh' }}>Loading Real-time Analytics...</div>;
 
   return (
-    <div className={styles.page} style={{ backgroundColor: theme.espresso, minHeight: '100vh', padding: '20px' }}>
-      <div style={{ marginBottom: '40px' }}>
-        <div style={{ 
-          fontFamily: "'DM Serif Display', serif", 
-          fontSize: '1.8rem', 
-          color: theme.crema, 
-          lineHeight: '1',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '5px',
-          marginBottom: '15px'
-        }}>
-          Faculty<span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
+    <div className="dashboard-fade-in" style={{ 
+      color: theme.latte, 
+      backgroundColor: theme.espresso, 
+      minHeight: '100vh', 
+      padding: '40px 10px 40px 5px',
+      position: 'relative'
+    }}>
+      {/* Premium Background Elements */}
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: `radial-gradient(circle at 50% -20%, #2a1b10 0%, #070504 70%)` }} />
+        <div className="orb orb-1" />
+        <div className="orb orb-2" />
+      </div>
+      <style>{`
+        .orb { position: absolute; border-radius: 50%; filter: blur(100px); z-index: 0; opacity: 0.05; animation: float 25s infinite alternate ease-in-out; }
+        .orb-1 { width: 600px; height: 600px; background: ${theme.crema}; top: -200px; right: -100px; }
+        .orb-2 { width: 500px; height: 500px; background: #2a1b10; bottom: -100px; left: -100px; }
+        @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 50px) scale(1.1); } }
+        .page-badge { background: #1b130e; border: 1px solid ${theme.border}; padding: 12px 25px; border-radius: 18px; display: inline-flex; align-items: center; gap: 12px; margin: 20px 0; }
+        .page-badge span { font-family: 'Inter', sans-serif; font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: -0.5px; }
+        /* Premium Row Hover Animation */
+        .premium-row {
+          transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+          cursor: pointer;
+        }
+        .premium-row:hover {
+          background-color: rgba(196, 164, 132, 0.12) !important;
+          transform: translateY(-5px) scale(1.005) !important;
+          box-shadow: 0 15px 35px rgba(0,0,0,0.4) !important;
+          border-color: rgba(196, 164, 132, 0.5) !important;
+          position: relative;
+          z-index: 10;
+        }
+      `}</style>
+      <div style={{ 
+        position: 'relative',
+        zIndex: 1,
+        width: '100%', 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'flex-start', 
+        marginBottom: '40px'
+      }}>
+        <div>
+          <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: theme.crema, lineHeight: 1 }}>
+            Faculty <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
+          </div>
+
+          <div className="page-badge">
+            <BarChart3 size={28} color={theme.crema} />
+            <span>Business Analytics</span>
+          </div>
+
+          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '1rem', fontWeight: 500, marginTop: '5px' }}>
+            Faculty Coffee | Real-time Performance Tracking & Sales Data
+          </p>
         </div>
-        <h2 style={{ color: '#fff', fontSize: '2.5rem', fontFamily: 'serif', margin: 0 }}>Business Analytics</h2>
-        <p style={{ color: theme.crema, opacity: 0.8 }}>Live performance tracking powered by actual sales data.</p>
       </div>
 
-      <div className={styles.statsRow} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '30px' }}>
+      <div style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '30px' }}>
         {cards.map((c, i) => (
-          <div key={i} style={{ 
+          <div key={i} className="premium-row" style={{ 
             backgroundColor: theme.card, 
             padding: '25px', 
             borderRadius: '20px', 
@@ -131,7 +172,7 @@ const Analytics = () => {
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '30px' }}>
+      <div style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '30px' }}>
         <div style={{ backgroundColor: theme.card, padding: '35px', borderRadius: '24px', border: `1px solid ${theme.border}`, minHeight: '380px', boxShadow: '0 15px 45px rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column' }}>
           <h3 style={{ color: '#fff', marginBottom: '30px', fontFamily: 'serif', fontSize: '1.5rem' }}>Weekly Sales Performance</h3>
           

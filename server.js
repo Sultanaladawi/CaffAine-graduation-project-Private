@@ -5,6 +5,25 @@ require('dotenv').config();
 const OpenAI = require('openai');
 const path = require('path');
 const fs = require('fs');
+const multer = require('multer');
+
+// Multer config: save to public/images, keep original extension
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, path.join(__dirname, 'public', 'images')),
+  filename: (req, file, cb) => {
+    const uniqueName = Date.now() + '-' + file.originalname.replace(/\s+/g, '-');
+    cb(null, uniqueName);
+  }
+});
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max
+  fileFilter: (req, file, cb) => {
+    const allowed = /jpeg|jpg|png|webp|gif/;
+    const ok = allowed.test(file.mimetype) && allowed.test(path.extname(file.originalname).toLowerCase());
+    ok ? cb(null, true) : cb(new Error('Only image files are allowed'));
+  }
+});
 let openai = null;
 if (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'your_key_here') {
   openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -13,7 +32,7 @@ if (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'your_key_here'
 }
 
 const app = express();
-const PORT = 5000;
+const PORT = 3002;
 
 app.use(cors({
   origin: (origin, callback) => callback(null, true),
@@ -21,15 +40,174 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
 
 app.use((req, res, next) => {
-  console.log(`[DEBUG] ${req.method} ${req.url}`);
+  console.log(`[Server] ${req.method} ${req.url}`);
   next();
 });
 
-// --- STORE STATUS API (FORCED POSITION) ---
+// Routes moved below db initialization
+
+// Image upload endpoint
+app.post('/api/upload-image', upload.single('image'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+  res.json({ filename: req.file.filename, url: `/images/${req.file.filename}` });
+});
+
+app.get('/api/ping', (req, res) => {
+  res.json({ status: 'ok', message: 'Server is reaching here' });
+});
+
+const pool = mysql.createPool({
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASS || '',
+  database: process.env.DB_NAME || 'graduation_project',
+  port: process.env.DB_PORT || 3307,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+});
+
+const db = pool; // Alias for backward compatibility in the code
+
+// Standardize numeric input from various formats
+const convertNumerals = str => {
+  if (typeof str === 'undefined' || str === null) return '';
+  const s = str.toString();
+  return s.replace(/[\u0660-\u0669]/g, d => '\u0660\u0661\u0662\u0663\u0664\u0665\u0666\u0667\u0668\u0669'.indexOf(d)).replace(/[0-9]/g, d => d);
+};
+
+db.getConnection((err, connection) => {
+  if (err) {
+    console.error('MySQL Connection Error:', err.message);
+    return;
+  }
+  console.log(`Database connected successfully via Pool`);
+  
+  // --- Automated Schema Verification ---
+  const checkColumns = async () => {
+    try {
+      const promiseDb = db.promise();
+      const [columns] = await promiseDb.query("SHOW COLUMNS FROM orders");
+      const columnNames = columns.map(c => c.Field);
+      
+      if (!columnNames.includes('phone')) {
+        console.log('[Migration] Adding "phone" column to orders...');
+        await promiseDb.query("ALTER TABLE orders ADD COLUMN phone VARCHAR(50) DEFAULT NULL");
+      }
+      if (!columnNames.includes('delivery_address')) {
+        console.log('[Migration] Adding "delivery_address" column to orders...');
+        await promiseDb.query("ALTER TABLE orders ADD COLUMN delivery_address TEXT DEFAULT NULL");
+      }
+      console.log('[Migration] Schema verification complete.');
+    } catch (dbErr) {
+      console.error('[Migration] Schema check failed:', dbErr.message);
+    }
+  };
+  checkColumns();
+
+  if (connection) connection.release();
+});
+
+// --- PRIMARY ORDERS API (Top Priority) ---
+app.post('/api/orders', async (req, res) => {
+  
+  console.log('[Server] Body:', JSON.stringify(req.body, null, 2));
+
+  const { customer_name, email, total_amount, cartItems, order_type, delivery_address, phone } = req.body;
+  
+  // Basic validation: Email is now optional, but name, items and phone are required
+  if (!customer_name || !Array.isArray(cartItems) || cartItems.length === 0 || !phone) {
+    console.error('[Server] Order Error: Missing required fields (Name, Items, or Phone)');
+    return res.status(400).json({ error: 'Missing required contact information' });
+  }
+
+  const totalAmount = parseFloat(total_amount);
+  const promiseDb = db.promise();
+  
+  const conn = await promiseDb.getConnection();
+  
+  try {
+    await conn.beginTransaction();
+    console.log('[Server] Transaction started');
+    
+    // Check stock
+    for (const item of cartItems) {
+      const productId = parseInt(item.id, 10);
+      const quantity = parseInt(item.qty, 10);
+      if (isNaN(productId)) continue;
+
+      const [ingredients] = await conn.query(`
+        SELECT i.item_name, i.quantity as stock_qty, r.quantity_required
+        FROM recipes r
+        JOIN inventory i ON r.inventory_id = i.id
+        WHERE r.menu_item_id = ?
+      `, [productId]);
+      
+      for (const recipe of ingredients) {
+        const requiredTotal = parseFloat(recipe.quantity_required) * quantity;
+        if (recipe.stock_qty < requiredTotal) {
+          throw new Error(`Insufficient stock for: ${recipe.item_name}`);
+        }
+      }
+    }
+
+    // Insert Order with default 2 minutes prep time
+    const [orderInsertResult] = await conn.query(
+      "INSERT INTO orders (customer_name, email, total_amount, status, created_at, estimated_ready_at, order_type, delivery_address, phone) VALUES (?, ?, ?, 'preparing', NOW(), DATE_ADD(NOW(), INTERVAL 2 MINUTE), ?, ?, ?)",
+      [customer_name, email, totalAmount, order_type || 'takeaway', delivery_address || null, phone || null]
+    );
+    const orderId = orderInsertResult.insertId;
+
+    // Insert Items
+    for (const item of cartItems) {
+      const productId = parseInt(item.id, 10);
+      const quantity = parseFloat(item.qty);
+      const price = parseFloat(item.priceNum);
+      
+      await conn.query(
+        "INSERT INTO order_items (order_id, product_id, item_name, quantity, price) VALUES (?, ?, ?, ?, ?)",
+        [orderId, isNaN(productId) ? null : productId, item.name, quantity, price]
+      );
+      
+      // Deduct product recipe
+      if (!isNaN(productId)) {
+        const [recipeSteps] = await conn.query("SELECT inventory_id, quantity_required FROM recipes WHERE menu_item_id = ?", [productId]);
+        for (const ingredient of recipeSteps) {
+          const deductAmount = parseFloat(ingredient.quantity_required) * quantity;
+          await conn.query("UPDATE inventory SET quantity = GREATEST(quantity - ?, 0) WHERE id = ?", [deductAmount, ingredient.inventory_id]);
+        }
+      }
+
+      // Deduct addons
+      if (Array.isArray(item.addons)) {
+        for (const addon of item.addons) {
+          const [addonRows] = await conn.query("SELECT inventory_id FROM addons WHERE name = ? OR id = ?", [addon.name, addon.id]);
+          if (addonRows && addonRows.length > 0 && addonRows[0].inventory_id) {
+            await conn.query("UPDATE inventory SET quantity = GREATEST(quantity - ?, 0) WHERE id = ?", [1 * quantity, addonRows[0].inventory_id]);
+          }
+        }
+      }
+    }
+
+    await conn.commit();
+    console.log('[Server] Order saved successfully:', orderId);
+    res.status(201).json({ success: true, orderId });
+
+  } catch (err) {
+    console.error('[Server] CRITICAL Order Error:', err.message);
+    await conn.rollback();
+    res.status(500).json({ error: err.message || 'Internal Server Error' });
+  } finally {
+    conn.release();
+  }
+});
+
+// --- STORE STATUS API ---
 app.get('/api/store-status', (req, res) => {
   db.query('SELECT value FROM site_settings WHERE \`key\` = ?', ['store_status'], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
@@ -47,32 +225,6 @@ app.post('/api/store-status', (req, res) => {
   });
 });
 // ------------------------------------------
-
-app.get('/api/ping', (req, res) => {
-  res.json({ status: 'ok', message: 'Server is reaching here' });
-});
-
-const db = mysql.createConnection({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASS || '',
-  database: process.env.DB_NAME || 'faculty_coffee',
-  port: process.env.DB_PORT || 3307
-});
-
-const convertNumerals = str => {
-  if (typeof str === 'undefined' || str === null) return '';
-  const s = str.toString();
-  return s.replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[0-9]/g, d => d);
-};
-
-db.connect(err => {
-  if (err) {
-    console.error('MySQL Connection Error:', err.message);
-    return;
-  }
-  console.log(`Database connected successfully on port ${db.config.port}`);
-});
 
 // Ensure contact_messages and job_applications tables exist
 db.query(`
@@ -249,6 +401,20 @@ db.query(`
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 `, (err) => { if (err) console.error('Ensure store_reviews table error:', err); });
 
+// Ensure orders has estimated_ready_at column
+db.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS estimated_ready_at DATETIME DEFAULT NULL;`, (err) => {
+  if (err && !err.message.includes('Duplicate column name')) console.error('Alter orders error:', err.message);
+});
+
+// Ensure delivery columns exist in orders table
+db.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_address TEXT DEFAULT NULL;`, (err) => {
+  if (err && !err.message.includes('Duplicate column name')) console.error('Alter orders address error:', err.message);
+});
+
+db.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS phone VARCHAR(50) DEFAULT NULL;`, (err) => {
+  if (err && !err.message.includes('Duplicate column name')) console.error('Alter orders phone error:', err.message);
+});
+
 // Ensure ai_insights_cache table exists
 db.query(`
   CREATE TABLE IF NOT EXISTS ai_insights_cache (
@@ -327,34 +493,34 @@ app.get('/api/feedback', async (req, res) => {
 });
 
 app.post('/api/feedback/general', (req, res) => {
-  console.log('[DEBUG] Received General Feedback:', req.body);
+  console.log('[Server] Received General Feedback:', req.body);
   const { reviewer_name, comment, rating } = req.body;
   const q = 'INSERT INTO general_feedback (reviewer_name, comment, rating) VALUES (?, ?, ?)';
   db.query(q, [reviewer_name || 'Anonymous', comment, rating || 5], (err, result) => {
     if (err) {
-      console.error('[DEBUG] SQL Error inserting general feedback:', err.message);
+      console.error('[Server] SQL Error inserting general feedback:', err.message);
       return res.status(500).json({ error: err.message });
     }
-    console.log('[DEBUG] General feedback saved! ID:', result.insertId);
+    console.log('[Server] General feedback saved! ID:', result.insertId);
     res.status(201).json({ message: 'Feedback submitted successfully', id: result.insertId });
   });
 });
 
 app.post('/api/feedback/product', (req, res) => {
-  console.log('[DEBUG] Received Product Feedback:', req.body);
+  console.log('[Server] Received Product Feedback:', req.body);
   const { product_id, reviewer_name, comment, rating } = req.body;
   if (!product_id) {
-    console.log('[DEBUG] Error: Missing product_id');
+    
     return res.status(400).json({ error: 'Product ID is required' });
   }
   
   const q = 'INSERT INTO product_reviews (product_id, reviewer_name, comment, rating) VALUES (?, ?, ?, ?)';
   db.query(q, [product_id, reviewer_name || 'Anonymous', comment, rating || 5], (err, result) => {
     if (err) {
-      console.error('[DEBUG] SQL Error inserting review:', err.message);
+      console.error('[Server] SQL Error inserting review:', err.message);
       return res.status(500).json({ error: err.message });
     }
-    console.log('[DEBUG] Review saved successfully! ID:', result.insertId);
+    console.log('[Server] Review saved successfully! ID:', result.insertId);
     res.status(201).json({ message: 'Review submitted successfully', id: result.insertId });
   });
 });
@@ -463,6 +629,36 @@ app.post('/api/addons', async (req, res) => {
   }
 });
 
+// update an addon
+app.put('/api/addons/:id', async (req, res) => {
+  const { id } = req.params;
+  const { name, price, inventory_id } = req.body;
+  if (!name) return res.status(400).json({ error: 'Missing name' });
+  try {
+    const promiseDb = db.promise();
+    await promiseDb.query('UPDATE addons SET name = ?, price = ?, inventory_id = ? WHERE id = ?', 
+      [name.trim(), price || 0, inventory_id || null, id]);
+    res.json({ success: true, id, name: name.trim(), price, inventory_id });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// delete an addon
+app.delete('/api/addons/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const promiseDb = db.promise();
+    // First remove from bridge table
+    await promiseDb.query('DELETE FROM menu_item_addons WHERE addon_id = ?', [id]);
+    // Then remove the addon itself
+    await promiseDb.query('DELETE FROM addons WHERE id = ?', [id]);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // expose all tags
 app.get('/api/tags', (req, res) => {
   db.query('SELECT * FROM tags ORDER BY name ASC', (err, results) => {
@@ -488,6 +684,33 @@ app.post('/api/tags', async (req, res) => {
   }
 });
 
+// rename a tag
+app.put('/api/tags/:id', async (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+  if (!name) return res.status(400).json({ error: 'Missing name' });
+  try {
+    const promiseDb = db.promise();
+    await promiseDb.query('UPDATE tags SET name = ? WHERE id = ?', [name.trim(), id]);
+    res.json({ success: true, id, name: name.trim() });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// delete a tag and its links
+app.delete('/api/tags/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const promiseDb = db.promise();
+    await promiseDb.query('DELETE FROM menu_item_tags WHERE tag_id = ?', [id]);
+    await promiseDb.query('DELETE FROM tags WHERE id = ?', [id]);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/orders', (req, res) => {
   const query = "SELECT * FROM orders";
   db.query(query, (err, results) => {
@@ -503,15 +726,106 @@ app.get('/api/orders/:id', (req, res) => {
   const { id } = req.params;
   const query = "SELECT * FROM orders WHERE id = ?";
   db.query(query, [id], (err, results) => {
-    if (err) {
-      console.error('Order Fetch Error:', err);
-      return res.status(500).json({ error: 'Internal Server Error' });
-    }
-    if (results.length === 0) {
-      return res.status(404).json({ error: 'Order not found' });
-    }
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length === 0) return res.status(404).json({ error: 'Order not found' });
     res.status(200).json(results[0]);
   });
+});
+
+app.get('/api/order-status/:id', (req, res) => {
+  const { id } = req.params;
+  const sql = `
+    SELECT 
+      status, 
+      estimated_ready_at,
+      GREATEST(0, TIMESTAMPDIFF(SECOND, NOW(), estimated_ready_at)) AS seconds_left
+    FROM orders 
+    WHERE id = ?`;
+
+  db.query(sql, [id], (err, results) => {
+    if (err) {
+      console.error('[Status API] SQL Error:', err.message);
+      return res.status(500).json({ error: err.message });
+    }
+    if (results.length === 0) return res.status(404).json({ error: 'Order not found' });
+    res.json({
+      status: results[0].status,
+      seconds_left: results[0].seconds_left || 0
+    });
+  });
+});
+
+app.put('/api/extend-order/:id', (req, res) => {
+  const { id } = req.params;
+  const { minutes } = req.body;
+  if (!minutes) return res.status(400).json({ error: 'Minutes required' });
+
+  console.log(`[Extend API] Extending order #${id} by ${minutes}m`);
+  const cleanMins = parseInt(minutes) || 2;
+
+  // ✅ GREATEST ensures we always extend from NOW if the order already expired
+  const query = `
+    UPDATE orders 
+    SET estimated_ready_at = DATE_ADD(GREATEST(COALESCE(estimated_ready_at, NOW()), NOW()), INTERVAL ${cleanMins} MINUTE),
+        status = 'preparing' 
+    WHERE id = ?`;
+  
+  db.query(query, [id], (err, result) => {
+    if (err) {
+      console.error('[Extend API] SQL Error:', err.message);
+      return res.status(500).json({ error: err.message });
+    }
+    res.json({ success: true, message: `Preparation time extended by ${cleanMins} minutes` });
+  });
+});
+
+app.put('/api/mark-ready/:id', (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  if (!status) return res.status(400).json({ error: 'Status required' });
+
+  console.log(`[Status API] Marking order #${id} as ${status}`);
+
+  // 1. Update status using standard callback
+  db.query("UPDATE orders SET status = ? WHERE id = ?", [status, id], (err, result) => {
+    if (err) {
+      console.error('[Mark Ready Error]:', err.message);
+      return res.status(500).json({ error: err.message });
+    }
+
+    // 2. Success response
+    res.json({ success: true, message: `Order status updated to ${status}` });
+
+    // 3. Background Notifications (non-blocking)
+    if (status === 'ready') {
+      db.query("SELECT customer_name, email, phone FROM orders WHERE id = ?", [id], (err, rows) => {
+        if (!err && rows.length > 0) {
+          const order = rows[0];
+          console.log(`\n🔔 [NOTIFICATION] --- Order Ready: ORD-${String(id).padStart(3, '0')} ---`);
+          if (order.phone) console.log(`📱 SMS to ${order.phone}: "Hello ${order.customer_name}, your order is ready!"`);
+          if (order.email) console.log(`📧 Email to ${order.email}: "Order Ready! Your order is waiting."`);
+          console.log(`---------------------------------------------------------\n`);
+        }
+      });
+    }
+  });
+});
+
+app.get('/api/order-items/:orderId', async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    console.log(`[Server] Fetching items for order_id: ${orderId}`);
+    const promiseDb = db.promise();
+    const [results] = await promiseDb.query(
+      "SELECT oi.*, COALESCE(oi.item_name, m.name) as item_name FROM order_items oi LEFT JOIN menu_items m ON oi.product_id = m.id WHERE oi.order_id = ?",
+      [orderId]
+    );
+    console.log(`[Server] Found ${results.length} items for order_id: ${orderId}`);
+    res.status(200).json(results);
+  } catch (err) {
+    console.error('Order Items Fetch Error:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 app.get('/api/products', async (req, res) => {
@@ -538,13 +852,13 @@ app.get('/api/products', async (req, res) => {
           ELSE 0 
         END as isOutOfStock,
         (
-          SELECT GROUP_CONCAT(CONCAT(a.id, '|', a.name, '|', a.price))
+          SELECT GROUP_CONCAT(DISTINCT CONCAT(a.id, '|', a.name, '|', a.price))
           FROM menu_item_addons mia
           JOIN addons a ON mia.addon_id = a.id
           WHERE mia.menu_item_id = m.id
         ) as linked_addons,
         (
-          SELECT GROUP_CONCAT(CONCAT(t.id, '|', t.name))
+          SELECT GROUP_CONCAT(DISTINCT CONCAT(t.id, '|', t.name))
           FROM menu_item_tags mit
           JOIN tags t ON mit.tag_id = t.id
           WHERE mit.menu_item_id = m.id
@@ -638,7 +952,13 @@ app.post('/api/inventory', (req, res) => {
         console.error('[Inventory] Add SQL Error:', err.message);
         return res.status(500).json({ error: `SQL Error: ${err.message}` });
       }
-      res.status(201).json({ message: 'Item added', id: result.insertId });
+      res.status(201).json({ 
+        id: result.insertId, 
+        item_name, 
+        quantity: cleanQty, 
+        unit, 
+        min_threshold: cleanThreshold 
+      });
     });
   } catch (error) {
     console.error('[Inventory] Add Catch Error:', error.message);
@@ -653,7 +973,7 @@ app.put('/api/update-stock-item/:id', (req, res) => {
     const cleanQty = parseFloat(convertNumerals(quantity).replace(/[^0-9.]/g, '')) || 0;
     const cleanThreshold = parseInt(convertNumerals(min_threshold).replace(/[^0-9.]/g, '')) || 0;
 
-    console.log('[DEBUG] Hit Unique Update Route for ID:', id);
+    console.log('[Server] Hit Unique Update Route for ID:', id);
     const query = "UPDATE inventory SET item_name = ?, quantity = ?, unit = ?, min_threshold = ? WHERE id = ?";
     db.query(query, [item_name, cleanQty, unit, cleanThreshold, id], (err, result) => {
       if (err) {
@@ -706,6 +1026,44 @@ app.delete('/api/careers/:id', (req, res) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ message: 'Job deleted' });
   });
+});
+
+// --- Recipe / Ingredient Mapping ---
+app.get('/api/products/:id/recipe', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const promiseDb = db.promise();
+    const [results] = await promiseDb.query(`
+      SELECT r.*, i.item_name, i.unit 
+      FROM recipes r
+      JOIN inventory i ON r.inventory_id = i.id
+      WHERE r.menu_item_id = ?
+    `, [id]);
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/products/:id/recipe', async (req, res) => {
+  const { id } = req.params;
+  const { ingredients } = req.body; // Array of { inventory_id, quantity_required }
+  const promiseDb = db.promise();
+  try {
+    await promiseDb.beginTransaction();
+    // Clear old recipe
+    await promiseDb.query('DELETE FROM recipes WHERE menu_item_id = ?', [id]);
+    // Insert new mapping
+    if (Array.isArray(ingredients) && ingredients.length > 0) {
+      const values = ingredients.map(ing => [id, ing.inventory_id, ing.quantity_required]);
+      await promiseDb.query('INSERT INTO recipes (menu_item_id, inventory_id, quantity_required) VALUES ?', [values]);
+    }
+    await promiseDb.commit();
+    res.json({ success: true });
+  } catch (err) {
+    await promiseDb.rollback();
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.post('/api/ai', async (req, res) => {
@@ -789,119 +1147,6 @@ app.get('/api/applications', (req, res) => {
   });
 });
 
-app.post('/api/orders', async (req, res) => {
-  const { customer_name, email, total_amount, cartItems } = req.body;
-  if (!customer_name || !email || !Array.isArray(cartItems) || cartItems.length === 0) {
-    return res.status(400).json({ error: 'Invalid order payload' });
-  }
-  const totalAmount = parseFloat(total_amount);
-  if (Number.isNaN(totalAmount) || totalAmount < 0) {
-    return res.status(400).json({ error: 'Invalid total amount' });
-  }
-  const promiseDb = db.promise();
-  try {
-    await promiseDb.beginTransaction();
-    for (const item of cartItems) {
-      const productId = parseInt(item.id, 10);
-      const quantity = parseInt(item.qty, 10);
-      if (Number.isNaN(productId) || productId <= 0) {
-        throw new Error('Invalid product id in order item');
-      }
-      const [ingredients] = await promiseDb.query(`
-        SELECT i.item_name, i.quantity as stock_qty, r.quantity_required
-        FROM recipes r
-        JOIN inventory i ON r.inventory_id = i.id
-        WHERE r.menu_item_id = ?
-      `, [productId]);
-      for (const recipe of ingredients) {
-        const requiredTotal = parseFloat(recipe.quantity_required) * quantity;
-        if (recipe.stock_qty < requiredTotal) {
-          throw new Error(`Insufficient stock for: ${recipe.item_name}`);
-        }
-      }
-    }
-    const [[{ nextOrderId }]] = await promiseDb.query("SELECT IFNULL(MAX(id), 0) + 1 AS nextOrderId FROM orders");
-    const orderId = nextOrderId;
-    await promiseDb.query(
-      "INSERT INTO orders (id, customer_name, email, total_amount, status, created_at) VALUES (?, ?, ?, ?, 'preparing', NOW())",
-      [orderId, customer_name, email, totalAmount]
-    );
-    const insertOrderItem = "INSERT INTO order_items (id, order_id, product_id, item_name, quantity, price) VALUES (?, ?, ?, ?, ?, ?)";
-    const updateInventoryById = "UPDATE inventory SET quantity = GREATEST(quantity - ?, 0) WHERE id = ?";
-    const [[{ nextOrderItemId }]] = await promiseDb.query("SELECT IFNULL(MAX(id), 0) + 1 AS nextOrderItemId FROM order_items");
-    let orderItemId = nextOrderItemId;
-    for (const item of cartItems) {
-      const productId = parseInt(item.id, 10);
-      const quantity = parseFloat(item.qty);
-      const price = parseFloat(item.priceNum);
-      if (Number.isNaN(productId) || productId <= 0 || !quantity || quantity <= 0 || Number.isNaN(price)) continue;
-      await promiseDb.query(insertOrderItem, [orderItemId, orderId, productId, item.name, quantity, price]);
-      // 2. Deduct inventory based on product recipe
-      const [recipeSteps] = await promiseDb.query("SELECT inventory_id, quantity_required FROM recipes WHERE menu_item_id = ?", [productId]);
-      for (const ingredient of recipeSteps) {
-        const deductAmount = parseFloat(ingredient.quantity_required) * quantity;
-        await promiseDb.query(updateInventoryById, [deductAmount, ingredient.inventory_id]);
-      }
-
-      // 3. NEW: Deduct inventory for selected addons
-      if (Array.isArray(item.selectedAddons)) {
-        for (const addon of item.selectedAddons) {
-          // Fetch the inventory_id and price if needed from DB for this addon
-          const [addonData] = await promiseDb.query("SELECT inventory_id FROM addons WHERE name = ? OR id = ?", [addon.name, addon.id]);
-          if (addonData && addonData[0] && addonData[0].inventory_id) {
-            // Deduct 1 unit of that inventory item (e.g., 1 shot, 1 portion of milk)
-            await promiseDb.query(updateInventoryById, [1 * quantity, addonData[0].inventory_id]);
-          }
-        }
-      }
-      orderItemId += 1;
-    }
-    await promiseDb.commit();
-    res.status(201).json({ success: true, orderId });
-    setTimeout(async () => {
-      try {
-        const updateDb = mysql.createConnection({
-          host: process.env.DB_HOST || 'localhost',
-          user: process.env.DB_USER || 'root',
-          password: process.env.DB_PASS || '',
-          database: process.env.DB_NAME || 'graduation_project',
-          port: process.env.DB_PORT || 3307
-        });
-        updateDb.connect(err => {
-          if (err) {
-            console.error('Auto-update DB Connection Error:', err.message);
-            return;
-          }
-          updateDb.query(
-            'UPDATE orders SET status = ? WHERE id = ?',
-            ['ready', orderId],
-            err => {
-              if (err) {
-                console.error(`[Auto-Update] Error updating order ${orderId}:`, err.message);
-              } else {
-                console.log(`[Auto-Update] Order #${orderId} marked as ready`);
-              }
-              updateDb.end();
-            }
-          );
-        });
-      } catch (error) {
-        console.error('[Auto-Update] Error:', error.message);
-      }
-    }, 120000);
-  } catch (err) {
-    console.error('[Server] Order Error:', err.message);
-    try {
-      await promiseDb.rollback();
-    } catch (rollbackErr) {
-      console.error('[Server] Rollback Error:', rollbackErr);
-    }
-    if (err.message.includes('Insufficient stock')) {
-      return res.status(400).json({ error: err.message });
-    }
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
 
 app.get('/api/messages', (req, res) => {
   const query = "SELECT * FROM chat_messages ORDER BY created_at DESC LIMIT 50";
@@ -1027,49 +1272,69 @@ app.put('/api/products/reorder', async (req, res) => {
 
 // Create new product
 app.post('/api/products', async (req, res) => {
-  const { name, price_num, description, available, category_id, image_url, tags, addons, addon_ids, tag_ids } = req.body;
+  
+  console.log('[Server] Received Body:', JSON.stringify(req.body, null, 2));
+  let { name, price_num, description, available, category_id, image_url, tags, addons, addon_ids, tag_ids } = req.body;
+
+  // Safety: Map legacy string IDs to numeric IDs if necessary
+  if (category_id === 'espresso') category_id = '2';
+  if (category_id === 'tea') category_id = '6';
+  if (category_id === 'cold') category_id = '1';
+  if (category_id === 'food') category_id = '3';
+  if (category_id === 'sweets') category_id = '5';
+  if (category_id === 'soft') category_id = '4';
+  if (category_id === 'sides') category_id = '4';
+
   if (!name) return res.status(400).json({ error: 'Missing name' });
 
   try {
-    const promiseDb = db.promise();
-    await promiseDb.beginTransaction();
+    const pool = db.promise();
+    const conn = await pool.getConnection();
+    await conn.beginTransaction();
 
-    // Get max sort_order
-    const [rows] = await promiseDb.query('SELECT MAX(sort_order) as maxOrder FROM menu_items');
+    // Find current ordering
+    const [rows] = await conn.query('SELECT MAX(sort_order) as maxOrder FROM menu_items');
     const nextOrder = (rows[0].maxOrder || 0) + 1;
 
-    const cleanPrice = price_num ? convertNumerals(price_num.toString()).replace(/[^0-9.]/g, '') : null;
+    const rawPrice = price_num ? convertNumerals(price_num.toString()).replace(/[^0-9.]/g, '') : null;
+    const cleanPrice = (rawPrice && rawPrice.trim() !== '') ? rawPrice : null;
     const price_display = cleanPrice ? `£${parseFloat(cleanPrice).toFixed(2)}` : null;
 
     const q = 'INSERT INTO menu_items (category_id, name, price_num, price_display, description, tags, available, image_url, addons, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    const [result] = await promiseDb.query(q, [category_id || null, name, cleanPrice, price_display, description || null, tags || null, available ?? 1, image_url || null, addons || null, nextOrder]);
+    const params = [category_id || null, name, cleanPrice, price_display, description || null, tags || null, available ?? 1, image_url || null, addons || null, nextOrder];
+    console.log('[Server] Executing INSERT with params:', params);
+    const [result] = await conn.query(q, params);
     
     const productId = result.insertId;
 
     // Sync Addons in bridge table
     if (Array.isArray(addon_ids)) {
+      console.log('[Server] Syncing Addons:', addon_ids);
       for (const aid of addon_ids) {
         if (aid) {
-          await promiseDb.query('INSERT INTO menu_item_addons (menu_item_id, addon_id) VALUES (?, ?)', [productId, aid]);
+          await conn.query('INSERT IGNORE INTO menu_item_addons (menu_item_id, addon_id) VALUES (?, ?)', [productId, aid]);
         }
       }
     }
 
     // Sync Tags in bridge table
     if (Array.isArray(tag_ids)) {
+      console.log('[Server] Syncing Tags:', tag_ids);
       for (const tid of tag_ids) {
         if (tid) {
-          await promiseDb.query('INSERT INTO menu_item_tags (menu_item_id, tag_id) VALUES (?, ?)', [productId, tid]);
+          await conn.query('INSERT IGNORE INTO menu_item_tags (menu_item_id, tag_id) VALUES (?, ?)', [productId, tid]);
         }
       }
     }
 
-    await promiseDb.commit();
+    await conn.commit();
     res.status(201).json({ message: 'Product created successfully', id: productId });
   } catch (err) {
-    await db.promise().rollback();
-    console.error('Create product error:', err.message);
-    res.status(500).json({ error: err.message });
+    if (conn) await conn.rollback();
+    console.error('Create product error:', err);
+    res.status(500).json({ error: err.sqlMessage || err.message || 'Internal Server Error' });
+  } finally {
+    if (conn) conn.release();
   }
 });
 
@@ -1077,40 +1342,48 @@ app.put('/api/products/:id', async (req, res) => {
   const { id } = req.params;
   let { name, price_num, description, available, category_id, image_url, tags, addons, addon_ids, tag_ids } = req.body;
   
+  const pool = db.promise();
+  let conn;
+  
   try {
-    const promiseDb = db.promise();
-    await promiseDb.beginTransaction();
+    conn = await pool.getConnection();
+    await conn.beginTransaction();
 
-    const cleanPrice = price_num ? convertNumerals(price_num.toString()).replace(/[^0-9.]/g, '') : null;
+    let cleanPrice = null;
+    if (price_num !== undefined && price_num !== null) {
+      cleanPrice = convertNumerals(price_num.toString()).replace(/[^0-9.]/g, '');
+    }
     const query = "UPDATE menu_items SET name = ?, price_num = ?, description = ?, available = ?, category_id = ?, image_url = ?, tags = ?, addons = ? WHERE id = ?";
-    await promiseDb.query(query, [name, cleanPrice, description, available, category_id || null, image_url || null, tags || null, addons || null, id]);
+    await conn.query(query, [name, cleanPrice, description, available, category_id || null, image_url || null, tags || null, addons || null, id]);
 
     // Sync Addons in bridge table
     if (Array.isArray(addon_ids)) {
-      await promiseDb.query('DELETE FROM menu_item_addons WHERE menu_item_id = ?', [id]);
+      await conn.query('DELETE FROM menu_item_addons WHERE menu_item_id = ?', [id]);
       for (const aid of addon_ids) {
         if (aid) {
-          await promiseDb.query('INSERT INTO menu_item_addons (menu_item_id, addon_id) VALUES (?, ?)', [id, aid]);
+          await conn.query('INSERT INTO menu_item_addons (menu_item_id, addon_id) VALUES (?, ?)', [id, aid]);
         }
       }
     }
 
     // Sync Tags in bridge table
     if (Array.isArray(tag_ids)) {
-      await promiseDb.query('DELETE FROM menu_item_tags WHERE menu_item_id = ?', [id]);
+      await conn.query('DELETE FROM menu_item_tags WHERE menu_item_id = ?', [id]);
       for (const tid of tag_ids) {
         if (tid) {
-          await promiseDb.query('INSERT INTO menu_item_tags (menu_item_id, tag_id) VALUES (?, ?)', [id, tid]);
+          await conn.query('INSERT INTO menu_item_tags (menu_item_id, tag_id) VALUES (?, ?)', [id, tid]);
         }
       }
     }
 
-    await promiseDb.commit();
+    await conn.commit();
     res.json({ message: 'Product updated successfully' });
   } catch (err) {
-    await db.promise().rollback();
-    console.error('[Server] Product Update Error:', err.message);
-    res.status(500).json({ error: err.message });
+    if (conn) await conn.rollback();
+    console.error('[Server] Product Update Error:', err);
+    res.status(500).json({ error: err.sqlMessage || err.message || 'Internal Server Error' });
+  } finally {
+    if (conn) conn.release();
   }
 });
 
@@ -1145,8 +1418,9 @@ app.get('/api/applications', (req, res) => {
   });
 });
 
+
 app.post('/api/applications', (req, res) => {
-  console.log('[DEBUG] Applications Post Body:', req.body);
+  console.log('[Server] Applications Post Body:', req.body);
   const { name, email, phone, position, cover_letter, resume_url } = req.body;
   const q = 'INSERT INTO job_applications (name, email, phone, position, cover_letter, resume_url) VALUES (?, ?, ?, ?, ?, ?)';
   db.query(q, [name, email, phone, position, cover_letter, resume_url], (err, result) => {
@@ -1173,6 +1447,14 @@ app.delete('/api/applications/:id', (req, res) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ message: 'Application deleted' });
   });
+});
+
+// Serve static files from the React build folder
+app.use(express.static(path.join(__dirname, 'build')));
+
+// Catch-all route to serve index.html for React Router
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 app.listen(PORT, '0.0.0.0', () => {

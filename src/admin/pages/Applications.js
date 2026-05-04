@@ -98,23 +98,62 @@ const Applications = () => {
   };
 
   return (
-    <div style={{ padding: '40px', backgroundColor: colors.espresso, minHeight: '100vh' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
+    <div className="dashboard-fade-in" style={{ 
+      color: colors.latte, 
+      backgroundColor: colors.espresso, 
+      minHeight: '100vh', 
+      padding: '40px 10px 40px 5px',
+      position: 'relative'
+    }}>
+      {/* Premium Background Elements */}
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: `radial-gradient(circle at 50% -20%, #2a1b10 0%, #070504 70%)` }} />
+        <div className="orb orb-1" />
+        <div className="orb orb-2" />
+      </div>
+      <style>{`
+        .orb { position: absolute; border-radius: 50%; filter: blur(100px); z-index: 0; opacity: 0.05; animation: float 25s infinite alternate ease-in-out; }
+        .orb-1 { width: 600px; height: 600px; background: ${colors.crema}; top: -200px; right: -100px; }
+        .orb-2 { width: 500px; height: 500px; background: #2a1b10; bottom: -100px; left: -100px; }
+        @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 50px) scale(1.1); } }
+        .page-badge { background: #1b130e; border: 1px solid ${colors.border}; padding: 12px 25px; border-radius: 18px; display: inline-flex; align-items: center; gap: 12px; margin: 20px 0; }
+        .page-badge span { font-family: 'Inter', sans-serif; font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: -0.5px; }
+        /* Premium Row Hover Animation */
+        .premium-row {
+          transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+          cursor: pointer;
+        }
+        .premium-row:hover {
+          background-color: rgba(196, 164, 132, 0.12) !important;
+          transform: translateY(-5px) scale(1.005);
+          box-shadow: 0 15px 35px rgba(0,0,0,0.4) !important;
+          border-color: rgba(196, 164, 132, 0.5) !important;
+          position: relative;
+          z-index: 10;
+        }
+      `}</style>
+      <div style={{ 
+        position: 'relative',
+        zIndex: 1,
+        width: '100%', 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'flex-start', 
+        marginBottom: '40px'
+      }}>
         <div>
-          <div style={{ 
-            fontFamily: "'DM Serif Display', serif", 
-            fontSize: '1.8rem', 
-            color: colors.crema, 
-            lineHeight: '1',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px',
-            marginBottom: '15px'
-          }}>
-            Faculty<span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
+          <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: colors.crema, lineHeight: 1 }}>
+            Faculty <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
           </div>
-          <h1 style={{ color: '#fff', fontSize: '2.5rem', fontFamily: 'serif', margin: 0 }}>Candidate Submissions</h1>
-          <p style={{ color: colors.crema, marginTop: '10px' }}>Review and manage potential candidates for open roles.</p>
+
+          <div className="page-badge">
+            <User size={28} color={colors.crema} />
+            <span>Candidate Applications</span>
+          </div>
+
+          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '1rem', fontWeight: 500, marginTop: '5px' }}>
+            Faculty Coffee | Reviewing & Managing Potential Talent
+          </p>
         </div>
         <button 
           onClick={exportPDF}
@@ -131,31 +170,18 @@ const Applications = () => {
       </div>
 
       {loading ? (
-        <div style={{ color: colors.crema }}>Loading applications...</div>
+        <div style={{ position: 'relative', zIndex: 1, color: colors.crema, padding: '0 20px' }}>Loading applications...</div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))', gap: '30px' }}>
+        <div style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))', gap: '30px' }}>
           {apps.length > 0 ? apps.map(app => (
-            <div key={app.id} style={{ 
-              backgroundColor: 'rgba(255, 255, 255, 0.03)', 
+            <div key={app.id} className="premium-row" style={{ 
+              backgroundColor: 'rgba(255, 255, 255, 0.02)', 
               backdropFilter: 'blur(10px)',
               borderRadius: '24px', 
               padding: '35px', 
               border: `1px solid rgba(196, 164, 132, 0.15)`, 
               position: 'relative',
-              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-              boxShadow: '0 15px 35px rgba(0,0,0,0.2)'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.transform = 'translateY(-10px)';
-              e.currentTarget.style.border = `1px solid ${colors.crema}`;
-              e.currentTarget.style.boxShadow = '0 25px 50px rgba(0,0,0,0.4)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.border = `1px solid rgba(196, 164, 132, 0.15)`;
-              e.currentTarget.style.boxShadow = '0 15px 35px rgba(0,0,0,0.2)';
-            }}
-            >
+            }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '25px' }}>
                 <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
                   <div style={{ background: 'linear-gradient(135deg, rgba(196,164,132,0.2) 0%, rgba(196,164,132,0.05) 100%)', padding: '15px', borderRadius: '18px', border: '1px solid rgba(196,164,132,0.1)' }}>

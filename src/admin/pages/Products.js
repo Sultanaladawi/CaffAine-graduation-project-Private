@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import './Products.css';
-import { Plus, Edit, Trash2, X, GripVertical, Image, Download } from 'lucide-react';
+
+import { Plus, Edit, Trash2, X, GripVertical, Image, Download, CheckCircle2 } from 'lucide-react';
 import { BsGrid3X3 } from 'react-icons/bs';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -16,12 +16,31 @@ const Products = () => {
   const [newTagName, setNewTagName] = useState('');
   const [newAddonName, setNewAddonName] = useState('');
   const [newAddonPrice, setNewAddonPrice] = useState('');
+  // Tag inline editing
+  const [tagEditId, setTagEditId] = useState(null);
+  const [tagEditName, setTagEditName] = useState('');
+  // Addon inline editing
+  const [addonEditId, setAddonEditId] = useState(null);
+  const [addonEditName, setAddonEditName] = useState('');
+  const [addonEditPrice, setAddonEditPrice] = useState('');
+  const [addonEditInventoryId, setAddonEditInventoryId] = useState('');
+  const [newAddonInventoryId, setNewAddonInventoryId] = useState('');
+  const [newInvName, setNewInvName] = useState('');
+  const [newInvUnit, setNewInvUnit] = useState('g');
+  const [newInvQty, setNewInvQty] = useState('');
+  const [newInvThreshold, setNewInvThreshold] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('add');
   const [images, setImages] = useState([]);
   const [showImagePicker, setShowImagePicker] = useState(false);
+  const [uploadLoading, setUploadLoading] = useState(false);
   const [orderChanged, setOrderChanged] = useState(false);
-  const [notification, setNotification] = useState(null); // New state for elegant notifications
+  const [notification, setNotification] = useState(null); 
+
+  // Recipe management
+  const [allInventory, setAllInventory] = useState([]);
+  const [recipeIngredients, setRecipeIngredients] = useState([]);
+
   const dragItem = useRef(null);
   const dragOverItem = useRef(null);
 
@@ -110,12 +129,32 @@ const Products = () => {
     }
   };
 
+  const fetchInventory = async () => {
+    try {
+      const res = await axios.get('/api/inventory');
+      setAllInventory(res.data || []);
+    } catch (err) {
+      console.error('Inventory fetch error:', err);
+    }
+  };
+
+  const fetchRecipe = async (productId) => {
+    try {
+      const res = await axios.get(`/api/products/${productId}/recipe`);
+      setRecipeIngredients(res.data || []);
+    } catch (err) {
+      console.error('Recipe fetch error:', err);
+      setRecipeIngredients([]);
+    }
+  };
+
   useEffect(() => {
     fetchProducts();
     fetchCategories();
     fetchImages();
     fetchAddons();
     fetchTags();
+    fetchInventory();
   }, []);
 
   // Drag & Drop handlers
@@ -155,7 +194,8 @@ const Products = () => {
 
   const openAddModal = () => {
     setModalMode('add');
-    setFormData({ id: null, name: '', price_num: '', description: '', available: 1, category_id: 'espresso', image_url: '', tags: '', addons: '', addon_ids: [], tag_ids: [] });
+    setFormData({ id: null, name: '', price_num: '', description: '', available: 1, category_id: dbCategories[0]?.id || '', image_url: '', tags: '', addons: '', addon_ids: [], tag_ids: [] });
+    setRecipeIngredients([]);
     setShowModal(true);
   };
 
@@ -167,32 +207,47 @@ const Products = () => {
       price_num: product.price_num,
       description: product.description,
       available: product.available ?? 1,
-      category_id: product.category_id || 'espresso',
+      category_id: product.category_id || (dbCategories[0]?.id || ''),
       image_url: product.image_url || '',
       tags: product.tags || '',
       addons: product.addons || '',
       addon_ids: product.linkedAddons ? product.linkedAddons.map(a => parseInt(a.id)) : [],
       tag_ids: product.linkedTags ? product.linkedTags.map(t => parseInt(t.id)) : []
     });
+    fetchRecipe(product.id);
     setShowModal(true);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Filter out any legacy or invalid IDs before sending
+      // Filter out any legacy or invalid IDs and remove duplicates before sending
       const cleanFormData = {
         ...formData,
-        addon_ids: (formData.addon_ids || []).filter(id => !String(id).includes('legacy') && !isNaN(parseInt(id))),
-        tag_ids: (formData.tag_ids || []).filter(id => !String(id).includes('legacy') && !isNaN(parseInt(id)))
+        addon_ids: [...new Set((formData.addon_ids || []).filter(id => !String(id).includes('legacy') && !isNaN(parseInt(id))).map(id => parseInt(id)))],
+        tag_ids: [...new Set((formData.tag_ids || []).filter(id => !String(id).includes('legacy') && !isNaN(parseInt(id))).map(id => parseInt(id)))]
       };
 
+      let productId = formData.id;
       if (modalMode === 'add') {
-        await axios.post('/api/products', cleanFormData);
+        const res = await axios.post('/api/products', cleanFormData);
+        productId = res.data.id;
         showToast("Product created with precision");
       } else {
         await axios.put(`/api/products/${formData.id}`, cleanFormData);
         showToast("Product details refined");
+      }
+
+      // Save Recipe
+      try {
+        await axios.post(`/api/products/${productId}/recipe`, {
+          ingredients: recipeIngredients.filter(ing => ing.inventory_id && ing.quantity_required).map(ing => ({
+            inventory_id: parseInt(ing.inventory_id),
+            quantity_required: parseFloat(ing.quantity_required)
+          }))
+        });
+      } catch (recipeErr) {
+        console.error('Recipe save failed:', recipeErr);
       }
       setShowModal(false);
       fetchProducts();
@@ -207,23 +262,101 @@ const Products = () => {
     try {
       const res = await axios.post('/api/tags', { name: newTagName.trim() });
       const created = res.data;
-      setAllTags(prev => [...prev, created].sort((a,b) => a.name.localeCompare(b.name)));
+      setAllTags(prev => [...prev, created].sort((a,b) => (a.name || '').localeCompare(b.name || '')));
       setFormData(prev => ({...prev, tag_ids: [...prev.tag_ids, created.id]}));
       setNewTagName('');
-    } catch (err) { alert("Failed to add tag"); }
+    } catch (err) { showToast('Failed to add tag', 'error'); }
+  };
+
+  const handleDeleteTag = async (tagId) => {
+    if (!window.confirm('Delete this tag from the system?')) return;
+    try {
+      await axios.delete(`/api/tags/${tagId}`);
+      setAllTags(prev => prev.filter(t => t.id !== tagId));
+      setFormData(prev => ({...prev, tag_ids: prev.tag_ids.filter(id => id !== tagId)}));
+      showToast('Tag deleted');
+    } catch (err) { showToast('Failed to delete tag', 'error'); }
+  };
+
+  const handleSaveTagEdit = async (tagId) => {
+    if (!tagEditName.trim()) return;
+    try {
+      await axios.put(`/api/tags/${tagId}`, { name: tagEditName.trim() });
+      setAllTags(prev => prev.map(t => t.id === tagId ? {...t, name: tagEditName.trim()} : t));
+      setTagEditId(null);
+      setTagEditName('');
+      showToast('Tag updated');
+    } catch (err) { showToast('Failed to update tag', 'error'); }
   };
 
   const handleQuickAddAddon = async () => {
     if (!newAddonName.trim()) return;
     try {
-      const res = await axios.post('/api/addons', { name: newAddonName.trim(), price: parseFloat(newAddonPrice) || 0 });
+      const res = await axios.post('/api/addons', { 
+        name: newAddonName.trim(), 
+        price: parseFloat(newAddonPrice) || 0
+      });
       const created = res.data;
-      setAllAddons(prev => [...prev, created].sort((a,b) => a.name.localeCompare(b.name)));
+      setAllAddons(prev => [...prev, created].sort((a,b) => (a.name || '').localeCompare(b.name || '')));
       setFormData(prev => ({...prev, addon_ids: [...prev.addon_ids, created.id]}));
       setNewAddonName('');
       setNewAddonPrice('');
-    } catch (err) { alert("Failed to add addon"); }
+    } catch (err) { showToast('Failed to add addon', 'error'); }
   };
+
+  const handleQuickAddInventory = async () => {
+    if (!newInvName.trim()) return;
+    try {
+      const res = await axios.post('/api/inventory', { 
+        item_name: newInvName.trim(), 
+        unit: newInvUnit,
+        quantity: parseFloat(newInvQty) || 0,
+        min_threshold: parseInt(newInvThreshold) || 0
+      });
+      const created = res.data;
+      // The API returns the new item, add to list
+      setAllInventory(prev => [...prev, created].sort((a,b) => (a.item_name || '').localeCompare(b.item_name || '')));
+      // Auto-add one row to the current recipe with this new item
+      setRecipeIngredients(prev => [...prev, { inventory_id: created.id, quantity_required: '' }]);
+      setNewInvName('');
+      setNewInvQty('');
+      setNewInvThreshold('');
+      showToast(`Added ${created.item_name} to inventory`, 'success');
+    } catch (err) { 
+      console.error(err);
+      showToast('Failed to add inventory item', 'error'); 
+    }
+  };
+
+  const handleDeleteAddon = async (addonId) => {
+    if (!window.confirm('Delete this addon from the system?')) return;
+    try {
+      await axios.delete(`/api/addons/${addonId}`);
+      setAllAddons(prev => prev.filter(a => a.id !== addonId));
+      setFormData(prev => ({...prev, addon_ids: prev.addon_ids.filter(id => id !== addonId)}));
+      showToast('Addon deleted');
+    } catch (err) { showToast('Failed to delete addon', 'error'); }
+  };
+
+  const handleSaveAddonEdit = async (addonId) => {
+    if (!addonEditName.trim()) return;
+    try {
+      await axios.put(`/api/addons/${addonId}`, { 
+        name: addonEditName.trim(), 
+        price: parseFloat(addonEditPrice) || 0
+      });
+      setAllAddons(prev => prev.map(a => a.id === addonId ? {
+        ...a, 
+        name: addonEditName.trim(), 
+        price: parseFloat(addonEditPrice) || 0
+      } : a));
+      setAddonEditId(null);
+      setAddonEditName('');
+      setAddonEditPrice('');
+      showToast('Addon updated');
+    } catch (err) { showToast('Failed to update addon', 'error'); }
+  };
+
 
   const exportPDF = () => {
     try {
@@ -318,8 +451,34 @@ const Products = () => {
     <div className="dashboard-fade-in" style={{ 
       backgroundColor: colors.espresso, 
       minHeight: '100vh', 
-      padding: '40px 10px 40px 5px' // Shifting left significantly
+      padding: '40px 10px 40px 5px', // Shifting left significantly
+      position: 'relative',
+      overflow: 'hidden'
     }}>
+      {/* Premium Background Elements */}
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: `radial-gradient(circle at 50% -20%, #2a1b10 0%, #070504 70%)`, zIndex: 0 }} />
+      <div className="orb orb-1" />
+      <div className="orb orb-2" />
+      <style>{`
+        .orb { position: absolute; border-radius: 50%; filter: blur(100px); z-index: 0; opacity: 0.05; animation: float 25s infinite alternate ease-in-out; }
+        .orb-1 { width: 600px; height: 600px; background: ${colors.crema}; top: -200px; right: -100px; }
+        .orb-2 { width: 500px; height: 500px; background: #2a1b10; bottom: -100px; left: -100px; }
+        @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 50px) scale(1.1); } }
+        .page-badge { background: #1b130e; border: 1px solid ${colors.border}; padding: 12px 25px; border-radius: 18px; display: inline-flex; align-items: center; gap: 12px; margin: 20px 0; }
+        .page-badge span { font-family: 'Inter', sans-serif; font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: -0.5px; }
+
+        /* Premium Row Hover Animation */
+        .premium-row {
+          transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+        }
+        .premium-row:hover {
+          background-color: rgba(196, 164, 132, 0.08) !important;
+          transform: translateY(-2px) scale(1.002);
+          box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+          position: relative;
+          z-index: 10;
+        }
+      `}</style>
       {/* Elegant Notification Toast */}
       {notification && (
         <div className={`premium-toast ${notification.type}`}>
@@ -388,7 +547,7 @@ const Products = () => {
               <div>
                 <label style={labelStyle}>Description</label>
                 <textarea 
-                  value={formData.description} 
+                  value={formData.description || ''} 
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
                   placeholder="Tell us about this product..."
                   style={{ ...inputStyle, minHeight: '80px', resize: 'vertical' }}
@@ -397,17 +556,35 @@ const Products = () => {
 
               <div style={{ display: 'flex', gap: '20px' }}>
                 <div style={{ flex: 1 }}>
-                  <label style={labelStyle}>Category</label>
-                  <select 
-                    value={formData.category_id} 
-                    onChange={(e) => setFormData({...formData, category_id: e.target.value})}
-                    style={inputStyle}
-                  >
-                    {dbCategories.map(cat => (
-                      <option key={cat.id} value={cat.id} style={{ backgroundColor: colors.espresso }}>{cat.label || cat.name}</option>
-                    ))}
-                  </select>
+                  <label style={labelStyle}>Product Category</label>
+                  
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '10px' }}>
+                    {dbCategories.map(cat => {
+                      const isSelected = String(formData.category_id) === String(cat.id);
+                      return (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          onClick={() => setFormData(prev => ({...prev, category_id: cat.id}))}
+                          style={{
+                            padding: '10px 18px',
+                            borderRadius: '12px',
+                            border: isSelected ? `2px solid ${colors.crema}` : `1px solid ${colors.border}`,
+                            backgroundColor: isSelected ? 'rgba(196, 164, 132, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+                            color: isSelected ? colors.crema : colors.latte,
+                            cursor: 'pointer',
+                            fontWeight: isSelected ? '700' : '400',
+                            transition: '0.2s',
+                            fontSize: '0.85rem'
+                          }}
+                        >
+                          {cat.name || cat.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
+
                 <div style={{ flex: 1 }}>
                   <label style={labelStyle}>Availability</label>
                   <select 
@@ -415,76 +592,253 @@ const Products = () => {
                     onChange={(e) => setFormData({...formData, available: parseInt(e.target.value)})}
                     style={inputStyle}
                   >
-                    <option value={1} style={{ backgroundColor: colors.espresso }}>Available</option>
-                    <option value={0} style={{ backgroundColor: colors.espresso }}>Unavailable</option>
+                    <option value={1} style={{ backgroundColor: colors.espresso }}>Available (Live)</option>
+                    <option value={0} style={{ backgroundColor: colors.espresso }}>Unavailable (Hidden)</option>
                   </select>
+
+                  <div style={{ marginTop: '20px', padding: '15px', borderRadius: '15px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${colors.border}` }}>
+                    <div style={{ fontSize: '0.75rem', color: '#888', marginBottom: '5px' }}>Quick Tip:</div>
+                    <div style={{ fontSize: '0.8rem', color: colors.latte, lineHeight: '1.4' }}>
+                      Categories define where the product appears on the customer menu. Tags help with filtering and search.
+                    </div>
+                  </div>
                 </div>
               </div>
 
               <div style={{ display: 'flex', gap: '25px' }}>
                 <div style={{ flex: 1 }}>
                   <label style={labelStyle}>Category Tags</label>
-                  <div style={{ 
-                    display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', 
-                    padding: '15px', backgroundColor: colors.input, 
-                    borderRadius: '16px', border: `1px solid ${colors.border}`,
-                    maxHeight: '180px', overflowY: 'auto'
-                  }}>
-                    {allTags.map(tag => (
-                      <label key={tag.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem', color: colors.latte, cursor: 'pointer', padding: '4px 0' }}>
-                        <input 
-                          type="checkbox" 
-                          checked={formData.tag_ids.includes(tag.id)}
-                          onChange={(e) => {
-                            const newIds = e.target.checked 
-                              ? [...formData.tag_ids, tag.id]
-                              : formData.tag_ids.filter(id => id !== tag.id);
-                            setFormData({...formData, tag_ids: newIds});
-                          }}
-                          style={{ accentColor: colors.crema, width: '16px', height: '16px' }}
-                        />
-                        {tag.name}
-                      </label>
-                    ))}
+
+                  {/* Selected tags as removable pills */}
+                  {formData.tag_ids.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '10px', padding: '10px', background: 'rgba(196,164,132,0.05)', borderRadius: '12px', border: '1px solid rgba(196,164,132,0.15)' }}>
+                      {formData.tag_ids.map((tid, idx) => {
+                        const tag = allTags.find(t => t.id === tid);
+                        if (!tag) return null;
+                        return (
+                          <span key={`tag-${tid}-${idx}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', borderRadius: '20px', background: 'linear-gradient(135deg, #c7a57a, #a47c4f)', color: '#1a0e05', fontSize: '0.72rem', fontWeight: '800', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+                            {tag.name}
+                            <button type="button" onClick={() => setFormData(prev => ({...prev, tag_ids: prev.tag_ids.filter((_, i) => i !== idx)}))} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: '#1a0e05', fontSize: '1rem', lineHeight: 1 }}>×</button>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* All tags with inline edit/delete */}
+                  <div style={{ padding: '6px', backgroundColor: colors.input, borderRadius: '14px', border: `1px solid ${colors.border}`, maxHeight: '155px', overflowY: 'auto' }}>
+                    {allTags.map(tag => {
+                      const isSelected = formData.tag_ids.includes(tag.id);
+                      const isEditing = tagEditId === tag.id;
+                      return (
+                        <div key={tag.id} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 6px', borderRadius: '8px', marginBottom: '2px', background: isSelected ? 'rgba(196,164,132,0.1)' : 'transparent', transition: '0.2s' }}>
+                          <input type="checkbox" checked={isSelected}
+                            onChange={e => {
+                              const newIds = e.target.checked ? [...formData.tag_ids, tag.id] : formData.tag_ids.filter(id => id !== tag.id);
+                              setFormData(prev => ({...prev, tag_ids: newIds}));
+                            }}
+                            style={{ accentColor: colors.crema, width: '14px', height: '14px', flexShrink: 0, cursor: 'pointer' }}
+                          />
+                          {isEditing ? (
+                            <input value={tagEditName} onChange={e => setTagEditName(e.target.value)}
+                              onKeyDown={e => { if(e.key==='Enter'){e.preventDefault();handleSaveTagEdit(tag.id);} if(e.key==='Escape') setTagEditId(null); }}
+                              autoFocus
+                              style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: `1px solid ${colors.crema}`, borderRadius: '6px', color: colors.latte, padding: '2px 8px', fontSize: '0.8rem', outline: 'none' }}
+                            />
+                          ) : (
+                            <span style={{ flex: 1, fontSize: '0.82rem', color: isSelected ? colors.crema : colors.latte }}>{tag.name}</span>
+                          )}
+                          {isEditing ? (
+                            <button type="button" onClick={() => handleSaveTagEdit(tag.id)} style={{ background: 'rgba(56,239,125,0.15)', border: '1px solid rgba(56,239,125,0.3)', borderRadius: '6px', color: '#38ef7d', cursor: 'pointer', padding: '2px 8px', fontSize: '0.72rem', fontWeight: '700' }}>✓</button>
+                          ) : (
+                            <button type="button" onClick={() => { setTagEditId(tag.id); setTagEditName(tag.name); }} style={{ background: 'none', border: 'none', color: '#777', cursor: 'pointer', padding: '2px 5px', fontSize: '0.75rem', flexShrink: 0 }} title="Rename tag">✏️</button>
+                          )}
+                          <button type="button" onClick={() => handleDeleteTag(tag.id)} style={{ background: 'none', border: 'none', color: 'rgba(231,74,59,0.5)', cursor: 'pointer', padding: '2px 5px', fontSize: '0.75rem', flexShrink: 0 }} title="Delete tag">✕</button>
+                        </div>
+                      );
+                    })}
+                    {allTags.length === 0 && <div style={{ color: '#555', fontSize: '0.8rem', padding: '12px', textAlign: 'center' }}>No tags yet. Add one below.</div>}
                   </div>
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-                    <input type="text" value={newTagName} onChange={e => setNewTagName(e.target.value)} placeholder="Add new tag..." style={{...inputStyle, padding: '10px', fontSize: '0.85rem'}} />
-                    <button type="button" onClick={handleQuickAddTag} style={{backgroundColor: colors.crema, color: colors.espresso, border: 'none', borderRadius: '10px', padding: '0 18px', cursor: 'pointer', fontWeight: 'bold'}}>+</button>
+
+                  {/* Quick add with Enter support */}
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '12px', alignItems: 'center' }}>
+                    <input type="text" value={newTagName} onChange={e => setNewTagName(e.target.value)}
+                      onKeyDown={e => { if(e.key === 'Enter') { e.preventDefault(); handleQuickAddTag(); }}}
+                      placeholder="New tag..." style={{...inputStyle, width: '0', flex: 1, padding: '10px', fontSize: '0.85rem'}} />
+                    <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleQuickAddTag(); }} style={{backgroundColor: colors.crema, color: colors.espresso, border: 'none', borderRadius: '10px', width: '42px', height: '42px', cursor: 'pointer', fontWeight: 'bold', flexShrink: 0, fontSize: '1.2rem'}}>+</button>
                   </div>
                 </div>
 
                 <div style={{ flex: 1 }}>
                   <label style={labelStyle}>Available Add-ons</label>
-                  <div style={{ 
-                    display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', 
-                    padding: '15px', backgroundColor: colors.input, 
-                    borderRadius: '16px', border: `1px solid ${colors.border}`,
-                    maxHeight: '180px', overflowY: 'auto'
-                  }}>
-                    {allAddons.map(addon => (
-                      <label key={addon.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem', color: colors.latte, cursor: 'pointer', padding: '4px 0' }}>
-                        <input 
-                          type="checkbox" 
-                          checked={formData.addon_ids.includes(addon.id)}
-                          onChange={(e) => {
-                            const newIds = e.target.checked 
-                              ? [...formData.addon_ids, addon.id]
-                              : formData.addon_ids.filter(id => id !== addon.id);
-                            setFormData({...formData, addon_ids: newIds});
-                          }}
-                          style={{ accentColor: colors.crema, width: '16px', height: '16px' }}
-                        />
-                        <span style={{ flex: 1 }}>{addon.name}</span>
-                        <span style={{ fontSize: '0.75rem', opacity: 0.6 }}>£{addon.price}</span>
-                      </label>
-                    ))}
+                  
+                  {/* Selected addons as removable pills */}
+                  {formData.addon_ids.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '10px', padding: '10px', background: 'rgba(196,164,132,0.05)', borderRadius: '12px', border: '1px solid rgba(196,164,132,0.15)' }}>
+                      {formData.addon_ids.map((aid, idx) => {
+                        const addon = allAddons.find(a => a.id === aid);
+                        if (!addon) return null;
+                        return (
+                          <span key={`addon-${aid}-${idx}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', borderRadius: '20px', background: 'rgba(196,164,132,0.1)', border: '1px solid rgba(196,164,132,0.3)', color: colors.crema, fontSize: '0.72rem', fontWeight: '700' }}>
+                            {addon.name} (£{addon.price})
+                            <button type="button" onClick={() => setFormData(prev => ({...prev, addon_ids: prev.addon_ids.filter((_, i) => i !== idx)}))} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: colors.crema, fontSize: '1rem', lineHeight: 1, marginLeft: '2px' }}>×</button>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* All addons with inline edit/delete */}
+                  <div style={{ padding: '6px', backgroundColor: colors.input, borderRadius: '14px', border: `1px solid ${colors.border}`, maxHeight: '155px', overflowY: 'auto' }}>
+                    {allAddons.map(addon => {
+                      const isSelected = formData.addon_ids.includes(addon.id);
+                      const isEditing = addonEditId === addon.id;
+                      return (
+                        <div key={addon.id} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 6px', borderRadius: '8px', marginBottom: '2px', background: isSelected ? 'rgba(196,164,132,0.1)' : 'transparent', transition: '0.2s' }}>
+                          <input type="checkbox" checked={isSelected}
+                            onChange={e => {
+                              const newIds = e.target.checked ? [...formData.addon_ids, addon.id] : formData.addon_ids.filter(id => id !== addon.id);
+                              setFormData(prev => ({...prev, addon_ids: newIds}));
+                            }}
+                            style={{ accentColor: colors.crema, width: '14px', height: '14px', flexShrink: 0, cursor: 'pointer' }}
+                          />
+                          {isEditing ? (
+                            <div style={{ display: 'flex', gap: '4px', flex: 1 }}>
+                              <input value={addonEditName} onChange={e => setAddonEditName(e.target.value)}
+                                placeholder="Name"
+                                style={{ flex: 2, background: 'rgba(255,255,255,0.05)', border: `1px solid ${colors.crema}`, borderRadius: '6px', color: colors.latte, padding: '2px 6px', fontSize: '0.75rem', outline: 'none' }}
+                              />
+                              <input value={addonEditPrice} onChange={e => setAddonEditPrice(e.target.value)}
+                                placeholder="£"
+                                style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: `1px solid ${colors.crema}`, borderRadius: '6px', color: colors.latte, padding: '2px 6px', fontSize: '0.75rem', outline: 'none' }}
+                              />
+                            </div>
+                          ) : (
+                            <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: isSelected ? colors.crema : colors.latte }}>
+                              <span>{addon.name}</span>
+                              <span style={{ opacity: 0.6, fontSize: '0.75rem' }}>£{addon.price}</span>
+                            </div>
+                          )}
+                          {isEditing ? (
+                            <button type="button" onClick={() => handleSaveAddonEdit(addon.id)} style={{ background: 'rgba(56,239,125,0.15)', border: '1px solid rgba(56,239,125,0.3)', borderRadius: '6px', color: '#38ef7d', cursor: 'pointer', padding: '2px 8px', fontSize: '0.72rem', fontWeight: '700' }}>✓</button>
+                          ) : (
+                            <button type="button" onClick={() => { 
+                              setAddonEditId(addon.id); 
+                              setAddonEditName(addon.name); 
+                              setAddonEditPrice(addon.price); 
+                              setAddonEditInventoryId(addon.inventory_id || '');
+                            }} style={{ background: 'none', border: 'none', color: '#777', cursor: 'pointer', padding: '2px 5px', fontSize: '0.75rem', flexShrink: 0 }} title="Edit addon">✏️</button>
+                          )}
+                          <button type="button" onClick={() => handleDeleteAddon(addon.id)} style={{ background: 'none', border: 'none', color: 'rgba(231,74,59,0.5)', cursor: 'pointer', padding: '2px 5px', fontSize: '0.75rem', flexShrink: 0 }} title="Delete addon">✕</button>
+                        </div>
+                      );
+                    })}
+                    {allAddons.length === 0 && <div style={{ color: '#555', fontSize: '0.8rem', padding: '12px', textAlign: 'center' }}>No addons yet.</div>}
                   </div>
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-                    <input type="text" value={newAddonName} onChange={e => setNewAddonName(e.target.value)} placeholder="Addon..." style={{...inputStyle, padding: '10px', fontSize: '0.85rem', flex: 2}} />
-                    <input type="text" value={newAddonPrice} onChange={e => setNewAddonPrice(e.target.value)} placeholder="£" style={{...inputStyle, padding: '10px', fontSize: '0.85rem', flex: 1}} />
-                    <button type="button" onClick={handleQuickAddAddon} style={{backgroundColor: colors.crema, color: colors.espresso, border: 'none', borderRadius: '10px', padding: '0 18px', cursor: 'pointer', fontWeight: 'bold'}}>+</button>
+
+                    <div style={{ display: 'flex', gap: '6px', marginTop: '12px' }}>
+                      <input type="text" value={newAddonName} onChange={e => setNewAddonName(e.target.value)}
+                        onKeyDown={e => { if(e.key === 'Enter') { e.preventDefault(); handleQuickAddAddon(); }}}
+                        placeholder="Name" style={{...inputStyle, width: '100px', flex: '2', padding: '10px', fontSize: '0.82rem'}} />
+                      <input type="text" value={newAddonPrice} onChange={e => setNewAddonPrice(e.target.value)}
+                        onKeyDown={e => { if(e.key === 'Enter') { e.preventDefault(); handleQuickAddAddon(); }}}
+                        placeholder="£" style={{...inputStyle, width: '50px', flex: '1', padding: '10px', fontSize: '0.82rem'}} />
+                      <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleQuickAddAddon(); }} style={{backgroundColor: colors.crema, color: colors.espresso, border: 'none', borderRadius: '10px', width: '42px', height: '42px', cursor: 'pointer', fontWeight: 'bold', flexShrink: 0, fontSize: '1.2rem'}}>+</button>
+                    </div>
                   </div>
                 </div>
+
+              {/* NEW: Recipe / Ingredients Section */}
+              <div style={{ padding: '20px', backgroundColor: 'rgba(196,164,132,0.05)', borderRadius: '20px', border: `1px solid ${colors.border}`, marginTop: '10px' }}>
+                <label style={{ ...labelStyle, marginBottom: '15px', color: colors.crema, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <GripVertical size={16} /> Recipe &amp; Ingredients Mapping
+                </label>
+                
+                {/* Existing ingredients list */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '15px' }}>
+                  {recipeIngredients.map((ing, idx) => (
+                    <div key={idx} style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                      <select 
+                        value={ing.inventory_id} 
+                        onChange={(e) => {
+                          const newIngs = [...recipeIngredients];
+                          newIngs[idx].inventory_id = e.target.value;
+                          setRecipeIngredients(newIngs);
+                        }}
+                        style={{ ...inputStyle, flex: 2, padding: '10px' }}
+                      >
+                        <option value="">Select Ingredient...</option>
+                        {allInventory.map(inv => (
+                          <option key={inv.id} value={inv.id}>{inv.item_name} ({inv.unit})</option>
+                        ))}
+                      </select>
+                      <input 
+                        type="number" step="0.01"
+                        value={ing.quantity_required}
+                        onChange={(e) => {
+                          const newIngs = [...recipeIngredients];
+                          newIngs[idx].quantity_required = e.target.value;
+                          setRecipeIngredients(newIngs);
+                        }}
+                        placeholder="Qty used"
+                        style={{ ...inputStyle, flex: 1, padding: '10px' }}
+                      />
+                      <button type="button" onClick={() => setRecipeIngredients(recipeIngredients.filter((_, i) => i !== idx))} style={{ background: 'none', border: 'none', color: '#e74a3b', cursor: 'pointer' }}><Trash2 size={18} /></button>
+                    </div>
+                  ))}
+                </div>
+                
+                <button 
+                  type="button" 
+                  onClick={() => setRecipeIngredients([...recipeIngredients, { inventory_id: '', quantity_required: '' }])}
+                  style={{ background: 'rgba(196,164,132,0.1)', border: `1px dashed ${colors.crema}`, color: colors.crema, padding: '10px', borderRadius: '10px', width: '100%', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '15px' }}
+                >
+                  + Add Ingredient to Recipe
+                </button>
+
+                {/* Add New Raw Material */}
+                <details style={{ borderTop: `1px solid ${colors.border}`, paddingTop: '15px' }}>
+                  <summary style={{ cursor: 'pointer', color: '#aaa', fontSize: '0.82rem', fontWeight: '600', userSelect: 'none', listStyle: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontSize: '1rem' }}>➕</span> Create New Raw Material (if not in list above)
+                  </summary>
+                  <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <input type="text" value={newInvName} onChange={e => setNewInvName(e.target.value)}
+                      placeholder="Material name (e.g. Espresso Beans)"
+                      style={{ ...inputStyle, padding: '10px', fontSize: '0.85rem' }} />
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <input type="number" value={newInvQty} onChange={e => setNewInvQty(e.target.value)}
+                        placeholder="Initial Qty"
+                        style={{ ...inputStyle, flex: 1, padding: '10px', fontSize: '0.85rem' }} />
+                      <input type="number" value={newInvThreshold} onChange={e => setNewInvThreshold(e.target.value)}
+                        placeholder="Low Stock Alert"
+                        style={{ ...inputStyle, flex: 1, padding: '10px', fontSize: '0.85rem' }} title="Low stock alert threshold" />
+                      <select
+                        value={['g','ml','pcs'].includes(newInvUnit) || newInvUnit === '' ? newInvUnit : '__custom__'}
+                        onChange={e => {
+                          if (e.target.value === '__custom__') setNewInvUnit('');
+                          else setNewInvUnit(e.target.value);
+                        }}
+                        style={{ ...inputStyle, flex: 1, padding: '10px', fontSize: '0.85rem' }}>
+                        <option value="g">g</option>
+                        <option value="ml">ml</option>
+                        <option value="pcs">pcs</option>
+                        <option value="__custom__">Other...</option>
+                      </select>
+                      {!['g','ml','pcs'].includes(newInvUnit) && (
+                        <input type="text" value={newInvUnit}
+                          onChange={e => setNewInvUnit(e.target.value)}
+                          placeholder="e.g. kg, L, cup..."
+                          style={{ ...inputStyle, flex: 1, padding: '10px', fontSize: '0.85rem' }}
+                          autoFocus
+                        />
+                      )}
+                    </div>
+                    <button type="button" onClick={handleQuickAddInventory}
+                      style={{ backgroundColor: colors.crema, color: colors.espresso, border: 'none', borderRadius: '10px', padding: '10px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9rem' }}>
+                      ➕ Add to Inventory
+                    </button>
+                  </div>
+                </details>
               </div>
 
               <div style={{ display: 'flex', gap: '15px', marginTop: '10px' }}>
@@ -504,7 +858,43 @@ const Products = () => {
             <div style={{ backgroundColor: colors.bean, borderRadius: '30px', padding: '35px', width: '100%', maxWidth: '900px', maxHeight: '85vh', overflowY: 'auto', border: `1px solid ${colors.border}`, boxShadow: '0 25px 60px rgba(0,0,0,0.6)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
                 <h3 style={{ color: colors.crema, margin: 0, fontFamily: "'DM Serif Display', serif", fontSize: '1.8rem' }}>Select Product Image</h3>
-                <button onClick={() => setShowImagePicker(false)} style={{ background: 'none', border: 'none', color: colors.latte, cursor: 'pointer', padding: '5px' }}><X size={28} /></button>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                  {/* Upload from Device Button */}
+                  <label style={{ 
+                    display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer',
+                    padding: '10px 18px', borderRadius: '12px', fontSize: '0.9rem', fontWeight: '600',
+                    backgroundColor: uploadLoading ? '#555' : colors.latte,
+                    color: colors.bean, border: 'none', transition: '0.2s'
+                  }}>
+                    {uploadLoading ? '⏳ Uploading...' : '📁 Upload from Device'}
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      style={{ display: 'none' }}
+                      disabled={uploadLoading}
+                      onChange={async (e) => {
+                        const file = e.target.files[0];
+                        if (!file) return;
+                        setUploadLoading(true);
+                        const fd = new FormData();
+                        fd.append('image', file);
+                        try {
+                          const res = await axios.post('/api/upload-image', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+                          const newFilename = res.data.filename;
+                          await fetchImages(); // refresh grid
+                          setFormData(prev => ({ ...prev, image_url: newFilename }));
+                          setShowImagePicker(false);
+                        } catch (err) {
+                          alert('Upload failed: ' + (err.response?.data?.error || err.message));
+                        } finally {
+                          setUploadLoading(false);
+                          e.target.value = '';
+                        }
+                      }}
+                    />
+                  </label>
+                  <button onClick={() => setShowImagePicker(false)} style={{ background: 'none', border: 'none', color: colors.latte, cursor: 'pointer', padding: '5px' }}><X size={28} /></button>
+                </div>
               </div>
               
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '20px' }}>
@@ -553,34 +943,27 @@ const Products = () => {
         )}
 
       <div style={{ 
+        position: 'relative',
+        zIndex: 1,
         width: '100%', 
-        maxWidth: '1480px', 
         display: 'flex', 
         justifyContent: 'space-between', 
-        alignItems: 'center', 
-        marginBottom: '40px',
-        padding: '0 20px'
+        alignItems: 'flex-start', 
+        marginBottom: '40px'
       }}>
         <div>
-          <div style={{ 
-            fontFamily: "'DM Serif Display', serif", 
-            fontSize: '2rem', 
-            color: colors.crema, 
-            lineHeight: '1',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px',
-            marginBottom: '15px'
-          }}>
-            Faculty<span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
+          <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: colors.crema, lineHeight: 1 }}>
+            Faculty <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
           </div>
-          <div className="header-box">
-            <h2 style={{ display: 'flex', alignItems: 'center', gap: '15px', margin: 0, ...headerTextStyle }}>
-              <BsGrid3X3 size={32} color={colors.crema} /> 
-              Product Inventory
-            </h2>
+
+          <div className="page-badge">
+            <BsGrid3X3 size={28} color={colors.crema} />
+            <span>Product Catalog</span>
           </div>
-          <p style={{ color: colors.crema, marginTop: '12px', opacity: 0.6, fontSize: '0.95rem' }}>Manage Faculty Coffee menu items and their configurations with premium precision.</p>
+
+          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '1rem', fontWeight: 500, marginTop: '5px' }}>
+            Faculty Coffee | Menu Items & Product Configuration
+          </p>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
           <div style={{ display: 'flex', gap: '15px' }}>
@@ -625,6 +1008,8 @@ const Products = () => {
       </div>
 
       <div style={{ 
+        position: 'relative',
+        zIndex: 1,
         width: '100%',
         maxWidth: '1500px', 
         backgroundColor: 'rgba(255, 255, 255, 0.01)', 
@@ -641,7 +1026,7 @@ const Products = () => {
         ) :          <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 10px', color: colors.latte, textAlign: 'left', tableLayout: 'fixed' }}>
               <colgroup>
-                <col style={{ width: '90px' }} />
+                <col style={{ width: '140px' }} />
                 <col style={{ width: '22%' }} />
                 <col style={{ width: '12%' }} />
                 <col style={{ width: '9%' }} />
@@ -664,7 +1049,7 @@ const Products = () => {
               </thead>
               <tbody>
                 {products.map((item, index) => (
-                  <tr key={item.id} className="product-row"
+                  <tr key={item.id} className="product-row premium-row"
                     draggable
                     onDragStart={() => handleDragStart(index)}
                     onDragEnter={() => handleDragEnter(index)}
@@ -678,10 +1063,9 @@ const Products = () => {
                     <td style={{ padding: '16px 12px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <div style={{ cursor: 'grab', opacity: 0.3 }}><GripVertical size={14} /></div>
-                        <div className="id-badge-premium">
-                          <span className="id-prefix">PRD</span>
-                          <span className="id-number">{String(index + 1).padStart(3, '0')}</span>
-                        </div>
+                        <span style={{ display: 'inline-block', whiteSpace: 'nowrap', padding: '6px 14px', borderRadius: '8px', background: 'linear-gradient(135deg, #c7a57a 0%, #a47c4f 100%)', color: colors.espresso, fontWeight: 900, letterSpacing: '1px', boxShadow: '0 4px 10px rgba(196, 164, 132, 0.3)' }}>
+                          PRD-{String(index + 1).padStart(3, '0')}
+                        </span>
                       </div>
                     </td>
                     <td style={{ padding: '12px' }}>
@@ -729,10 +1113,13 @@ const Products = () => {
                           </span>
                         )) : item.tags ? item.tags.split(',').map((tag, i) => (
                            <span key={i} style={{ 
-                            fontSize: '0.6rem', color: colors.crema, 
-                            border: '1px solid rgba(196, 164, 132, 0.3)',
-                            padding: '3px 7px', borderRadius: '6px',
-                            fontWeight: '600'
+                            fontSize: '0.6rem', 
+                            color: '#120a05', 
+                            background: 'linear-gradient(135deg, #c7a57a 0%, #e0d0b8 100%)', 
+                            padding: '3px 8px', 
+                            borderRadius: '6px',
+                            fontWeight: '700', 
+                            textTransform: 'uppercase'
                           }}>
                             {tag.trim()}
                           </span>
@@ -741,7 +1128,14 @@ const Products = () => {
                     </td>
                     <td style={{ padding: '12px' }}>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                        {item.addons ? item.addons.split(',').slice(0, 3).map((addon, i) => (
+                        {item.linkedAddons && item.linkedAddons.length > 0 ? item.linkedAddons.slice(0, 3).map((addon, i) => (
+                          <span key={i} style={{ 
+                            fontSize: '0.65rem', color: colors.crema, opacity: 0.7,
+                            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
+                          }}>
+                            + {addon.name}
+                          </span>
+                        )) : item.addons ? item.addons.split(',').slice(0, 3).map((addon, i) => (
                           <span key={i} style={{ 
                             fontSize: '0.65rem', color: colors.crema, opacity: 0.7,
                             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
@@ -749,7 +1143,9 @@ const Products = () => {
                             + {addon.trim()}
                           </span>
                         )) : <span style={{ color: '#444', fontSize: '0.7rem', fontStyle: 'italic' }}>—</span>}
-                        {item.addons && item.addons.split(',').length > 3 && (
+                        {item.linkedAddons && item.linkedAddons.length > 3 ? (
+                          <span style={{ fontSize: '0.6rem', color: colors.gold, opacity: 0.5 }}>+{item.linkedAddons.length - 3} more</span>
+                        ) : item.addons && item.addons.split(',').length > 3 && (
                           <span style={{ fontSize: '0.6rem', color: colors.gold, opacity: 0.5 }}>+{item.addons.split(',').length - 3} more</span>
                         )}
                       </div>
