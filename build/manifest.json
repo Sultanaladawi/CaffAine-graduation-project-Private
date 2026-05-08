@@ -1,0 +1,29 @@
+{
+  "short_name": "Faculty",
+  "name": "Faculty Coffee - Specialty Roasters",
+  "description": "Experience the finest specialty coffee in Birmingham. Order fresh brews and pastries directly from our mobile app.",
+  "icons": [
+    {
+      "src": "favicon.jpg",
+      "type": "image/jpeg",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": ".",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#170e0a",
+  "background_color": "#170e0a",
+  "orientation": "portrait",
+  "lang": "en-US",
+  "shortcuts": [
+    {
+      "name": "Admin Dashboard",
+      "short_name": "Admin",
+      "description": "Manage orders, inventory and products",
+      "url": "/admin",
+      "icons": [{ "src": "favicon.jpg", "sizes": "512x512", "type": "image/jpeg" }]
+    }
+  ]
+}
