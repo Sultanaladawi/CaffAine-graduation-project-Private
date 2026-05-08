@@ -15,13 +15,19 @@ const Feedback = () => {
     setTimeout(() => setNotification(null), 3000);
   };
 
-  const exportPDF = () => {
+  const exportPDF = async () => {
     try {
       const currentList = activeTab === 'general' ? data.general : data.products;
       if (currentList.length === 0) {
         alert("No feedback available in this category to export.");
         return;
       }
+
+      // Log the export action
+      await axios.post('/api/admin/log', { 
+        action: 'EXPORT PDF', 
+        details: `Administrator exported Customer Feedback & Reviews (${activeTab}) to PDF.` 
+      });
       
       const doc = new jsPDF();
       

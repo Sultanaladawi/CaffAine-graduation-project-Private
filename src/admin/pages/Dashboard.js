@@ -15,6 +15,10 @@ const Dashboard = () => {
     totalProducts: 0,
     totalOrders: 0,
     totalSales: 0,
+    todaySales: 0,
+    todayOrders: 0,
+    storeStatus: 'unknown',
+    storeMode: 'auto',
     lowStock: 0,
     lowStockItems: [],
     dailySales: []
@@ -67,6 +71,10 @@ const Dashboard = () => {
         totalProducts: incomingData.totalProducts || 0,
         totalOrders: incomingData.totalOrders || 0,
         totalSales: parseFloat(incomingData.totalSales || 0),
+        todaySales: incomingData.todaySales || 0,
+        todayOrders: incomingData.todayOrders || 0,
+        storeStatus: incomingData.storeStatus || 'unknown',
+        storeMode: incomingData.storeMode || 'auto',
         lowStock: incomingData.lowStock || 0,
         lowStockItems: incomingData.lowStockItems || [],
         dailySales: last7Days
@@ -121,6 +129,29 @@ const Dashboard = () => {
         
         .page-badge { background: #1b130e; border: 1px solid ${theme.border}; padding: 12px 25px; border-radius: 18px; display: inline-flex; align-items: center; gap: 12px; margin: 20px 0; }
         .page-badge span { font-family: 'Inter', sans-serif; font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: -0.5px; }
+        
+        .status-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 6px 15px;
+          border-radius: 12px;
+          font-size: 0.7rem;
+          font-weight: 900;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          margin-top: 10px;
+        }
+        .status-open { background: rgba(196, 164, 132, 0.1); color: #c4a484; border: 1px solid rgba(196, 164, 132, 0.2); }
+        .status-closed { background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.2); }
+        .status-auto { background: rgba(56, 239, 125, 0.1); color: #38ef7d; border: 1px solid rgba(56, 239, 125, 0.2); }
+        .pulse { width: 8px; height: 8px; border-radius: 50%; }
+        .pulse-open { background: #c4a484; box-shadow: 0 0 10px #c4a484; animation: pulse-beige 2s infinite; }
+        .pulse-closed { background: #ff4d4d; box-shadow: 0 0 10px #ff4d4d; animation: pulse-red 2s infinite; }
+        .pulse-auto { background: #38ef7d; box-shadow: 0 0 10px #38ef7d; animation: pulse-green 2s infinite; }
+        @keyframes pulse-beige { 0% { box-shadow: 0 0 0 0 rgba(196, 164, 132, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(196, 164, 132, 0); } 100% { box-shadow: 0 0 0 0 rgba(196, 164, 132, 0); } }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 77, 77, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); } }
+        @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(56, 239, 125, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(56, 239, 125, 0); } 100% { box-shadow: 0 0 0 0 rgba(56, 239, 125, 0); } }
       `}</style>
 
       {/* Clean & Elegant Header */}
@@ -137,6 +168,25 @@ const Dashboard = () => {
         <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '1rem', fontWeight: 500, marginTop: '5px' }}>
           Real-time analytics and system performance monitoring.
         </p>
+
+        {/* Real-time Summary Cards */}
+        <div style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
+          <div style={{ background: 'rgba(56, 239, 125, 0.05)', border: '1px solid rgba(56, 239, 125, 0.15)', padding: '10px 20px', borderRadius: '14px' }}>
+            <div style={{ fontSize: '0.6rem', color: '#38ef7d', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>Today's Revenue</div>
+            <div style={{ fontSize: '1.2rem', color: '#fff', fontWeight: '900' }}>£{parseFloat(stats.todaySales || 0).toFixed(2)}</div>
+          </div>
+          <div style={{ background: 'rgba(79, 172, 254, 0.05)', border: '1px solid rgba(79, 172, 254, 0.15)', padding: '10px 20px', borderRadius: '14px' }}>
+            <div style={{ fontSize: '0.6rem', color: '#4facfe', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>Today's Orders</div>
+            <div style={{ fontSize: '1.2rem', color: '#fff', fontWeight: '900' }}>{stats.todayOrders || 0}</div>
+          </div>
+        </div>
+
+        <div className={`status-badge ${stats.storeMode === 'auto' ? 'status-auto' : (stats.storeMode === 'manual_open' ? 'status-open' : 'status-closed')}`}>
+          <div className={`pulse ${stats.storeMode === 'auto' ? 'pulse-auto' : (stats.storeMode === 'manual_open' ? 'pulse-open' : 'pulse-closed')}`} />
+          {stats.storeMode === 'auto' 
+            ? `AUTO MODE: ${stats.storeStatus.toUpperCase()}` 
+            : `MANUAL: ${stats.storeStatus.toUpperCase()}`}
+        </div>
 
         {/* Minimal Clock */}
         <div style={{ position: 'absolute', top: 0, right: 0, textAlign: 'right' }}>

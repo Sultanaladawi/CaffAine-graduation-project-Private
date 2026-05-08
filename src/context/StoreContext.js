@@ -27,7 +27,9 @@ export const StoreProvider = ({ children }) => {
     const fetchStatus = async () => {
       try {
         const res = await axios.get(`${API_BASE}/api/store-status`);
-        setManualStatus(res.data.status);
+        // Use the mode and status from backend for full sync
+        setManualStatus(res.data.mode || 'auto');
+        setIsStoreOpen(res.data.status === 'open');
       } catch (err) {
         console.error("Fetch Status Error:", err);
       }
@@ -38,32 +40,20 @@ export const StoreProvider = ({ children }) => {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    if (manualStatus === 'open') {
-      setIsStoreOpen(true);
-    } else if (manualStatus === 'closed') {
-      setIsStoreOpen(false);
-    } else {
-      setIsStoreOpen(checkAutoStatus());
-    }
-  }, [manualStatus]);
-
   const toggleStatus = async () => {
     let next;
-    if (manualStatus === 'auto') next = 'closed';
-    else if (manualStatus === 'closed') next = 'open';
+    if (manualStatus === 'auto') next = 'manual_closed';
+    else if (manualStatus === 'manual_closed') next = 'manual_open';
     else next = 'auto';
     
     // Optimistic UI update
-    const prevStatus = manualStatus;
     setManualStatus(next);
 
     try {
       await axios.post(`${API_BASE}/api/store-status`, { status: next });
     } catch (err) {
       console.error("Failed to update store status:", err);
-      setManualStatus(prevStatus); // Rollback on error
-      alert("Error: Could not connect to server. Please check if backend is running.");
+      alert("Error: Could not connect to server.");
     }
   };
 

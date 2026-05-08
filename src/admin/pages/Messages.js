@@ -8,13 +8,19 @@ const Messages = () => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const exportPDF = () => {
+  const exportPDF = async () => {
     try {
       if (messages.length === 0) {
         alert("No messages available to export.");
         return;
       }
       
+      // Log the export action
+      await axios.post('/api/admin/log', { 
+        action: 'EXPORT PDF', 
+        details: 'Administrator exported the Inbox Messages report to PDF.' 
+      });
+
       const doc = new jsPDF();
       
       // Header

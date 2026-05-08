@@ -57,20 +57,6 @@ export const menuCategories = [
       { id: 22, name: "Raspberry & Custard laminated pastry.", price: "£3.45", desc: "Crispy, buttery laminated dough filled with smooth vanilla custard and topped with fresh raspberries", tags: ["vegetarian"] },
     ],
   },
-  {
-    id: "soft",
-    label: "Soft Drinks",
-    icon: "fa-bottle-water",
-    color: "#708090",
-    items: [],
-  },
-  {
-    id: "other",
-    label: "Other Products",
-    icon: "fa-box-open",
-    color: "#999999",
-    items: [],
-  },
 ];
 
 export const featuredItems = [
@@ -85,6 +71,16 @@ export const featuredItems = [
     vegan: false,
   },
   {
+    id: 4,
+    name: "Latte",
+    category: "Espresso",
+    desc: "A smooth and creamy coffee classic made with a rich double shot of espresso and topped with a generous layer of silky steamed milk. Finished with a light touch of micro-foam, perfect for those who enjoy a milder coffee flavor",
+    price: "£3.80",
+    image: "/images/Latte.jpg",
+    tag: "Coffee",
+    vegan: false,
+  },
+  {
     id: 10,
     name: "Freshly Baked Pastry",
     category: "Bakery",
@@ -95,23 +91,13 @@ export const featuredItems = [
     vegan: false,
   },
   {
-    id: 43,
-    name: "Gaza Cola",
-    category: "soft-drinks",
-    desc: "The classic,refreshing taste of Gaza Cola. A bold, sweet, and perfectly carbonated beverage.Best enjoyed chilled for a crisp experience.",
-    price: "£1.00",
-    image: "/images/Gaza_cola.jpg",
-    tag: "GazaCola",
-    vegan: false,
-  },
-  {
     id: 11,
-    name: "Brunch Plate",
-    category: "Sweets",
-    desc: "A fluffy stack of golden pancakes layered with smooth caramel sauce. Topped with a fresh medley of strawberries, blueberries, and raspberries for a perfect balance of sweetness and tanginess.",
-    price: "£3.50",
-    image: "/images/brunch_plate.png",
-    tag: "Desserts",
+    name: "Sandwich",
+    category: "food",
+    desc: "A vibrant and wholesome plant-based masterpiece. This multi-layered sandwich features thick slices of seeded whole-wheat bread, generously layered with creamy dill-flecked plant-based cheese, followed by layers of fresh, crisp greens: watercress, spinach, and a healthy dose of mixed microgreens. Sandwiched between these greens is a bright array of colors: ripe avocado, red onion rings, and sweet yellow and red heirloom tomato slices. A feast for the eyes and the palate",
+    price: "£3.00",
+    image: "/images/sandwich.jpg",
+    tag: "HealthyLunch",
     vegan: false,
   },
 ];

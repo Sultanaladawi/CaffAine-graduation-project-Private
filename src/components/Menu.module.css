@@ -281,18 +281,27 @@
 }
 
 .modalContentFull {
-  background-color: #fcf6ef;
-  border-radius: 20px;
-  width: 90%;
-  max-width: 450px;
+  background-color: var(--bg-card);
+  border-radius: 32px;
+  width: 95%;
+  max-width: 500px;
   position: relative;
-  box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+  box-shadow: 0 30px 70px rgba(0,0,0,0.4);
   animation: modalZoom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   overflow: hidden;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--border);
+}
+
+@media (min-width: 900px) {
+  .modalContentFull {
+    max-width: 1000px;
+    flex-direction: row;
+    height: 650px;
+    align-items: stretch;
+  }
 }
 
 @keyframes modalZoom {
@@ -327,8 +336,23 @@
 
 .modalImageFull {
   width: 100%;
-  height: 365px;
-  background-color: #f5f1ed;
+  height: 320px;
+  background-color: var(--latte-soft);
+  position: relative;
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .modalImageFull {
+    height: 240px;
+  }
+}
+
+@media (min-width: 900px) {
+  .modalImageFull {
+    width: 50%;
+    height: 100% !important;
+  }
 }
 
 .modalImageFull img {
@@ -338,29 +362,50 @@
 }
 
 .modalBodyFull {
-  padding: 25px;
+  padding: 40px;
   overflow-y: auto;
+  flex: 1;
+  background-color: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 900px) {
+  .modalBodyFull {
+    width: 50%;
+  }
+}
+
+.titleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 12px;
 }
 
 .titleRow h3 {
   margin: 0;
-  font-size: 1.8rem;
-  color: #2c1810;
+  font-size: 2rem;
+  color: var(--espresso);
   font-family: 'DM Serif Display', serif;
+  line-height: 1.1;
 }
 
 .priceHighlight {
-  color: #8c6a56;
+  color: var(--gold-dim);
   font-weight: 700;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   font-family: 'DM Serif Display', serif;
+  white-space: nowrap;
 }
 
 .descText {
-  color: #666;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  margin: 0 0 25px 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0 0 30px 0;
+  opacity: 0.8;
 }
 
 .addonSection h4,
@@ -385,16 +430,34 @@
   justify-content: space-between;
   align-items: center;
   padding: 15px 20px;
-  background-color: rgba(196, 164, 132, 0.15);
-  border-radius: 12px;
+  background-color: var(--latte-soft);
+  border-radius: 16px;
   cursor: pointer;
-  border: 1px solid transparent;
+  border: 1px solid var(--border);
   transition: all 0.2s;
+  color: var(--espresso);
+}
+
+.addonRow:hover {
+  border-color: var(--gold);
+  background-color: var(--bg-card-hover);
 }
 
 .addonRowSelected {
-  background-color: rgba(196, 164, 132, 0.3);
-  border-color: #c4a484;
+  background-color: var(--gold-glow) !important;
+  border-color: var(--gold) !important;
+  box-shadow: 0 5px 15px rgba(200, 156, 116, 0.1);
+}
+
+.addonName {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.addonPrice {
+  font-weight: 700;
+  color: var(--gold-dim);
+  font-size: 0.9rem;
 }
 
 .feedbackSectionCompact {

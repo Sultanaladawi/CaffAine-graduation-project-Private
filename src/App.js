@@ -33,6 +33,7 @@ import Applications       from './admin/pages/Applications';
 import Jobs               from './admin/pages/Jobs';
 import Feedback           from './admin/pages/Feedback';
 import Messages           from './admin/pages/Messages';
+import LeaderDashboard    from './admin/pages/LeaderDashboard';
 
 let LenisClass = null;
 try { LenisClass = require('@studio-freight/lenis').default; } catch (_) {}
@@ -168,6 +169,7 @@ export default function App() {
                 <Route path="messages"     element={<Messages />} />
                 <Route path="feedback"     element={<Feedback />} />
                 <Route path="ai-assistant" element={<AIAssistant />} />
+                <Route path="leader"       element={<LeaderDashboard />} />
               </Route>
 
               <Route path="*" element={<Navigate to="/" replace />} />

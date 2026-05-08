@@ -35,6 +35,18 @@ function cartReducer(state, action) {
     case 'CLEAR_CART':
       return { ...state, items: [] };
 
+    case 'FIX_ADDON_PRICES':
+      return {
+        ...state,
+        _v: CART_VERSION,
+        items: state.items.map(item => {
+          const price = parseFloat(item.priceNum);
+          const isAddon = String(item.id).startsWith('addon-');
+          const fixedPrice = isAddon && (!price || price <= 0) ? 0.50 : (price || 0);
+          return { ...item, priceNum: fixedPrice };
+        })
+      };
+
     default:
       return state;
     }
@@ -42,17 +54,47 @@ function cartReducer(state, action) {
 
 const STORAGE_KEY = 'faculty_coffee_cart';
 
+const CART_VERSION = 2; // Increment this to force-fix old cached carts
+
+function sanitizeCart(cart) {
+  if (!cart || !Array.isArray(cart.items)) return { items: [], _v: CART_VERSION };
+  return {
+    ...cart,
+    _v: CART_VERSION,
+    items: cart.items.map(item => {
+      const price = parseFloat(item.priceNum);
+      const isAddon = String(item.id).startsWith('addon-');
+      // Any addon with zero/missing price gets corrected to 0.50
+      const fixedPrice = isAddon && (!price || price <= 0) ? 0.50 : (price || 0);
+      return { ...item, priceNum: fixedPrice };
+    })
+  };
+}
+
 function loadCart() {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : { items: [] };
+    if (!stored) return { items: [], _v: CART_VERSION };
+    const parsed = JSON.parse(stored);
+    // If cart version is old or missing, sanitize all items
+    if (!parsed._v || parsed._v < CART_VERSION) {
+      const fixed = sanitizeCart(parsed);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(fixed)); // Save fixed cart immediately
+      return fixed;
+    }
+    return parsed;
   } catch {
-    return { items: [] };
+    return { items: [], _v: CART_VERSION };
   }
 }
 
 export function CartProvider({ children }) {
   const [state, dispatch] = useReducer(cartReducer, null, loadCart);
+
+  // One-time fix on mount: correct any zero-price addon items in current state
+  useEffect(() => {
+    dispatch({ type: 'FIX_ADDON_PRICES' });
+  }, []);
 
   useEffect(() => {
     if (state) {

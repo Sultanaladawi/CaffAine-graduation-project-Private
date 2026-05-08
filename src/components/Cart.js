@@ -5,7 +5,10 @@ import { useEffect } from 'react';
 export default function Cart({ onClose, onCheckout }) {
   const { items, totalItems, totalPrice, removeItem, setQty, clearCart } = useCart();
 
-  const formatPrice = (n) => `£${n.toFixed(2)}`;
+  const formatPrice = (n) => {
+    const val = parseFloat(n) || 0;
+    return `£${val.toFixed(2)}`;
+  };
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';

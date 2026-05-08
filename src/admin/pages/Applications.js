@@ -27,12 +27,19 @@ const Applications = () => {
     }
   };
 
-  const exportPDF = () => {
+  const exportPDF = async () => {
     try {
       if (apps.length === 0) {
         alert("No applications to export.");
         return;
       }
+
+      // Log the export action
+      await axios.post('/api/admin/log', { 
+        action: 'EXPORT PDF', 
+        details: 'Administrator exported the Candidate Submissions report to PDF.' 
+      });
+
       const doc = new jsPDF();
       doc.setFontSize(22);
       doc.setTextColor(45, 41, 38);

@@ -16,7 +16,8 @@ const Orders = () => {
     primary: '#c4a484',
     border: 'rgba(196, 164, 132, 0.15)',
     text: '#e6d5c3',
-    success: '#38ef7d'  
+    success: '#38ef7d',
+    info: '#4facfe'
   };
 
   const showToast = (message, type = 'success') => {
@@ -46,12 +47,18 @@ const Orders = () => {
     fetchOrders();
   }, []);
 
-  const exportPDF = () => {
+  const exportPDF = async () => {
     try {
       if (orders.length === 0) {
         alert("No orders available to export.");
         return;
       }
+
+      // Log the export action
+      await axios.post('/api/admin/log', { 
+        action: 'EXPORT PDF', 
+        details: 'Administrator exported the Sales/Orders report to PDF.' 
+      });
       
       const doc = new jsPDF();
       
@@ -113,6 +120,39 @@ const Orders = () => {
 
   const closeDetails = () => setSelectedOrder(null);
 
+  const extendTime = async (e, id) => {
+    if (e) e.stopPropagation();
+    try {
+      await axios.put(`/api/extend-order/${id}`, { minutes: 2 });
+      showToast("+2 Minutes added to prep time", "success");
+      fetchOrders();
+    } catch (err) {
+      showToast("Failed to extend time", "error");
+    }
+  };
+
+  const markReady = async (e, id) => {
+    if (e) e.stopPropagation();
+    try {
+      await axios.put(`/api/mark-ready/${id}`, { status: 'ready' });
+      showToast("Order marked as ready!", "success");
+      fetchOrders();
+    } catch (err) {
+      showToast("Failed to update status", "error");
+    }
+  };
+
+  const markCompleted = async (e, id) => {
+    if (e) e.stopPropagation();
+    try {
+      await axios.put(`/api/mark-ready/${id}`, { status: 'completed' });
+      showToast("Order marked as completed!", "success");
+      fetchOrders();
+    } catch (err) {
+      showToast("Failed to update status", "error");
+    }
+  };
+
   return (
     <div style={{ backgroundColor: theme.bg, minHeight: '100vh', padding: '30px', position: 'relative', overflow: 'hidden' }}>
       
@@ -138,79 +178,98 @@ const Orders = () => {
       )}
 
       {selectedOrder && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', backdropFilter: 'blur(8px)' }}>
-          <div style={{ backgroundColor: '#0d0806', width: '100%', maxWidth: '500px', borderRadius: '30px', border: `1px solid ${theme.border}`, padding: '40px', position: 'relative', boxShadow: '0 25px 50px rgba(0,0,0,0.5)' }}>
-            <button onClick={closeDetails} style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: '1.5rem' }}>&times;</button>
-            <h3 style={{ color: theme.primary, margin: '0 0 20px 0', fontSize: '2.2rem', fontFamily: "'DM Serif Display', serif", fontWeight: 700 }}>
-              Order Details {' '}
-              <span style={{ display: 'inline-block', padding: '6px 12px', borderRadius: '10px', background: 'linear-gradient(90deg, #c7a57a, #a47c4f)', color: '#000', fontWeight: 800, letterSpacing: '1px', fontSize: '1.2rem' }}>{`ORD-${String(selectedOrder.id).padStart(3, '0')}`}</span>
-            </h3>
+      <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', backdropFilter: 'blur(8px)' }}>
+          <div style={{ backgroundColor: '#0d0806', width: '100%', maxWidth: '520px', maxHeight: '90vh', borderRadius: '30px', border: `1px solid ${theme.border}`, position: 'relative', boxShadow: '0 25px 50px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            
+            {/* Fixed Header */}
+            <div style={{ padding: '30px 40px 20px', borderBottom: `1px solid ${theme.border}`, flexShrink: 0 }}>
+              <button onClick={closeDetails} style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: '1.5rem' }}>×</button>
+              <h3 style={{ color: theme.primary, margin: '0 0 5px 0', fontSize: '2rem', fontFamily: "'DM Serif Display', serif", fontWeight: 700 }}>
+                Order Details{' '}
+                <span style={{ display: 'inline-block', padding: '6px 12px', borderRadius: '10px', background: 'linear-gradient(90deg, #c7a57a, #a47c4f)', color: '#000', fontWeight: 800, letterSpacing: '1px', fontSize: '1.1rem' }}>{`ORD-${String(selectedOrder.id).padStart(3, '0')}`}</span>
+              </h3>
+            </div>
 
-            {/* Customer Contact & Logistics Info */}
-            <div style={{ background: 'rgba(196,164,132,0.05)', padding: '20px', borderRadius: '15px', marginBottom: '25px', border: `1px solid ${theme.border}` }}>
-               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                 <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', fontWeight: 600 }}>Customer Name:</span>
-                 <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '1rem' }}>{selectedOrder.customer_name || 'Guest'}</span>
-               </div>
-               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                 <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', fontWeight: 600 }}>Contact Phone:</span>
-                 {selectedOrder.phone ? (
-                   <a href={`tel:${selectedOrder.phone}`} style={{ color: theme.primary, fontWeight: 'bold', fontSize: '1rem', letterSpacing: '1px', textDecoration: 'none', background: 'rgba(196,164,132,0.1)', padding: '4px 10px', borderRadius: '6px', cursor: 'pointer', transition: '0.2s', display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid rgba(196,164,132,0.2)` }} onMouseOver={e => e.currentTarget.style.background = 'rgba(196,164,132,0.2)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(196,164,132,0.1)'}>
-                     📞 {selectedOrder.phone}
-                   </a>
-                 ) : (
-                   <span style={{ color: '#888', fontWeight: 'bold', fontSize: '1rem', letterSpacing: '1px' }}>N/A</span>
-                 )}
-               </div>
-               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', alignItems: 'center' }}>
-                 <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', fontWeight: 600 }}>Fulfillment Type:</span>
-                 <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '0.9rem', textTransform: 'uppercase', background: 'rgba(255,255,255,0.1)', padding: '4px 10px', borderRadius: '6px' }}>{selectedOrder.order_type || 'Walk-in'}</span>
-               </div>
-               {selectedOrder.order_type?.toLowerCase() === 'delivery' && (
-                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: '15px', paddingTop: '15px', borderTop: `1px dashed ${theme.border}` }}>
-                   <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', fontWeight: 600, marginTop: '5px' }}>Delivery Address (GPS):</span>
-                   {selectedOrder.delivery_address ? (
-                     <a href={`https://maps.google.com/?q=${encodeURIComponent(selectedOrder.delivery_address)}`} target="_blank" rel="noopener noreferrer" style={{ color: theme.success, fontWeight: 'bold', fontSize: '0.95rem', textAlign: 'right', maxWidth: '65%', lineHeight: '1.4', textDecoration: 'none', background: 'rgba(56,239,125,0.1)', padding: '8px 12px', borderRadius: '8px', border: '1px solid rgba(56,239,125,0.3)', cursor: 'pointer', transition: '0.2s', display: 'inline-flex', alignItems: 'flex-start', gap: '6px' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(56,239,125,0.2)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(56,239,125,0.1)'}>
-                       <span style={{ fontSize: '1.1rem' }}>📍</span> <span style={{ textDecoration: 'underline' }}>{selectedOrder.delivery_address}</span>
+            {/* Scrollable Body */}
+            <div style={{ overflowY: 'auto', flex: 1, padding: '20px 40px' }}>
+
+              {/* Customer Contact & Logistics Info */}
+              <div style={{ background: 'rgba(196,164,132,0.05)', padding: '20px', borderRadius: '15px', marginBottom: '20px', border: `1px solid ${theme.border}` }}>
+                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                   <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', fontWeight: 600 }}>Customer Name:</span>
+                   <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '1rem' }}>{selectedOrder.customer_name || 'Guest'}</span>
+                 </div>
+                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                   <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', fontWeight: 600 }}>Contact Phone:</span>
+                   {selectedOrder.phone ? (
+                     <a href={`tel:${selectedOrder.phone}`} style={{ color: theme.primary, fontWeight: 'bold', fontSize: '1rem', letterSpacing: '1px', textDecoration: 'none', background: 'rgba(196,164,132,0.1)', padding: '4px 10px', borderRadius: '6px', cursor: 'pointer', transition: '0.2s', display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid rgba(196,164,132,0.2)` }} onMouseOver={e => e.currentTarget.style.background = 'rgba(196,164,132,0.2)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(196,164,132,0.1)'}>
+                       📞 {selectedOrder.phone}
                      </a>
                    ) : (
-                     <span style={{ color: '#888', fontWeight: 'bold', fontSize: '0.95rem', textAlign: 'right', maxWidth: '65%', lineHeight: '1.4' }}>Address not provided</span>
+                     <span style={{ color: '#888', fontWeight: 'bold', fontSize: '1rem', letterSpacing: '1px' }}>N/A</span>
                    )}
                  </div>
-               )}
-            </div>
-            
-            <div style={{ borderTop: `1px solid ${theme.border}`, paddingTop: '15px' }}>
-              <table width="100%" style={{ borderCollapse: 'collapse', color: theme.text }}>
-                <thead>
-                  <tr style={{ color: theme.primary, borderBottom: `1px solid ${theme.border}` }}>
-                    <th style={{ padding: '10px', textAlign: 'left' }}>Item</th>
-                    <th style={{ padding: '10px', textAlign: 'center' }}>Qty</th>
-                    <th style={{ padding: '10px', textAlign: 'right' }}>Price</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orderItems.length > 0 ? orderItems.map((item, idx) => (
-                    <tr key={idx} style={{ borderBottom: `1px solid ${theme.border}` }}>
-                          <td style={{ padding: '12px 10px', color: cellTextStyle.color, fontFamily: cellTextStyle.fontFamily, fontSize: cellTextStyle.fontSize }}>{item.item_name}</td>
-                          <td style={{ padding: '12px 10px', textAlign: 'center', fontFamily: cellTextStyle.fontFamily }}>{item.quantity}</td>
-                          <td style={{ padding: '12px 10px', textAlign: 'right', color: theme.primary, fontFamily: cellTextStyle.fontFamily }}>£{(parseFloat(item.price) * item.quantity).toFixed(2)}</td>
+                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', alignItems: 'center' }}>
+                   <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', fontWeight: 600 }}>Fulfillment Type:</span>
+                   <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '0.9rem', textTransform: 'uppercase', background: 'rgba(255,255,255,0.1)', padding: '4px 10px', borderRadius: '6px' }}>{selectedOrder.order_type || 'Walk-in'}</span>
+                 </div>
+                 {selectedOrder.order_type?.toLowerCase() === 'delivery' && (
+                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: '15px', paddingTop: '15px', borderTop: `1px dashed ${theme.border}` }}>
+                     <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', fontWeight: 600, marginTop: '5px' }}>Delivery Address (GPS):</span>
+                     {selectedOrder.delivery_address ? (
+                       <a href={`https://maps.google.com/?q=${encodeURIComponent(selectedOrder.delivery_address)}`} target="_blank" rel="noopener noreferrer" style={{ color: theme.success, fontWeight: 'bold', fontSize: '0.95rem', textAlign: 'right', maxWidth: '65%', lineHeight: '1.4', textDecoration: 'none', background: 'rgba(56,239,125,0.1)', padding: '8px 12px', borderRadius: '8px', border: '1px solid rgba(56,239,125,0.3)', cursor: 'pointer', transition: '0.2s', display: 'inline-flex', alignItems: 'flex-start', gap: '6px' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(56,239,125,0.2)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(56,239,125,0.1)'}>
+                         <span style={{ fontSize: '1.1rem' }}>📍</span> <span style={{ textDecoration: 'underline' }}>{selectedOrder.delivery_address}</span>
+                       </a>
+                     ) : (
+                       <span style={{ color: '#888', fontWeight: 'bold', fontSize: '0.95rem', textAlign: 'right', maxWidth: '65%', lineHeight: '1.4' }}>Address not provided</span>
+                     )}
+                   </div>
+                 )}
+              </div>
+              
+              {/* Items Table */}
+              <div style={{ borderTop: `1px solid ${theme.border}`, paddingTop: '15px' }}>
+                <table width="100%" style={{ borderCollapse: 'collapse', color: theme.text }}>
+                  <thead>
+                    <tr style={{ color: theme.primary, borderBottom: `1px solid ${theme.border}` }}>
+                      <th style={{ padding: '10px', textAlign: 'left' }}>Item</th>
+                      <th style={{ padding: '10px', textAlign: 'center' }}>Qty</th>
+                      <th style={{ padding: '10px', textAlign: 'right' }}>Price</th>
                     </tr>
-                  )) : (
-                    <tr>
-                      <td colSpan="3" style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
-                        {loading ? 'Fetching details...' : 'No items found for this order.'}
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-              <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', color: theme.text, fontWeight: 'bold', fontSize: '1.1rem' }}>
-                <span>Total Amount:</span>
-                <span style={{ color: theme.primary }}>£{parseFloat(selectedOrder.total_amount).toFixed(2)}</span>
+                  </thead>
+                  <tbody>
+                    {orderItems.length > 0 ? orderItems.map((item, idx) => (
+                      <tr key={idx} style={{ borderBottom: `1px solid ${theme.border}` }}>
+                            <td style={{ padding: '12px 10px', color: cellTextStyle.color, fontFamily: cellTextStyle.fontFamily, fontSize: cellTextStyle.fontSize }}>{item.item_name}</td>
+                            <td style={{ padding: '12px 10px', textAlign: 'center', fontFamily: cellTextStyle.fontFamily }}>{item.quantity}</td>
+                            <td style={{ padding: '12px 10px', textAlign: 'right', color: theme.primary, fontFamily: cellTextStyle.fontFamily }}>£{(parseFloat(item.price) * item.quantity).toFixed(2)}</td>
+                      </tr>
+                    )) : (
+                      <tr>
+                        <td colSpan="3" style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
+                          {loading ? 'Fetching details...' : 'No items found for this order.'}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+                {selectedOrder.order_type?.toLowerCase() === 'delivery' && (
+                  <div style={{ marginTop: '15px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', color: 'rgba(255,255,255,0.6)', fontWeight: 'bold', fontSize: '0.95rem', borderTop: `1px dashed ${theme.border}`, paddingTop: '10px' }}>
+                    <span>Delivery Service Fee:</span>
+                    <span style={{ color: theme.success }}>£3.00</span>
+                  </div>
+                )}
+                <div style={{ marginTop: selectedOrder.order_type?.toLowerCase() === 'delivery' ? '5px' : '20px', display: 'flex', justifyContent: 'space-between', color: theme.text, fontWeight: 'bold', fontSize: '1.2rem', borderTop: selectedOrder.order_type?.toLowerCase() === 'delivery' ? 'none' : `1px solid ${theme.border}`, paddingTop: selectedOrder.order_type?.toLowerCase() === 'delivery' ? '0' : '15px' }}>
+                  <span>Total Amount:</span>
+                  <span style={{ color: theme.primary, fontSize: '1.4rem' }}>£{parseFloat(selectedOrder.total_amount).toFixed(2)}</span>
+                </div>
               </div>
             </div>
-            <button onClick={closeDetails} style={{ width: '100%', marginTop: '30px', padding: '14px', backgroundColor: theme.primary, color: '#000', border: 'none', borderRadius: '15px', fontWeight: '900', cursor: 'pointer' }}>Close Details</button>
+
+            {/* Fixed Footer */}
+            <div style={{ padding: '20px 40px', borderTop: `1px solid ${theme.border}`, flexShrink: 0 }}>
+              <button onClick={closeDetails} style={{ width: '100%', padding: '14px', backgroundColor: theme.primary, color: '#000', border: 'none', borderRadius: '15px', fontWeight: '900', cursor: 'pointer' }}>Close Details</button>
+            </div>
           </div>
         </div>
       )}
@@ -281,7 +340,7 @@ const Orders = () => {
                 <th style={{ padding: '20px', textAlign: 'left', fontSize: '0.8rem', letterSpacing: '1px', color: cellTextStyle.color }}>DATE & TIME</th>
                 <th style={{ padding: '20px', textAlign: 'left', fontSize: '0.8rem', letterSpacing: '1px', color: cellTextStyle.color }}>TOTAL AMOUNT</th>
                 <th style={{ padding: '20px', textAlign: 'left', fontSize: '0.8rem', letterSpacing: '1px', color: cellTextStyle.color }}>STATUS</th>
-                <th style={{ padding: '20px', textAlign: 'center', fontSize: '0.8rem', letterSpacing: '1px', color: cellTextStyle.color }}>DETAILS</th>
+                <th style={{ padding: '20px', textAlign: 'center', fontSize: '0.8rem', letterSpacing: '1px', color: cellTextStyle.color }}>ACTIONS</th>
               </tr>
             </thead>
             <tbody>
@@ -313,9 +372,56 @@ const Orders = () => {
                     </span>
                   </td>
                   <td style={{ padding: '20px', textAlign: 'center' }}>
-                    <button onClick={() => viewOrder(order)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                      <BsEye color={theme.primary} size={20} />
+                  <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
+                    {(!order.status || order.status.toLowerCase() === 'preparing' || order.status.toLowerCase() === 'pending') && (
+                      <>
+                        <button onClick={(e) => extendTime(e, order.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', transition: '0.2s' }} title="Add +2 Minutes">
+                          <BsClockHistory color={theme.info} size={20} />
+                        </button>
+                        <button onClick={(e) => markReady(e, order.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', transition: '0.2s' }} title="Mark as Ready">
+                          <BsCheckCircle color={theme.success} size={20} />
+                        </button>
+                      </>
+                    )}
+                    {order.status && order.status.toLowerCase() === 'ready' && (
+                      <button onClick={(e) => markCompleted(e, order.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', transition: '0.2s' }} title="Mark as Completed (Delivered)">
+                        <CheckCircle2 color={theme.success} size={20} />
+                      </button>
+                    )}
+                    <button 
+                      onClick={() => viewOrder(order)} 
+                      title="View Order Details"
+                      style={{ 
+                        background: 'linear-gradient(135deg, rgba(196,164,132,0.15), rgba(196,164,132,0.05))', 
+                        border: `1px solid ${theme.primary}`, 
+                        cursor: 'pointer', 
+                        transition: 'all 0.25s ease',
+                        borderRadius: '10px',
+                        padding: '8px 16px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '7px',
+                        color: theme.primary,
+                        fontWeight: '700',
+                        fontSize: '0.82rem',
+                        letterSpacing: '0.5px'
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.background = theme.primary;
+                        e.currentTarget.style.color = '#000';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = `0 6px 20px rgba(196,164,132,0.35)`;
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.background = 'linear-gradient(135deg, rgba(196,164,132,0.15), rgba(196,164,132,0.05))';
+                        e.currentTarget.style.color = theme.primary;
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
+                    >
+                      <BsEye size={17} /> VIEW
                     </button>
+                  </div>
                   </td>
                 </tr>
               );

@@ -4,7 +4,8 @@
   "scripts": {
     "start": "react-scripts start",
     "server": "node server.js",
-    "dev": "concurrently \"npm run server\" \"npm run start\""
+    "dev": "concurrently \"npm run server\" \"npm run start\"",
+    "build": "react-scripts build"
   },
   "dependencies": {
     "@studio-freight/lenis": "^1.0.42",

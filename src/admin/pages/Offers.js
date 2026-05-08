@@ -8,12 +8,19 @@ const Offers = () => {
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const exportPDF = () => {
+  const exportPDF = async () => {
     try {
       if (offers.length === 0) {
         alert("No promotions to export.");
         return;
       }
+
+      // Log the export action
+      await axios.post('/api/admin/log', { 
+        action: 'EXPORT PDF', 
+        details: 'Administrator exported Marketing Offers & Discounts to PDF.' 
+      });
+
       const doc = new jsPDF();
       doc.setFontSize(22);
       doc.setTextColor(45, 41, 38);

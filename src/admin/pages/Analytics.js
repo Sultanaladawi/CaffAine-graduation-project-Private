@@ -8,6 +8,8 @@ const Analytics = () => {
     totalSales: 0,
     totalOrders: 0,
     totalProducts: 0,
+    todaySales: 0,
+    todayOrders: 0,
     lowStock: 0
   });
   const [loading, setLoading] = useState(true);
@@ -31,21 +33,22 @@ const Analytics = () => {
         const last7Days = [];
         const rawDaily = Array.isArray(d.dailySales) ? d.dailySales : [];
         
+        const formatDate = (date) => {
+          const d = new Date(date);
+          return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        };
+
         for (let i = 6; i >= 0; i--) {
           const date = new Date();
           date.setDate(date.getDate() - i);
-          const dateStr = date.toISOString().split('T')[0];
+          const dateStr = formatDate(date);
           
-          // Find matching date in raw data
-          const match = rawDaily.find(s => {
-            if (!s.date) return false;
-            const sDateStr = new Date(s.date).toISOString().split('T')[0];
-            return sDateStr === dateStr;
-          });
+          const match = rawDaily.find(s => formatDate(s.date) === dateStr);
 
           last7Days.push({
-            day: date.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase(),
-            total: match ? parseFloat(match.total) : 0
+            day: date.toLocaleDateString('en-GB', { weekday: 'short' }).toUpperCase(),
+            total: match ? parseFloat(match.total) : 0,
+            fullDate: date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })
           });
         }
         setWeeklyData(last7Days);
@@ -53,11 +56,12 @@ const Analytics = () => {
         // Process Category Data
         const rawCats = Array.isArray(d.categoryStats) ? d.categoryStats : [];
         if (rawCats.length > 0) {
-          const totalOrders = rawCats.reduce((acc, curr) => acc + (parseInt(curr.count) || 0), 0);
-          const topCat = [...rawCats].sort((a,b) => b.count - a.count)[0];
+          const totalOrdersCount = rawCats.reduce((acc, curr) => acc + (parseInt(curr.count) || 0), 0);
+          const sortedCats = [...rawCats].sort((a,b) => b.count - a.count);
+          const topCat = sortedCats[0];
           setTopCategory({
             name: topCat.name,
-            percentage: totalOrders > 0 ? Math.round((topCat.count / totalOrders) * 100) : 0
+            percentage: totalOrdersCount > 0 ? Math.round((topCat.count / totalOrdersCount) * 100) : 0
           });
         }
 
@@ -118,6 +122,11 @@ const Analytics = () => {
           position: relative;
           z-index: 10;
         }
+        .bar-wrapper { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 10px; position: relative; cursor: pointer; }
+        .bar-tooltip { position: absolute; top: -30px; background: ${theme.crema}; color: #070504; padding: 5px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 900; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 10; white-space: nowrap; }
+        .bar-wrapper:hover .bar-tooltip { opacity: 1; transform: translateY(-10px); }
+        .bar-wrapper:hover .bar-fill { filter: brightness(1.2); transform: scaleX(1.05); }
+        .bar-fill { transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); }
       `}</style>
       <div style={{ 
         position: 'relative',
@@ -126,7 +135,7 @@ const Analytics = () => {
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'flex-start', 
-        marginBottom: '40px'
+        marginBottom: '20px'
       }}>
         <div>
           <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: theme.crema, lineHeight: 1 }}>
@@ -138,9 +147,17 @@ const Analytics = () => {
             <span>Business Analytics</span>
           </div>
 
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '1rem', fontWeight: 500, marginTop: '5px' }}>
-            Faculty Coffee | Real-time Performance Tracking & Sales Data
-          </p>
+          {/* Real-time Summary Cards */}
+          <div style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
+            <div style={{ background: 'rgba(56, 239, 125, 0.05)', border: '1px solid rgba(56, 239, 125, 0.15)', padding: '10px 20px', borderRadius: '14px' }}>
+              <div style={{ fontSize: '0.6rem', color: '#38ef7d', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>Today's Revenue</div>
+              <div style={{ fontSize: '1.2rem', color: '#fff', fontWeight: '900' }}>£{parseFloat(stats.todaySales || 0).toFixed(2)}</div>
+            </div>
+            <div style={{ background: 'rgba(79, 172, 254, 0.05)', border: '1px solid rgba(79, 172, 254, 0.15)', padding: '10px 20px', borderRadius: '14px' }}>
+              <div style={{ fontSize: '0.6rem', color: '#4facfe', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>Today's Orders</div>
+              <div style={{ fontSize: '1.2rem', color: '#fff', fontWeight: '900' }}>{stats.todayOrders || 0}</div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -178,41 +195,21 @@ const Analytics = () => {
           
           <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', gap: '15px', paddingBottom: '10px', height: '240px' }}>
              {weeklyData.length > 0 ? weeklyData.map((d, i) => (
-                <div key={i} style={{ 
-                  flex: 1, 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  alignItems: 'center', 
-                  justifyContent: 'flex-end',
-                  height: '100%'
-                }}>
-                  <div style={{ 
+                <div key={i} className="bar-wrapper">
+                  <div className="bar-tooltip">£{d.total.toFixed(2)}</div>
+                  <div className="bar-fill" style={{ 
                     width: '70%', 
                     maxWidth: '40px',
                     backgroundColor: i === 6 ? theme.crema : 'rgba(196, 164, 132, 0.15)', 
                     height: `${Math.max((d.total / maxWeekly) * 100, 2)}%`, 
                     borderRadius: '8px 8px 4px 4px', 
-                    transition: 'all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
                     position: 'relative',
                     boxShadow: i === 6 ? `0 0 20px ${theme.crema}44` : 'none'
                   }}>
-                    {d.total > 0 && (
-                      <div style={{ 
-                        position: 'absolute', 
-                        top: '-30px', 
-                        left: '50%', 
-                        transform: 'translateX(-50%)', 
-                        color: theme.crema, 
-                        fontSize: '0.75rem', 
-                        fontWeight: 'bold',
-                        whiteSpace: 'nowrap'
-                      }}>
-                        £{Math.round(d.total)}
-                      </div>
-                    )}
                   </div>
-                  <div style={{ marginTop: '15px', color: theme.text, opacity: 0.5, fontSize: '0.7rem', fontWeight: '800' }}>
+                  <div style={{ marginTop: '15px', color: theme.text, opacity: 0.5, fontSize: '0.7rem', fontWeight: '800', textAlign: 'center' }}>
                     {d.day}
+                    <div style={{ fontSize: '0.55rem', opacity: 0.4 }}>{d.fullDate}</div>
                   </div>
                 </div>
              )) : (

@@ -52,12 +52,18 @@ const Inventory = () => {
     fetchInventory();
   }, []);
 
-  const exportPDF = () => {
+  const exportPDF = async () => {
     try {
       if (inventory.length === 0) {
         alert("No inventory data available to export.");
         return;
       }
+
+      // Log the export action
+      await axios.post('/api/admin/log', { 
+        action: 'EXPORT PDF', 
+        details: 'Administrator exported the Inventory/Stock report to PDF.' 
+      });
       
       const doc = new jsPDF();
       
@@ -410,7 +416,7 @@ const Inventory = () => {
                         ) : isLow ? (
                           <span style={{ 
                             color: '#f59e0b', background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05))', border: '1px solid rgba(245, 158, 11, 0.3)',
-                            padding: '6px 14px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 'bold', letterSpacing: '0.5px' 
+                            padding: '6px 14px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 'bold', letterSpacing: '0.5px', whiteSpace: 'nowrap'
                           }}>LOW STOCK</span>
                         ) : (
                           <span style={{ 
