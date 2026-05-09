@@ -26,8 +26,7 @@ jobs:
           npm run build --if-present
 
       - name: Zip artifact for deployment
-        run: zip -r release.zip . --exclude "*.git*" --exclude ".env*" --exclude "src/*" --exclude "public/*"
-
+        run: zip -r release.zip . --exclude "*.git*" --exclude ".env*"
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
