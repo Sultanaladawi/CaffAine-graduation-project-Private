@@ -2,9 +2,10 @@
   "name": "gp-main",
   "version": "1.0.0",
   "scripts": {
-    "start": "react-scripts start",
+    "start": "node server.js",
+    "client": "react-scripts start",
     "server": "node server.js",
-    "dev": "concurrently \"npm run server\" \"npm run start\"",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
     "build": "react-scripts build"
   },
   "dependencies": {
