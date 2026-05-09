@@ -40,3 +40,5 @@ graduation_project_*
 *.pdf
 *.zip
 *.rar
+
+build/
