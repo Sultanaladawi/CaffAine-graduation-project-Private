@@ -1087,7 +1087,7 @@ app.post('/api/ai-chat', async (req, res) => {
       ] = await Promise.all([
         promiseDb.query("SELECT COUNT(*) as orders, COALESCE(SUM(total_amount),0) as revenue FROM orders"),
         promiseDb.query("SELECT DATE(created_at) as date, SUM(total_amount) as total FROM orders GROUP BY DATE(created_at) ORDER BY date DESC LIMIT 7"),
-        promiseDb.query("SELECT product_name, COUNT(*) as count FROM order_items GROUP BY product_name ORDER BY count DESC LIMIT 5"),
+        promiseDb.query("SELECT item_name, COUNT(*) as count FROM order_items GROUP BY item_name ORDER BY count DESC LIMIT 5"),
         promiseDb.query("SELECT item_name, quantity, min_threshold FROM inventory"),
         promiseDb.query("SELECT item_name, quantity FROM inventory WHERE quantity <= min_threshold"),
         promiseDb.query("SELECT COUNT(*) as count FROM orders WHERE status = 'preparing'"),
@@ -1107,7 +1107,7 @@ Current Status:
 - Inventory: ${inventory.length} items total. ${lowStock.length} items need restocking.
 - Today's Orders: ${orders[0]?.count || 0} in progress.
 - Sales History: ${dailySales.map(d => `${d.date}: £${d.total}`).join(', ')}
-- Popular Items: ${topProducts.map(p => `${p.product_name}`).join(', ')}
+- Popular Items: ${topProducts.map(p => `${p.item_name}`).join(', ')}
 - Recruitment: ${pendingApps[0]?.count || 0} new job applications.
 - Feedback: ${feedback[0]?.avg?.toFixed(1) || '0'}/5 stars.
 - Admin Logs: ${auditLogs.map(l => l.action).join(', ')}.
