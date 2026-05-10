@@ -16,13 +16,9 @@
     "mysql": "^2.18.1",
     "mysql2": "^3.22.2",
     "nodemon": "^3.1.14",
-    "openai": "^6.34.0"
-  },
-  "devDependencies": {
+    "openai": "^6.34.0",
     "@studio-freight/lenis": "^1.0.42",
-    "@types/node": "^25.6.0",
     "axios": "^1.15.2",
-    "concurrently": "^8.2.2",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
     "lucide-react": "^1.8.0",
@@ -31,6 +27,10 @@
     "react-icons": "^5.6.0",
     "react-router-dom": "^7.14.1",
     "react-scripts": "5.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "concurrently": "^8.2.2"
   },
   "browserslist": {
     "production": [
