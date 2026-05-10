@@ -23,11 +23,13 @@ export const StoreProvider = ({ children }) => {
 
   const API_BASE = ''; // Use relative path, proxy in package.json will handle it on localhost, and ngrok will handle it on mobile
 
+  const [isUpdating, setIsUpdating] = useState(false);
+
   useEffect(() => {
     const fetchStatus = async () => {
+      if (isUpdating) return; // Skip polling if we are currently updating the status
       try {
         const res = await axios.get(`${API_BASE}/api/store-status`);
-        // Use the mode and status from backend for full sync
         setManualStatus(res.data.mode || 'auto');
         setIsStoreOpen(res.data.status === 'open');
       } catch (err) {
@@ -36,23 +38,26 @@ export const StoreProvider = ({ children }) => {
     };
 
     fetchStatus();
-    const interval = setInterval(fetchStatus, 3000); // Polling every 3 seconds
+    const interval = setInterval(fetchStatus, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isUpdating]);
 
   const toggleStatus = async () => {
+    setIsUpdating(true);
     let next;
     if (manualStatus === 'auto') next = 'manual_closed';
     else if (manualStatus === 'manual_closed') next = 'manual_open';
     else next = 'auto';
     
-    // Optimistic UI update
     setManualStatus(next);
 
     try {
       await axios.post(`${API_BASE}/api/store-status`, { status: next });
+      // Small delay before allowing polling again to ensure backend is ready
+      setTimeout(() => setIsUpdating(false), 2000);
     } catch (err) {
       console.error("Failed to update store status:", err);
+      setIsUpdating(false);
       alert("Error: Could not connect to server.");
     }
   };

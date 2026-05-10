@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Coffaine — Graduation Project 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --c1:#FDFBF7;--c2:#F8F2E8;--c3:#F0E6D3;--c4:#E8D9C0;
+  --gold:#D4AF37;--gold2:#AA8B24;--caramel:#C4874A;--warm:#8B5E3C;
+  --text:#1A120B;--text2:#3C2A21;--text3:#5F4339;--text4:#8D7B68;
+  --glass:rgba(255, 255, 255, 0.45);
+  --glass-border:rgba(212, 175, 55, 0.25);
+  --gold-glow:0 0 15px rgba(212, 175, 55, 0.2);
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--c1);font-family:'Jost',sans-serif;cursor:none;}
+#cur{position:fixed;width:8px;height:8px;border-radius:50%;background:var(--gold);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);box-shadow:var(--gold-glow);}
+#cur2{position:fixed;width:32px;height:32px;border-radius:50%;border:1px solid var(--gold);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);opacity:.4;transition:left .1s,top .1s;}
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.3;}
+.deck{width:100vw;height:100vh;position:relative;overflow:hidden;}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .65s cubic-bezier(.4,0,.2,1),transform .65s cubic-bezier(.4,0,.2,1);transform:translateY(28px) scale(.99);overflow:hidden;}
+.slide.active{opacity:1;pointer-events:all;transform:translateY(0) scale(1);}
+.slide.prev{opacity:0;transform:translateY(-28px) scale(.99);}
+.slide::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");opacity:.6;}
+.slide>*{position:relative;z-index:1;}
+.bg1{background:linear-gradient(145deg,#F8F2E8 0%,#F0E6D3 100%);}
+.bg2{background:linear-gradient(145deg,#F0E6D3 0%,#E8D9C0 100%);}
+.bg3{background:linear-gradient(145deg,#EDE3D2 0%,#E4D5BE 100%);}
+.bg4{background:linear-gradient(160deg,#F5EFE4 0%,#EBE0CE 60%,#E3D3BA 100%);}
+.gtop{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent 0%,var(--caramel) 30%,var(--gold) 70%,transparent 100%);z-index:10;}
+.sh{padding:30px 56px 16px;border-bottom:1px solid rgba(196,135,74,.15);}
+.sh .stag{display:inline-flex;align-items:center;gap:6px;font-size:9px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--caramel);margin-bottom:10px;}
+.sh .stag::before{content:'';width:18px;height:1.5px;background:var(--caramel);}
+.sh h2{font-family:'Playfair Display',serif;font-size:36px;color:var(--text);line-height:1.1;margin-bottom:5px;}
+.sh p{font-size:12px;color:var(--text3);font-weight:300;}
+.sb{flex:1;padding:18px 56px 24px;overflow:hidden;}
+@keyframes fu{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+@keyframes pulse{0%,100%{opacity:.7;}50%{opacity:1;}}
+@keyframes lg{from{transform:scaleX(0);}to{transform:scaleX(1);}}
+.slide.active .a1{animation:fu .6s .05s both ease-out;}
+.slide.active .a2{animation:fu .6s .15s both ease-out;}
+.slide.active .a3{animation:fu .6s .25s both ease-out;}
+.slide.active .a4{animation:fu .6s .35s both ease-out;}
+.slide.active .a5{animation:fu .6s .45s both ease-out;}
+.slide.active .a6{animation:fu .6s .55s both ease-out;}
+.slide.active .a7{animation:fu .6s .65s both ease-out;}
+.slide.active .a8{animation:fu .6s .75s both ease-out;}
+.card{background:var(--glass);border:1px solid var(--glass-border);border-radius:20px;backdrop-filter:blur(15px);box-shadow:0 8px 32px rgba(100,60,20,0.05);transition:all .4s cubic-bezier(.4,0,.2,1);}
+.card:hover{transform:translateY(-5px) scale(1.01);box-shadow:0 15px 45px rgba(100,60,20,0.12);border-color:rgba(212, 175, 55, 0.5);}
+.tag{display:inline-block;font-size:9px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--caramel);border:1px solid rgba(196,135,74,.4);padding:4px 14px;border-radius:20px;}
+#prog{position:fixed;bottom:0;left:0;height:2.5px;background:linear-gradient(90deg,var(--caramel),var(--gold));transition:width .5s ease;z-index:999;}
+#ctr{position:fixed;bottom:22px;right:32px;font-size:10px;letter-spacing:3px;color:var(--text4);z-index:999;}
+#dots{position:fixed;right:16px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:7px;z-index:999;}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--c4);cursor:pointer;transition:all .3s;}
+.dot.on{background:var(--caramel);transform:scale(1.6);}
+#hint{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:3px;color:var(--text4);z-index:999;display:flex;gap:8px;align-items:center;animation:pulse 2.5s infinite;}
+.kbd{width:20px;height:20px;border-radius:4px;border:1px solid var(--c4);background:rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text3);}
+
+/* ── COVER ── */
+#s1{justify-content:center;align-items:center;background:linear-gradient(145deg,#F8F3EA 0%,#F0E5D0 55%,#E8D8BB 100%);}
+#s1 .orb1{position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(196,154,60,.14),transparent 70%);top:-100px;right:-80px;animation:float 6s ease-in-out infinite;}
+#s1 .orb2{position:absolute;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(196,135,74,.1),transparent 70%);bottom:-60px;left:-60px;animation:float 8s ease-in-out infinite reverse;}
+.cover-wrap{text-align:center;max-width:880px;padding:0 40px;}
+.brand-name{font-family:'Playfair Display',serif;font-size:100px;line-height:.95;letter-spacing:-2px;background:linear-gradient(135deg,var(--text) 0%,var(--caramel) 45%,var(--gold) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;}
+.brand-sub{font-family:'Cormorant Garamond',serif;font-size:17px;letter-spacing:6px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;}
+.brand-tag{font-family:'Cormorant Garamond',serif;font-size:19px;font-style:italic;color:var(--text2);margin-bottom:34px;}
+.cover-div{width:100px;height:1px;background:linear-gradient(90deg,transparent,var(--caramel),transparent);margin:0 auto 34px;}
+.cover-meta{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--text3);margin-bottom:40px;}
+.team-panel{background:rgba(255,255,255,.5);border:1px solid rgba(196,135,74,.22);border-radius:22px;padding:26px 44px;backdrop-filter:blur(12px);box-shadow:0 10px 48px rgba(100,60,20,.09);}
+.team-panel-title{font-size:8px;letter-spacing:5px;text-transform:uppercase;color:var(--text4);margin-bottom:16px;}
+.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 48px;}
+.tm{display:flex;align-items:center;gap:10px;}
+.tm-dot{width:7px;height:7px;border-radius:50%;background:var(--caramel);flex-shrink:0;}
+.tm-dot.gold{background:var(--gold);}
+.tm-name{font-size:13px;font-weight:600;color:var(--text);}
+.tm-role{font-size:9px;color:var(--text4);letter-spacing:1.5px;text-transform:uppercase;}
+.sv-row{grid-column:1/-1;text-align:center;padding-top:12px;border-top:1px solid rgba(196,135,74,.15);margin-top:6px;}
+.sv-label{font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--text4);margin-bottom:3px;}
+.sv-name{font-size:13px;font-weight:600;color:var(--text2);}
+
+/* ── AGENDA ── */
+#s2 .ag-wrap{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;}
+#s2 .ag{padding:16px 10px;border-radius:14px;text-align:center;cursor:default;transition:transform .3s;}
+#s2 .ag:hover{transform:translateY(-4px);}
+#s2 .ag-num{font-family:'Playfair Display',serif;font-size:28px;color:var(--caramel);line-height:1;margin-bottom:7px;}
+#s2 .ag-t{font-size:10px;font-weight:600;color:var(--text);margin-bottom:2px;}
+#s2 .ag-d{font-size:8px;color:var(--text3);}
+
+/* ── GRID 2 COL ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+
+/* ── FEATURE CARD ── */
+.fc{border-radius:14px;padding:20px;}
+.fc-icon{font-size:26px;margin-bottom:12px;}
+.fc-line{width:28px;height:2px;background:var(--caramel);margin-bottom:10px;border-radius:2px;}
+.fc-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--text);margin-bottom:6px;}
+.fc-text{font-size:10px;color:var(--text2);line-height:1.7;font-weight:300;}
+
+/* ── LIST ITEM ── */
+.li{display:flex;gap:10px;margin-bottom:10px;font-size:11px;color:var(--text2);line-height:1.55;}
+.li-dot{width:5px;height:5px;border-radius:50%;background:var(--caramel);margin-top:5px;flex-shrink:0;}
+.li-num{width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,var(--c4),var(--caramel));display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;margin-top:1px;}
+
+/* ── TECH CARD ── */
+.tc{border-radius:14px;padding:18px 20px;}
+.tc-layer{font-size:8px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--caramel);margin-bottom:5px;}
+.tc-name{font-family:'Playfair Display',serif;font-size:18px;color:var(--text);margin-bottom:6px;}
+.tc-bar{height:1.5px;background:linear-gradient(90deg,var(--caramel),transparent);margin-bottom:9px;}
+.tc-detail{font-size:9.5px;color:var(--text2);line-height:1.65;font-weight:300;}
+
+/* ── SECTION TITLE ── */
+.sec-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--text);margin-bottom:4px;}
+.sec-sub{font-size:9.5px;color:var(--text3);margin-bottom:14px;font-style:italic;}
+
+/* ── STAT BOX ── */
+.stat{border-radius:14px;padding:18px 14px;text-align:center;}
+.stat-val{font-family:'Playfair Display',serif;font-size:34px;color:var(--caramel);line-height:1;margin-bottom:5px;}
+.stat-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);}
+
+/* ── CHAT BUBBLE ── */
+.chat{border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:11px;justify-content:center;}
+.bubble{padding:11px 15px;border-radius:14px;font-size:10.5px;line-height:1.55;max-width:88%;}
+.bubble.user{background:var(--caramel);color:#fff;align-self:flex-end;border-radius:14px 14px 4px 14px;}
+.bubble.bot{background:rgba(255,255,255,.7);color:var(--text2);align-self:flex-start;border-radius:14px 14px 14px 4px;border:1px solid rgba(196,135,74,.2);}
+.bubble-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text4);margin-bottom:3px;}
+
+/* ── ADMIN CARD ── */
+.adm{border-radius:13px;padding:15px 12px;text-align:center;transition:transform .3s;}
+.adm:hover{transform:translateY(-4px);}
+.adm-icon{font-size:22px;margin-bottom:8px;}
+.adm-title{font-size:11px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.adm-desc{font-size:8px;color:var(--text3);line-height:1.4;}
+
+/* ── BAR CHART ── */
+.bar-chart{display:flex;flex-direction:column;gap:8px;}
+.bar-row{display:flex;align-items:center;gap:10px;font-size:9px;color:var(--text3);}
+.bar-label{width:80px;text-align:right;flex-shrink:0;}
+.bar-track{flex:1;height:13px;background:rgba(196,135,74,.12);border-radius:7px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:7px;background:linear-gradient(90deg,var(--caramel),var(--gold));}
+.bar-val{width:50px;font-weight:600;color:var(--text2);}
+
+/* ── FLOW ── */
+.flow{display:flex;align-items:center;}
+.fs{flex:1;border-radius:12px;padding:14px 8px;text-align:center;}
+.fs-icon{font-size:20px;margin-bottom:6px;}
+.fs-t{font-size:9.5px;font-weight:600;color:var(--text);}
+.fa{font-size:18px;color:var(--caramel);padding:0 4px;flex-shrink:0;font-family:'Playfair Display',serif;}
+
+/* ── CONCLUSION ── */
+#s24{justify-content:center;align-items:center;background:linear-gradient(145deg,#F8F3EA 0%,#F0E5D0 55%,#E8D8BB 100%);}
+#s24 .orb1{position:absolute;width:450px;height:450px;border-radius:50%;background:radial-gradient(circle,rgba(196,154,60,.13),transparent 70%);top:-80px;right:-60px;animation:float 7s ease-in-out infinite;}
+#s24 .orb2{position:absolute;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(196,135,74,.09),transparent 70%);bottom:-50px;left:-50px;animation:float 9s ease-in-out infinite reverse;}
+.conc-wrap{text-align:center;max-width:760px;padding:0 40px;}
+.conc-title{font-family:'Playfair Display',serif;font-size:56px;color:var(--text);line-height:1;margin-bottom:10px;}
+.conc-italic{font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;color:var(--text2);margin-bottom:28px;}
+.conc-div{width:80px;height:1px;background:linear-gradient(90deg,transparent,var(--caramel),transparent);margin:0 auto 28px;}
+.fg-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:30px;}
+.fg{background:rgba(255,255,255,.5);border:1px solid rgba(196,135,74,.2);border-radius:13px;padding:14px 16px;text-align:left;backdrop-filter:blur(8px);}
+.fg strong{font-size:12px;color:var(--text);display:block;margin-bottom:2px;}
+.fg span{font-size:9px;color:var(--text3);}
+.thanks-names{font-family:'Playfair Display',serif;font-size:18px;color:var(--caramel);letter-spacing:1px;}
+.thanks-meta{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--text4);margin-top:5px;}
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div id="cur"></div><div id="cur2"></div>
+<div id="prog"></div>
+<div id="ctr">01 / 24</div>
+<div id="dots"></div>
+<div id="hint"><span class="kbd">←</span><span class="kbd">→</span>navigate</div>
+<div class="deck">
+
+<!-- S1 COVER -->
+<div class="slide bg1" id="s1">
+<div class="gtop"></div>
+<div class="orb1"></div><div class="orb2"></div>
+<div class="cover-wrap">
+  <div class="a1"><div class="brand-name">Coffaine</div></div>
+  <div class="a1"><div class="brand-sub">Faculty Coffee · Birmingham, UK</div></div>
+  <div class="a2"><div class="brand-tag">"Independent specialty coffee at the heart of Birmingham's Piccadilly Arcade"</div></div>
+  <div class="a2"><div class="cover-div"></div></div>
+  <div class="a3"><div class="cover-meta">Graduation Project &nbsp;·&nbsp; Full-Stack Web Application &nbsp;·&nbsp; React.js + Node.js + MySQL + AI &nbsp;·&nbsp; 2026</div></div>
+  <div class="a4">
+    <div class="team-panel">
+      <div class="team-panel-title">Project Team</div>
+      <div class="team-grid">
+        <div class="tm" style="grid-column:1/-1;justify-content:center;margin-bottom:6px;">
+          <div class="tm-dot gold"></div>
+          <div><div class="tm-name" style="font-size:15px;color:var(--gold2)">Omar Al-Ajarma</div><div class="tm-role">Team Leader · Super Admin</div></div>
+        </div>
+        <div class="tm"><div class="tm-dot"></div><div><div class="tm-name">Sultan Al-Adawi</div><div class="tm-role">Full-Stack Developer</div></div></div>
+        <div class="tm"><div class="tm-dot"></div><div><div class="tm-name">Mohammad Al-Hadidi</div><div class="tm-role">Full-Stack Developer</div></div></div>
+        <div class="tm" style="grid-column:1/-1;justify-content:center;"><div class="tm-dot"></div><div><div class="tm-name">Bashar Al-Dabbas</div><div class="tm-role">Full-Stack Developer</div></div></div>
+        <div class="sv-row">
+          <div class="sv-label">Academic Supervisor</div>
+          <div class="sv-name">Dr. Mohammad Al-Riyalat</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="gtop" style="top:auto;bottom:0;transform:rotate(180deg);"></div>
+</div>
+
+<!-- S2 AGENDA -->
+<div class="slide bg2" id="s2">
+<div class="gtop"></div>
+<div class="sh">
+  <div class="stag a1">Roadmap</div>
+  <h2 class="a2">Presentation Agenda</h2>
+  <p class="a3">24 sections — a complete walkthrough of Coffaine from concept to deployment</p>
+</div>
+<div class="sb">
+  <div class="ag-wrap">
+    <div class="ag card a1"><div class="ag-num">01</div><div class="ag-t">Problem & Vision</div><div class="ag-d">Why we built this</div></div>
+    <div class="ag card a2"><div class="ag-num">02</div><div class="ag-t">Tech Stack</div><div class="ag-d">Architecture & tools</div></div>
+    <div class="ag card a3"><div class="ag-num">03</div><div class="ag-t">Database Design</div><div class="ag-d">14 tables, auto-migrate</div></div>
+    <div class="ag card a4"><div class="ag-num">04</div><div class="ag-t">Public Website</div><div class="ag-d">6 sections, smooth scroll</div></div>
+    <div class="ag card a5"><div class="ag-num">05</div><div class="ag-t">Menu System</div><div class="ag-d">Dynamic, voice search</div></div>
+    <div class="ag card a1"><div class="ag-num">06</div><div class="ag-t">Cart & Checkout</div><div class="ag-d">Full ordering flow</div></div>
+    <div class="ag card a2"><div class="ag-num">07</div><div class="ag-t">Sophie AI</div><div class="ag-d">Customer chatbot</div></div>
+    <div class="ag card a3"><div class="ag-num">08</div><div class="ag-t">CaffAIne AI</div><div class="ag-d">Admin intelligence</div></div>
+    <div class="ag card a4"><div class="ag-num">09</div><div class="ag-t">Admin Panel</div><div class="ag-d">12 live modules</div></div>
+    <div class="ag card a5"><div class="ag-num">10</div><div class="ag-t">Dashboard</div><div class="ag-d">Live KPIs, charts</div></div>
+    <div class="ag card a1"><div class="ag-num">11</div><div class="ag-t">Orders Module</div><div class="ag-d">Timer, lifecycle</div></div>
+    <div class="ag card a2"><div class="ag-num">12</div><div class="ag-t">Products CRUD</div><div class="ag-d">Add-ons, tags, images</div></div>
+    <div class="ag card a3"><div class="ag-num">13</div><div class="ag-t">Inventory</div><div class="ag-d">Recipes, auto-deduct</div></div>
+    <div class="ag card a4"><div class="ag-num">14</div><div class="ag-t">Analytics</div><div class="ag-d">Weekly charts, KPIs</div></div>
+    <div class="ag card a5"><div class="ag-num">15</div><div class="ag-t">Offers & Feedback</div><div class="ag-d">Promos & reviews</div></div>
+    <div class="ag card a1"><div class="ag-num">16</div><div class="ag-t">Careers</div><div class="ag-d">Jobs & applications</div></div>
+    <div class="ag card a2"><div class="ag-num">17</div><div class="ag-t">Security</div><div class="ag-d">Auth, roles, audit</div></div>
+    <div class="ag card a3"><div class="ag-num">18</div><div class="ag-t">Leader Dashboard</div><div class="ag-d">Super admin + PDF</div></div>
+    <div class="ag card a5"><div class="ag-num">20</div><div class="ag-t">Architecture</div><div class="ag-d">System integration</div></div>
+    <div class="ag card a1"><div class="ag-num">21</div><div class="ag-t">Challenges</div><div class="ag-d">Real problems solved</div></div>
+    <div class="ag card a2"><div class="ag-num">22</div><div class="ag-t">Future Roadmap</div><div class="ag-d">Beyond 2026</div></div>
+  </div>
+</div>
+</div>
+
+<!-- S3 PROBLEM & VISION -->
+<div class="slide bg1" id="s3">
+<div class="gtop"></div>
+<div class="sh">
+  <div class="stag a1">01 · Overview</div>
+  <h2 class="a2">Problem & Vision</h2>
+  <p class="a3">Faculty Coffee — real café at 14 Piccadilly Arcade, Birmingham — needed a complete digital transformation</p>
+</div>
+<div class="sb">
+  <div class="g2" style="height:100%">
+    <div class="fc card a1" style="height:100%">
+      <div class="fc-icon">⚡</div>
+      <div class="fc-line"></div>
+      <div class="fc-title">The Problem</div>
+      <div class="li"><div class="li-dot"></div>No online ordering — customers had to visit in person only</div>
+      <div class="li"><div class="li-dot"></div>Inventory tracked manually on paper — error-prone and slow</div>
+      <div class="li"><div class="li-dot"></div>No analytics — zero visibility into sales trends or top products</div>
+      <div class="li"><div class="li-dot"></div>No customer communication platform — inquiries untracked</div>
+      <div class="li"><div class="li-dot"></div>Staff hiring done manually — no digital application system</div>
+      <div class="li"><div class="li-dot"></div>Store open/closed status communicated only physically</div>
+    </div>
+    <div class="fc card a2" style="height:100%">
+      <div class="fc-icon">☕</div>
+      <div class="fc-line"></div>
+      <div class="fc-title">Our Vision</div>
+      <div class="li"><div class="li-dot"></div>A cinematic public site where customers browse, order, and interact</div>
+      <div class="li"><div class="li-dot"></div>A powerful admin dashboard with 12 modules — full operational control</div>
+      <div class="li"><div class="li-dot"></div>Dual AI assistants: Sophie for customers, CaffAIne for business intelligence</div>
+      <div class="li"><div class="li-dot"></div>Real-time inventory with recipe-based auto-deduction on every order</div>
+      <div class="li"><div class="li-dot"></div>Voice search in English and Arabic — bilingual dictionary built-in</div>
+      <div class="li"><div class="li-dot"></div>Auto open/close with schedule: Mon–Fri 07:30–17:00, Sat 09:00–18:00, Sun 10:00–16:00</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- S4 TECH STACK -->
+<div class="slide bg2" id="s4">
+<div class="gtop"></div>
+<div class="sh">
+  <div class="stag a1">02 · Architecture</div>
+  <h2 class="a2">Technology Stack</h2>
+  <p class="a3">Modern, scalable, production-ready — chosen for performance and maintainability</p>
+</div>
+<div class="sb">
+  <div class="g3">
+    <div class="tc card a1"><div class="tc-layer">Frontend</div><div class="tc-name">React.js 18</div><div class="tc-bar"></div><div class="tc-detail">React Router v7, Context API (CartContext + StoreContext + AdminContext), custom Hooks (useReveal, useAdminAuth), Lenis smooth scroll, animated loading screen, custom cursor</div></div>
+    <div class="tc card a2"><div class="tc-layer">Backend</div><div class="tc-name">Node.js + Express 5</div><div class="tc-bar"></div><div class="tc-detail">40+ RESTful API endpoints, Multer file uploads (10MB, images only), MySQL2 connection pool (10 connections), CORS, audit log middleware on every request</div></div>
+    <div class="tc card a3"><div class="tc-layer">Database</div><div class="tc-name">MySQL + Auto-Migration</div><div class="tc-bar"></div><div class="tc-detail">14 tables with FK constraints, auto schema migration on startup, connection pool, prepared statements (SQL injection protected), atomic transactions for orders</div></div>
+    <div class="tc card a4"><div class="tc-layer">Artificial Intelligence</div><div class="tc-name">OpenAI GPT-4o-mini</div><div class="tc-bar"></div><div class="tc-detail">Dual-mode: Sophie (customer) + CaffAIne (admin). GitHub Models fallback (Azure inference). 19 parallel DB queries for admin context. 45s timeout with AbortController</div></div>
+    <div class="tc card a5"><div class="tc-layer">UI / Icons</div><div class="tc-name">Lucide React + CSS Modules</div><div class="tc-bar"></div><div class="tc-detail">Lucide icons in admin, Font Awesome in public site, CSS Modules for scoped styles, custom design system, 30+ tag types with color-coded gradients</div></div>
+    <div class="tc card a6"><div class="tc-layer">Dev Tools</div><div class="tc-name">Concurrently + dotenv</div><div class="tc-bar"></div><div class="tc-detail">Parallel frontend + backend dev, .env + .env.development config, jsPDF + autoTable for PDF export, axios for admin API calls, supabaseClient.js for storage</div></div>
+  </div>
+</div>
+</div>
+
+<!-- S20 SYSTEM ARCHITECTURE -->
+<div class="slide bg3" id="s20">
+<div class="gtop"></div>
+<div class="sh">
+  <div class="stag a1">20 · Engineering</div>
+  <h2 class="a2">System Architecture</h2>
+  <p class="a3">A high-level view of how the client, server, database, and AI ecosystem interact</p>
+</div>
+<div class="sb">
+  <div class="card a1" style="padding:30px; display:flex; justify-content:center; align-items:center; height:100%;">
+    <div style="display:flex; gap:30px; align-items:center; width:100%; max-width:900px;">
+      <div style="flex:1; text-align:center; padding:20px; border:2px solid var(--gold); border-radius:20px; background:white;">
+        <div style="font-size:30px;">📱</div>
+        <div style="font-weight:700; color:var(--text); margin:10px 0;">Client Layer</div>
+        <div style="font-size:11px; color:var(--text3);">React.js SPA<br/>Context API<br/>Lenis Scroll</div>
+      </div>
+      <div style="font-size:24px; color:var(--gold);">⇄</div>
+      <div style="flex:1.2; text-align:center; padding:20px; border:2px dashed var(--caramel); border-radius:20px; background:rgba(255,255,255,0.7);">
+        <div style="font-size:30px;">⚙️</div>
+        <div style="font-weight:700; color:var(--text); margin:10px 0;">Logic Layer</div>
+        <div style="font-size:11px; color:var(--text3);">Node.js + Express<br/>RESTful APIs<br/>Audit Middleware</div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:20px; flex:1;">
+        <div style="text-align:center; padding:15px; border:2px solid var(--text4); border-radius:15px; background:white;">
+          <div style="font-size:24px;">💾</div>
+          <div style="font-weight:700; font-size:12px;">MySQL DB</div>
+        </div>
+        <div style="text-align:center; padding:15px; border:2px solid var(--warm); border-radius:15px; background:white;">
+          <div style="font-size:24px;">🤖</div>
+          <div style="font-weight:700; font-size:12px;">OpenAI GPT</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- S21 LEADER DASHBOARD -->
+<div class="slide bg3" id="s21">
+<div class="gtop"></div>
+<div class="sh">
+  <div class="stag a1">18 · Leader Dashboard</div>
+  <h2 class="a2">Leader Dashboard & PDF Export</h2>
+  <p class="a3">Super admin exclusive — audit logs, critical feedback detection, and one-click PDF report</p>
+</div>
+<div class="sb">
+  <div class="g2">
+    <div class="card a1" style="padding:22px;">
+      <div class="sec-title">👑 Leader-Only Features</div>
+      <div class="sec-sub">Omar Al-Ajarma — super_admin role only</div>
+      <div class="li"><div class="li-num">1</div>3 parallel API calls: /api/admin/logs + /api/reviews + /api/contact-messages</div>
+      <div class="li"><div class="li-num">2</div>Auto-refresh every 15 seconds — always sees live activity</div>
+      <div class="li"><div class="li-num">3</div>Full audit log table: admin_name, action, details, timestamp — searchable</div>
+      <div class="li"><div class="li-num">4</div>Search across name + action + details simultaneously</div>
+      <div class="li"><div class="li-num">5</div>Hoverable row highlight for quick scanning</div>
+      <div class="li"><div class="li-num">6</div>If non-super-admin visits /admin/leader → instant redirect to dashboard</div>
+    </div>
+    <div class="card a2" style="padding:22px;">
+      <div class="sec-title">📊 Critical Feedback Detection + PDF</div>
+      <div class="sec-sub">Automated bad-experience surfacing</div>
+      <div class="li"><div class="li-dot"></div>Combines product_reviews (rating ≤ 3) + contact messages with bad keywords</div>
+      <div class="li"><div class="li-dot"></div>Bad keywords: bad, terrible, worst, awful, angry, complaint, ruined, disgusting, sick</div>
+      <div class="li"><div class="li-dot"></div>Sorted by created_at DESC — most recent critical issues first</div>
+      <div class="li"><div class="li-dot"></div>PDF export: jsPDF + autoTable library — one-click report generation</div>
+      <div class="li"><div class="li-dot"></div>PDF includes: audit logs table with all columns, formatted and auto-sized</div>
+      <div class="li"><div class="li-dot"></div>Download button with Filter and Search icons from Lucide React</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- S22 UX DETAILS & CHALLENGES -->
+<div class="slide bg1" id="s22">
+<div class="gtop"></div>
+<div class="sh">
+  <div class="stag a1">19 · UX Details & Challenges</div>
+  <h2 class="a2">Premium UX & Real Challenges Solved</h2>
+  <p class="a3">The thoughtful details and real engineering problems we faced during development</p>
+</div>
+<div class="sb">
+  <div class="g2">
+    <div class="card a1" style="padding:20px;">
+      <div class="sec-title">✨ UX Details Built</div>
+      <div class="sec-sub">Every detail from the actual codebase</div>
+      <div class="li"><div class="li-dot"></div><strong>Lenis Smooth Scroll:</strong> @studio-freight/lenis with duration 1.25s and custom easing function</div>
+      <div class="li"><div class="li-dot"></div><strong>Custom Cursor:</strong> #cursor-dot + #cursor-ring — branded, replaces browser default</div>
+      <div class="li"><div class="li-dot"></div><strong>Loading Screen:</strong> Custom LoadingScreen component with onComplete callback → fades into hero</div>
+      <div class="li"><div class="li-dot"></div><strong>Mouse Parallax:</strong> Hero image moves ±10px/8px based on cursor position in section</div>
+      <div class="li"><div class="li-dot"></div><strong>useReveal Hook:</strong> IntersectionObserver-based — adds 'vis' class when element enters viewport</div>
+      <div class="li"><div class="li-dot"></div><strong>Scroll Progress Bar:</strong> #scroll-progress element shows reading position</div>
+      <div class="li"><div class="li-dot"></div><strong>Voice Search:</strong> Web Speech API + bilingual Arabic dictionary in Menu + Sophie</div>
+      <div class="li"><div class="li-dot"></div><strong>MobileNav:</strong> Separate mobile navigation component for responsive layout</div>
+    </div>
+    <div class="card a2" style="padding:20px;">
+      <div class="sec-title">⚡ Real Challenges Solved</div>
+      <div class="sec-sub">Actual problems encountered during development</div>
+      <div class="li"><div class="li-dot"></div><strong>0-Price Addons:</strong> Migration script fixes historical order_items where price=0 by looking up addons table</div>
+      <div class="li"><div class="li-dot"></div><strong>Category Migration:</strong> Legacy string IDs (espresso, cold, food) mapped to numeric IDs — smart recovery keywords</div>
+      <div class="li"><div class="li-dot"></div><strong>AI Context Size:</strong> 19 queries for CaffAIne — used Promise.allSettled() so one failure doesn't break others</div>
+      <div class="li"><div class="li-dot"></div><strong>Dual AI Provider:</strong> Auto-detects GitHub token (ghp_/github_) vs OpenAI key → switches baseURL accordingly</div>
+      <div class="li"><div class="li-dot"></div><strong>Arabic Numerals:</strong> convertNumerals() converts ١٢٣ → 123 for inventory inputs from Arabic users</div>
+      <div class="li"><div class="li-dot"></div><strong>FK Conflict on Delete:</strong> Product delete fails if in orders → returns 400 with "mark as Unavailable instead"</div>
+      <div class="li"><div class="li-dot"></div><strong>Addon Price Fix:</strong> On startup, UPDATE addons SET price=0.50 WHERE price=0 — prevents free add-ons</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- S23 FUTURE ROADMAP -->
+<div class="slide bg4" id="s23">
+<div class="gtop"></div>
+<div class="sh">
+  <div class="stag a1">23 · Vision</div>
+  <h2 class="a2">Future Roadmap</h2>
+  <p class="a3">Phase 2 — Transitioning from a graduation project to a nationwide coffee enterprise platform</p>
+</div>
+<div class="sb">
+  <div class="g3">
+    <div class="fc card a1">
+      <div class="fc-icon">📱</div><div class="fc-line"></div>
+      <div class="fc-title">Mobile Ecosystem</div>
+      <div class="fc-text">Native iOS/Android apps with push notifications for order status and proximity-based loyalty rewards (Geofencing).</div>
+    </div>
+    <div class="fc card a2">
+      <div class="fc-icon">🔮</div><div class="fc-line"></div>
+      <div class="fc-title">Predictive AI</div>
+      <div class="fc-text">Moving from reactive to proactive inventory — using historical data to predict stock shortages before they happen.</div>
+    </div>
+    <div class="fc card a3">
+      <div class="fc-icon">☕</div><div class="fc-line"></div>
+      <div class="fc-title">Multi-Branch</div>
+      <div class="fc-text">Scaling to support multiple café locations with a single master dashboard for branch-by-branch performance analytics.</div>
+    </div>
+  </div>
+  <div class="card a4" style="margin-top:20px; padding:20px; text-align:center;">
+    <div style="font-family:'Playfair Display',serif; font-size:20px; color:var(--text);">"Innovation is our finest blend."</div>
+  </div>
+</div>
+</div>
+
+<!-- S24 CONCLUSION -->
+<div class="slide bg4" id="s24">
+<div class="gtop"></div>
+<div class="orb1"></div><div class="orb2"></div>
+<div class="conc-wrap">
+  <div class="a1"><span class="tag">Conclusion</span></div>
+  <div class="a2" style="margin-top:18px;"><div class="conc-title">Thank You</div></div>
+  <div class="a3"><div class="conc-italic">Coffaine — built with passion, precision, and purpose at Faculty Coffee, Birmingham</div></div>
+  <div class="a3"><div class="conc-div"></div></div>
+  <div class="fg-grid a4">
+    <div class="fg"><strong>📱 Native Mobile App</strong><span>iOS & Android with push notifications for order updates</span></div>
+    <div class="fg"><strong>💳 Payment Gateway</strong><span>Stripe integration for online card payments at checkout</span></div>
+    <div class="fg"><strong>🌍 Multi-Branch</strong><span>Scale to multiple Faculty Coffee locations under one system</span></div>
+    <div class="fg"><strong>🔔 Real-Time Updates</strong><span>WebSockets for live order status without polling</span></div>
+  </div>
+  <div class="a5">
+    <div class="thanks-names">Omar · Sultan · Mohammad · Bashar</div>
+    <div class="thanks-meta">Supervised by Dr. Mohammad Al-Riyalat &nbsp;·&nbsp; Software Engineering &nbsp;·&nbsp; 2026</div>
+  </div>
+</div>
+<div class="gtop" style="top:auto;bottom:0;transform:rotate(180deg);"></div>
+</div>
+
+</div>
+<script>
+/* ── PARTICLES SYSTEM ── */
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+function resize() { if(canvas){canvas.width=window.innerWidth; canvas.height=window.innerHeight;} }
+window.addEventListener('resize', resize);
+resize();
+class Particle {
+  constructor() { this.init(); }
+  init() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.size = Math.random() * 2 + 0.5;
+    this.speedX = Math.random() * 0.4 - 0.2;
+    this.speedY = Math.random() * 0.4 - 0.2;
+    this.opacity = Math.random() * 0.5 + 0.1;
+  }
+  update() {
+    this.x += this.speedX; this.y += this.speedY;
+    if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.init();
+  }
+  draw() {
+    ctx.fillStyle = `rgba(196, 154, 60, ${this.opacity})`;
+    ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+  }
+}
+for (let i = 0; i < 60; i++) particles.push(new Particle());
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => { p.update(); p.draw(); });
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+const cur=document.getElementById('cur'),cur2=document.getElementById('cur2');
+document.addEventListener('mousemove',e=>{
+  cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';
+  setTimeout(()=>{cur2.style.left=e.clientX+'px';cur2.style.top=e.clientY+'px';},60);
+});
+const slides=[...document.querySelectorAll('.slide')];
+const prog=document.getElementById('prog'),ctr=document.getElementById('ctr');
+const dotsEl=document.getElementById('dots'),hint=document.getElementById('hint');
+const N=slides.length;let cur_=0;
+slides.forEach((_,i)=>{const d=document.createElement('div');d.className='dot'+(i===0?' on':'');d.onclick=()=>go(i);dotsEl.appendChild(d);});
+function go(n){
+  if(n<0||n>=N)return;
+  slides[cur_].classList.remove('active');slides[cur_].classList.add('prev');
+  setTimeout(()=>slides[cur_].classList.remove('prev'),700);
+  cur_=n;slides[cur_].classList.add('active');
+  ctr.textContent=String(cur_+1).padStart(2,'0')+' / '+String(N).padStart(2,'0');
+  prog.style.width=((cur_+1)/N*100)+'%';
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('on',i===cur_));
+  if(cur_>0)hint.style.opacity='0';
+}
+document.addEventListener('keydown',e=>{
+  if(['ArrowRight','ArrowDown',' '].includes(e.key)){e.preventDefault();go(cur_+1);}
+  if(['ArrowLeft','ArrowUp'].includes(e.key)){e.preventDefault();go(cur_-1);}
+});
+let tx=0;
+document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
+document.addEventListener('touchend',e=>{const dx=tx-e.changedTouches[0].clientX;if(Math.abs(dx)>50)go(cur_+(dx>0?1:-1));},{passive:true});
+go(0);
+</script>
+</body>
+</html>

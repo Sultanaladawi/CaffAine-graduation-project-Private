@@ -70,6 +70,11 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
 
+// Serving the presentation file with a short, professional URL
+app.get('/presentation', (req, res) => {
+  res.sendFile(path.join(__dirname, 'Coffaine_Final_Presentation.html'));
+});
+
 app.get('/Coffaine_Final_Presentation.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'Coffaine_Final_Presentation.html'));
 });
@@ -274,7 +279,8 @@ app.post('/api/orders', async (req, res) => {
 });
 
 const getAutoStoreStatus = () => {
-  const now = new Date();
+  // Use UK Time for auto-calculation
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/London' }));
   const day = now.getDay();
   const currentTime = now.getHours() * 100 + now.getMinutes();
 
@@ -356,14 +362,39 @@ db.query("SELECT * FROM categories", (err, categories) => {
   }
 });
 
-db.query(`ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS image_url VARCHAR(1024) DEFAULT NULL;`, (err) => { if (err && !err.message.includes('Duplicate')) console.error(err.message); });
-db.query(`ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;`, (err) => { if (err && !err.message.includes('Duplicate')) console.error(err.message); });
+db.query("SHOW COLUMNS FROM menu_items LIKE 'image_url'", (err, results) => {
+  if (!err && results.length === 0) db.query("ALTER TABLE menu_items ADD COLUMN image_url VARCHAR(1024) DEFAULT NULL");
+});
+db.query("SHOW COLUMNS FROM menu_items LIKE 'created_at'", (err, results) => {
+  if (!err && results.length === 0) db.query("ALTER TABLE menu_items ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
+});
 db.query(`CREATE TABLE IF NOT EXISTS product_reviews (id INT AUTO_INCREMENT PRIMARY KEY, product_id INT NOT NULL, reviewer_name VARCHAR(255) DEFAULT NULL, comment TEXT DEFAULT NULL, rating TINYINT(1) DEFAULT 5, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (product_id) REFERENCES menu_items(id) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure product_reviews table error:', err); });
 db.query(`CREATE TABLE IF NOT EXISTS general_feedback (id INT AUTO_INCREMENT PRIMARY KEY, reviewer_name VARCHAR(255) DEFAULT 'Anonymous', comment TEXT DEFAULT NULL, rating TINYINT(1) DEFAULT 5, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure general_feedback table error:', err); });
 db.query(`CREATE TABLE IF NOT EXISTS store_reviews (id INT AUTO_INCREMENT PRIMARY KEY, reviewer_name VARCHAR(255) DEFAULT 'Anonymous', comment TEXT DEFAULT NULL, rating TINYINT(1) DEFAULT 5, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure store_reviews table error:', err); });
-db.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS estimated_ready_at DATETIME DEFAULT NULL;`, (err) => { if (err && !err.message.includes('Duplicate')) console.error(err.message); });
-db.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_address TEXT DEFAULT NULL;`, (err) => { if (err && !err.message.includes('Duplicate')) console.error(err.message); });
-db.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS phone VARCHAR(50) DEFAULT NULL;`, (err) => { if (err && !err.message.includes('Duplicate')) console.error(err.message); });
+    // Enhanced migration check for Azure MySQL compatibility
+    db.query("SHOW COLUMNS FROM orders LIKE 'estimated_ready_at'", (err, results) => {
+      if (!err && results.length === 0) {
+        db.query("ALTER TABLE orders ADD COLUMN estimated_ready_at DATETIME DEFAULT NULL", (err) => {
+          if (!err) console.log("[Migration] Added estimated_ready_at to orders");
+        });
+      }
+    });
+
+    db.query("SHOW COLUMNS FROM orders LIKE 'delivery_address'", (err, results) => {
+      if (!err && results.length === 0) {
+        db.query("ALTER TABLE orders ADD COLUMN delivery_address TEXT DEFAULT NULL", (err) => {
+          if (!err) console.log("[Migration] Added delivery_address to orders");
+        });
+      }
+    });
+
+    db.query("SHOW COLUMNS FROM orders LIKE 'phone'", (err, results) => {
+      if (!err && results.length === 0) {
+        db.query("ALTER TABLE orders ADD COLUMN phone VARCHAR(50) DEFAULT NULL", (err) => {
+          if (!err) console.log("[Migration] Added phone to orders");
+        });
+      }
+    });
 db.query(`CREATE TABLE IF NOT EXISTS ai_insights_cache (id INT AUTO_INCREMENT PRIMARY KEY, topic VARCHAR(100) UNIQUE, content TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure ai_insights_cache table error:', err); });
 db.query(`CREATE TABLE IF NOT EXISTS admin_logs (id INT AUTO_INCREMENT PRIMARY KEY, admin_email VARCHAR(255) NOT NULL, admin_name VARCHAR(255) DEFAULT NULL, action VARCHAR(255) NOT NULL, details TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure admin_logs table error:', err); });
 db.query("UPDATE addons SET price = 0.50 WHERE price = 0", (err) => { if (err) console.error('Update addon prices error:', err); });
