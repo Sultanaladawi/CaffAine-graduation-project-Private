@@ -297,7 +297,7 @@ const getAutoStoreStatus = () => {
 };
 
 app.get('/api/store-status', (req, res) => {
-  db.query('SELECT value FROM site_settings WHERE `key` = ?', ['store_status'], (err, results) => {
+  db.query('SELECT value FROM site_settings WHERE `key` = ? LIMIT 1', ['store_status'], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     let mode = results.length > 0 ? results[0].value : 'auto';
     let currentState = mode;
@@ -310,11 +310,14 @@ app.get('/api/store-status', (req, res) => {
 
 app.post('/api/store-status', (req, res) => {
   const { status } = req.body;
-  db.query('INSERT INTO site_settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = ?',
-    ['store_status', status, status], (err) => {
+  // Use a two-step process to be 100% sure on all MySQL versions
+  db.query('DELETE FROM site_settings WHERE `key` = ?', ['store_status'], (err) => {
+    if (err) console.error('Delete old status error:', err);
+    db.query('INSERT INTO site_settings (`key`, `value`) VALUES (?, ?)', ['store_status', status], (err) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ success: true, mode: status });
     });
+  });
 });
 
 db.query(`CREATE TABLE IF NOT EXISTS contact_messages (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, message TEXT NOT NULL, status VARCHAR(50) DEFAULT 'new', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure contact_messages table error:', err); });

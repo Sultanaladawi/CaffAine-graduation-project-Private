@@ -49,16 +49,22 @@ export const StoreProvider = ({ children }) => {
     else if (manualStatus === 'manual_closed') next = 'manual_open';
     else next = 'auto';
     
+    console.log("Attempting to toggle store status to:", next);
+    
     setManualStatus(next);
 
     try {
-      await axios.post(`${API_BASE}/api/store-status`, { status: next });
-      // Small delay before allowing polling again to ensure backend is ready
-      setTimeout(() => setIsUpdating(false), 2000);
+      const res = await axios.post(`${API_BASE}/api/store-status`, { status: next });
+      console.log("Server responded successfully:", res.data);
+      // Wait 5 seconds to let Azure DB settle
+      setTimeout(() => {
+        setIsUpdating(false);
+        console.log("Update lock released, polling resumed.");
+      }, 5000);
     } catch (err) {
       console.error("Failed to update store status:", err);
       setIsUpdating(false);
-      alert("Error: Could not connect to server.");
+      alert("Error: Could not connect to server. Check console for details.");
     }
   };
 
