@@ -70,6 +70,10 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
 
+app.get('/Coffaine_Final_Presentation.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'Coffaine_Final_Presentation.html'));
+});
+
 app.use((req, res, next) => {
   console.log(`[Server] ${req.method} ${req.url}`);
 
