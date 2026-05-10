@@ -6,8 +6,7 @@
     "client": "react-scripts start",
     "server": "node server.js",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "build": "react-scripts build",
-    "postinstall": "npm run build"
+    "build": "react-scripts build"
   },
   "dependencies": {
     "@studio-freight/lenis": "^1.0.42",
