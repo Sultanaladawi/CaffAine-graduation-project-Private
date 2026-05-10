@@ -305,7 +305,7 @@ const AdminLayout = () => {
                   backgroundColor: '#ff4d4d', color: '#fff', border: '1px solid rgba(255, 77, 77, 0.5)',
                   padding: '6px 14px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '8px',
                   cursor: 'pointer', boxShadow: '0 0 15px rgba(255, 77, 77, 0.4)', animation: 'alarmPulse 1s infinite',
-                  fontWeight: '800', fontSize: '0.75rem', letterSpacing: '0.5px'
+                  fontWeight: '800', fontSize: '0.75rem', letterSpacing: '0.5px', zIndex: 9999, position: 'relative'
                 }}
               >
                 <BellRing size={16} /> STOP ALARM
@@ -314,7 +314,10 @@ const AdminLayout = () => {
 
             {/* Store Status Toggle Button - 3 States */}
             <button
-              onClick={toggleStatus}
+              onClick={() => {
+                console.log("Store status button clicked!");
+                toggleStatus();
+              }}
               style={{
                 display: 'flex', alignItems: 'center', gap: '10px',
                 padding: '8px 18px',
@@ -327,6 +330,7 @@ const AdminLayout = () => {
                 transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                 boxShadow: '0 0 15px rgba(0,0,0,0.2)',
                 position: 'relative',
+                zIndex: 9999, // Ensure it's clickable
               }}
             >
               <div style={{
