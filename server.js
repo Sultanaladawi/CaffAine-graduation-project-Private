@@ -400,6 +400,7 @@ db.query(`CREATE TABLE IF NOT EXISTS store_reviews (id INT AUTO_INCREMENT PRIMAR
     });
 db.query(`CREATE TABLE IF NOT EXISTS ai_insights_cache (id INT AUTO_INCREMENT PRIMARY KEY, topic VARCHAR(100) UNIQUE, content TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure ai_insights_cache table error:', err); });
 db.query(`CREATE TABLE IF NOT EXISTS admin_logs (id INT AUTO_INCREMENT PRIMARY KEY, admin_email VARCHAR(255) NOT NULL, admin_name VARCHAR(255) DEFAULT NULL, action VARCHAR(255) NOT NULL, details TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure admin_logs table error:', err); });
+db.query(`CREATE TABLE IF NOT EXISTS ai_assistant_logs (id INT AUTO_INCREMENT PRIMARY KEY, admin_query TEXT, ai_response TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure ai_assistant_logs table error:', err); });
 db.query("UPDATE addons SET price = 0.50 WHERE price = 0", (err) => { if (err) console.error('Update addon prices error:', err); });
 
 db.query("SHOW COLUMNS FROM categories", (err, columns) => {
@@ -1074,14 +1075,17 @@ app.post('/api/ai-chat', async (req, res) => {
 
   try {
     const promiseDb = db.promise();
-    if (isAdmin) {
-      // 19 Parallel Business Intelligence Queries for CaffAIne
+    // Force boolean conversion to handle any type mismatches
+    const isActuallyAdmin = String(isAdmin) === 'true';
+    
+    if (isActuallyAdmin) {
+      console.log(`[AI] Processing Admin Query with full business context. (UK Time: ${currentDateTime})`);
       const [
         [stats], [dailySales], [topProducts], [inventory], 
         [lowStock], [orders], [latestOrders], [categoryStats],
         [pendingApps], [messages], [feedback], [offers], [auditLogs]
       ] = await Promise.all([
-        promiseDb.query("SELECT COUNT(*) as orders, SUM(total_amount) as revenue FROM orders"),
+        promiseDb.query("SELECT COUNT(*) as orders, COALESCE(SUM(total_amount),0) as revenue FROM orders"),
         promiseDb.query("SELECT DATE(created_at) as date, SUM(total_amount) as total FROM orders GROUP BY DATE(created_at) ORDER BY date DESC LIMIT 7"),
         promiseDb.query("SELECT product_name, COUNT(*) as count FROM order_items GROUP BY product_name ORDER BY count DESC LIMIT 5"),
         promiseDb.query("SELECT item_name, quantity, min_threshold FROM inventory"),
@@ -1096,16 +1100,19 @@ app.post('/api/ai-chat', async (req, res) => {
         promiseDb.query("SELECT action, details FROM admin_logs ORDER BY created_at DESC LIMIT 5")
       ]);
 
-      businessContext += `\nBUSINESS DATA (LIVE):
+      businessContext = `You are the CaffAIne Business Intelligence Expert. 
+Current Status:
 - Total Revenue: £${stats[0]?.revenue || 0}
-- Orders Today: ${stats[0]?.orders || 0}
-- Inventory Status: ${inventory.length} items tracked. ${lowStock.length} items low on stock.
-- Active Orders: ${orders[0]?.count || 0} currently preparing.
-- Recent Performance: ${dailySales.map(d => `${d.date}: £${d.total}`).join(', ')}
-- Top Sellers: ${topProducts.map(p => `${p.product_name}`).join(', ')}
-- Hiring: ${pendingApps[0]?.count || 0} new job applications.
-- Customer Feedback: Average rating ${feedback[0]?.avg?.toFixed(1) || 'N/A'}/5.
-- Unread Messages: ${messages[0]?.count || 0} messages pending.`;
+- Orders To Date: ${stats[0]?.orders || 0}
+- Inventory: ${inventory.length} items total. ${lowStock.length} items need restocking.
+- Today's Orders: ${orders[0]?.count || 0} in progress.
+- Sales History: ${dailySales.map(d => `${d.date}: £${d.total}`).join(', ')}
+- Popular Items: ${topProducts.map(p => `${p.product_name}`).join(', ')}
+- Recruitment: ${pendingApps[0]?.count || 0} new job applications.
+- Feedback: ${feedback[0]?.avg?.toFixed(1) || '0'}/5 stars.
+- Admin Logs: ${auditLogs.map(l => l.action).join(', ')}.
+
+Instructions: Answer the admin's business questions using this data ONLY. Do NOT say you don't have access to data. Be precise and professional.`;
     } else {
       const [menuRes] = await promiseDb.query(`SELECT name, price_display FROM menu_items WHERE available = 1`);
       const menuItems = menuRes.map(m => `${m.name} (${m.price_display})`).join(', ');
@@ -1120,9 +1127,16 @@ app.post('/api/ai-chat', async (req, res) => {
     const aiMessages = [{ role: 'system', content: businessContext }];
     if (history && Array.isArray(history)) aiMessages.push(...history);
     aiMessages.push({ role: 'user', content: message });
-    const completion = await openai.chat.completions.create({ model: 'gpt-4o-mini', messages: aiMessages, max_tokens: 400 });
+    
+    const completion = await openai.chat.completions.create({ 
+      model: 'gpt-4o-mini', 
+      messages: aiMessages, 
+      max_tokens: 500,
+      temperature: 0.7
+    });
     return res.json({ reply: completion.choices[0]?.message?.content || "I'm a bit stuck! Reach us at hello@facultycoffee.co.uk ☕" });
   } catch (error) {
+    console.error('[AI] Chat Error:', error.message);
     return res.status(200).json({ reply: `[Local Mode] AI service temporarily unavailable. Please try again later.` });
   }
 });
@@ -1142,6 +1156,14 @@ app.post('/api/admin/log', (req, res) => {
 
 app.get('/api/test-ai', (req, res) => {
   res.json({ message: 'AI Server is reachable!', openai: !!openai });
+});
+
+app.post('/api/ai-assistant-logs', (req, res) => {
+  const { admin_query, ai_response } = req.body;
+  db.query('INSERT INTO ai_assistant_logs (admin_query, ai_response) VALUES (?, ?)', [admin_query, ai_response], (err) => {
+    if (err) console.error('AI Log Error:', err);
+    res.json({ success: true });
+  });
 });
 
 // ✅ Serve React build files
