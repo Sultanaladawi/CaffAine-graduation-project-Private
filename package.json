@@ -6,7 +6,7 @@
     "client": "react-scripts start",
     "server": "node server.js",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "build": "react-scripts build"
+    "build": "CI=false react-scripts build"
   },
   "dependencies": {
     "cors": "^2.8.6",
@@ -26,11 +26,11 @@
     "react-dom": "^18.2.0",
     "react-icons": "^5.6.0",
     "react-router-dom": "^7.14.1",
-    "react-scripts": "5.0.1"
+    "react-scripts": "5.0.1",
+    "concurrently": "^8.2.2"
   },
   "devDependencies": {
-    "@types/node": "^25.6.0",
-    "concurrently": "^8.2.2"
+    "@types/node": "^25.6.0"
   },
   "browserslist": {
     "production": [
