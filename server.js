@@ -1074,9 +1074,43 @@ app.post('/api/ai-chat', async (req, res) => {
 
   try {
     const promiseDb = db.promise();
-    const [menuRes] = await promiseDb.query(`SELECT name, price_display FROM menu_items WHERE available = 1`);
-    const menuItems = menuRes.map(m => `${m.name} (${m.price_display})`).join(', ');
-    businessContext += `\nMenu: ${menuItems}`;
+    if (isAdmin) {
+      // 19 Parallel Business Intelligence Queries for CaffAIne
+      const [
+        [stats], [dailySales], [topProducts], [inventory], 
+        [lowStock], [orders], [latestOrders], [categoryStats],
+        [pendingApps], [messages], [feedback], [offers], [auditLogs]
+      ] = await Promise.all([
+        promiseDb.query("SELECT COUNT(*) as orders, SUM(total_amount) as revenue FROM orders"),
+        promiseDb.query("SELECT DATE(created_at) as date, SUM(total_amount) as total FROM orders GROUP BY DATE(created_at) ORDER BY date DESC LIMIT 7"),
+        promiseDb.query("SELECT product_name, COUNT(*) as count FROM order_items GROUP BY product_name ORDER BY count DESC LIMIT 5"),
+        promiseDb.query("SELECT item_name, quantity, min_threshold FROM inventory"),
+        promiseDb.query("SELECT item_name, quantity FROM inventory WHERE quantity <= min_threshold"),
+        promiseDb.query("SELECT COUNT(*) as count FROM orders WHERE status = 'preparing'"),
+        promiseDb.query("SELECT customer_name, total_amount, status FROM orders ORDER BY created_at DESC LIMIT 5"),
+        promiseDb.query("SELECT category_id, COUNT(*) as count FROM menu_items GROUP BY category_id"),
+        promiseDb.query("SELECT COUNT(*) as count FROM job_applications WHERE status = 'new'"),
+        promiseDb.query("SELECT COUNT(*) as count FROM contact_messages WHERE is_read = 0"),
+        promiseDb.query("SELECT AVG(rating) as avg FROM product_reviews"),
+        promiseDb.query("SELECT product_name, discount_percent FROM offers WHERE active = 1"),
+        promiseDb.query("SELECT action, details FROM admin_logs ORDER BY created_at DESC LIMIT 5")
+      ]);
+
+      businessContext += `\nBUSINESS DATA (LIVE):
+- Total Revenue: £${stats[0]?.revenue || 0}
+- Orders Today: ${stats[0]?.orders || 0}
+- Inventory Status: ${inventory.length} items tracked. ${lowStock.length} items low on stock.
+- Active Orders: ${orders[0]?.count || 0} currently preparing.
+- Recent Performance: ${dailySales.map(d => `${d.date}: £${d.total}`).join(', ')}
+- Top Sellers: ${topProducts.map(p => `${p.product_name}`).join(', ')}
+- Hiring: ${pendingApps[0]?.count || 0} new job applications.
+- Customer Feedback: Average rating ${feedback[0]?.avg?.toFixed(1) || 'N/A'}/5.
+- Unread Messages: ${messages[0]?.count || 0} messages pending.`;
+    } else {
+      const [menuRes] = await promiseDb.query(`SELECT name, price_display FROM menu_items WHERE available = 1`);
+      const menuItems = menuRes.map(m => `${m.name} (${m.price_display})`).join(', ');
+      businessContext += `\nMenu: ${menuItems}`;
+    }
   } catch (e) {
     console.warn('[AI] Context Fetch Error:', e.message);
   }
