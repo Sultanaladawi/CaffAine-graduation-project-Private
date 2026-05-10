@@ -55,7 +55,7 @@ if (API_KEY && API_KEY !== 'your_key_here') {
 
 const app = express();
 
-// ✅ FIXED: Single PORT definition using Azure's process.env.PORT
+// ✅ Azure uses process.env.PORT; locally falls back to SERVER_PORT to avoid conflict with React client
 const PORT = process.env.PORT || 8080;
 
 // ✅ FIXED: CORS now allows Azure and localhost
