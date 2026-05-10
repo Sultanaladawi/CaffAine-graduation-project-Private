@@ -1109,7 +1109,7 @@ Current Status:
 - Sales History: ${dailySales.map(d => `${d.date}: £${d.total}`).join(', ')}
 - Popular Items: ${topProducts.map(p => `${p.item_name}`).join(', ')}
 - Recruitment: ${pendingApps[0]?.count || 0} new job applications.
-- Feedback: ${feedback[0]?.avg?.toFixed(1) || '0'}/5 stars.
+- Feedback: ${Number(feedback[0]?.avg || 0).toFixed(1)}/5 stars.
 - Admin Logs: ${auditLogs.map(l => l.action).join(', ')}.
 
 Instructions: Answer the admin's business questions using this data ONLY. Do NOT say you don't have access to data. Be precise and professional.`;
