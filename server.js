@@ -68,6 +68,15 @@ app.use(cors({
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// ✅ ENFORCE HTTPS (For Azure Production)
+app.use((req, res, next) => {
+  if (req.headers['x-forwarded-proto'] && req.headers['x-forwarded-proto'] !== 'https' && process.env.NODE_ENV === 'production') {
+    return res.redirect('https://' + req.get('host') + req.url);
+  }
+  next();
+});
+
 app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
 
 // Serving the presentation file with a short, professional URL
@@ -1133,6 +1142,7 @@ app.post('/api/ai-chat', async (req, res) => {
         const dailySales = getRes(11);
         const productReviews = getRes(16);
         const dataLatestDate = getRes(17, [{latest_date: null}])[0].latest_date;
+        const allInventory = getRes(13); // Full inventory list
         const teamActivity = getRes(18); // Latest 50 admin logs
 
         // Smart logic to identify "Today" and "Yesterday" relative to the actual database records
@@ -1156,13 +1166,14 @@ Current Store Activity Baseline (Last Activity Date: ${todayFormatted}):
 - Previous Day Sales (${yesterdayFormatted}): £${yesterdayRevenue}.
 - Best Sales Day Ever: ${bestDay ? `${new Date(bestDay.best_date).toLocaleDateString()}: £${bestDay.daily_rev}` : 'N/A'}.
 - Top Items Sold: ${topProducts.slice(0,5).map(p => `${p.name} (${p.sold})`).join(', ')}.
-- Inventory: ${lowStockCount} items need attention! Low items: ${lowStockDetails.map(i => i.item_name).join(', ')}.
+- Full Inventory Status: ${allInventory.map(i => `${i.item_name}: ${i.quantity} ${i.unit || ''}`).join(', ')}.
+- Low Stock Alerts: ${lowStockCount} items need attention! Low items: ${lowStockDetails.map(i => i.item_name).join(', ')}.
 - Sales Trend (Last 10 Days): ${dailySales.slice(0,10).map(d => `${d.date}: £${d.revenue}`).join(' | ')}.
 - Customer Sentiment: ${recentFeedback.slice(0,5).map(f => `${f.rating}/5 stars: "${f.comment}"`).join(' | ')}.
 - Recent Team Activity (Administrative Oversight): ${teamActivity.slice(0,10).map(log => `[${log.time}] ${log.admin_name}: ${log.action} (${log.details})`).join('; ')}.
 
 Instructions: The user's database records might be historical. Treat ${todayFormatted} as "Today". 
-As a BI expert, help the Leader monitor the store. If they ask about team performance or recent actions, use the "Recent Team Activity" logs provided above. Be concise and professional.`;
+As a BI expert, help the Leader monitor the store. If they ask about specific stock items like "Sugar" or "Apples", refer to the "Full Inventory Status" provided above. Be concise and professional.`;
       } catch (dbError) {
         console.error('[AI] Data Merge Error:', dbError);
         businessContext = `You are the CaffAIne BI Assistant. System status: Operational. Please ask your business questions.`;

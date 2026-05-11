@@ -61,6 +61,20 @@ const AdminLayout = () => {
   };
 
   useEffect(() => {
+    // Force Favicon to be the original local asset
+    const link = document.querySelector("link[rel~='icon']");
+    if (link) {
+      link.href = '/favicon.ico';
+    } else {
+      const newLink = document.createElement('link');
+      newLink.rel = 'icon';
+      newLink.href = '/favicon.ico';
+      document.head.appendChild(newLink);
+    }
+    document.title = "CaffAIne | Strategic Dashboard";
+  }, []);
+
+  useEffect(() => {
     if (!admin) return;
 
     const checkStock = async () => {
