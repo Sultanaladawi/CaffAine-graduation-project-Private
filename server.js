@@ -1145,12 +1145,13 @@ app.post('/api/ai-chat', async (req, res) => {
         const allInventory = getRes(13); // Full inventory list
         const teamActivity = getRes(18); // Latest 50 admin logs
 
-        // Smart logic to identify "Today" and "Yesterday" relative to the actual database records
-        const baselineDate = dataLatestDate ? new Date(dataLatestDate) : new Date();
-        const yesterdayDate = new Date(baselineDate);
-        yesterdayDate.setDate(baselineDate.getDate() - 1);
+        // Use actual current UK date as "Today" for accurate daily sales reporting
+        const ukNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/London' }));
+        const baselineDate = ukNow;
+        const yesterdayDate = new Date(ukNow);
+        yesterdayDate.setDate(ukNow.getDate() - 1);
 
-        const todayFormatted = baselineDate.toISOString().split('T')[0];
+        const todayFormatted = ukNow.toISOString().split('T')[0];
         const yesterdayFormatted = yesterdayDate.toISOString().split('T')[0];
 
         const todaySalesRow = dailySales.find(d => d.date === todayFormatted);
