@@ -24,10 +24,12 @@ jobs:
         run: |
           npm install
           npm run build --if-present
-          npm prune --production
+          # Remove everything and only keep production modules to save space
+          rm -rf node_modules
+          npm install --production
 
       - name: Zip artifact for deployment
-        run: zip -r release.zip . --exclude "*.git*" --exclude ".env*" --exclude "node_modules/*" --exclude "src/*" --exclude ".github/*"
+        run: zip -r release.zip build/ node_modules/ server.js package.json package-lock.json .env* Coffaine_Premium_Presentation.html
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
