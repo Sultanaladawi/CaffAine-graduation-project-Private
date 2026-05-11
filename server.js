@@ -1120,11 +1120,11 @@ app.post('/api/ai-chat', async (req, res) => {
           /* 7 */ promiseDb.query(`SELECT item_name, quantity, unit, min_threshold, CASE WHEN quantity <= min_threshold THEN 'LOW' ELSE 'OK' END as stock_status FROM inventory ORDER BY stock_status DESC, item_name`),
           /* 8 */ promiseDb.query(`SELECT mi.name, mi.price_display, mi.available, c.name as category FROM menu_items mi LEFT JOIN categories c ON mi.category_id = c.id ORDER BY c.name, mi.name`),
           /* 9 */ promiseDb.query(`SELECT title, discount_percent FROM offers WHERE active = 1`),
-          /* 10 */ promiseDb.query(`SELECT COUNT(*) as total FROM contact_messages`),
-          /* 11 */ promiseDb.query(`SELECT status, COUNT(*) as count FROM job_applications GROUP BY status`),
-          /* 12 */ promiseDb.query(`SELECT title, type FROM careers WHERE active = 1`),
+          /* 10 */ promiseDb.query(`SELECT name, message, DATE_FORMAT(created_at,'%Y-%m-%d') as date FROM contact_messages ORDER BY created_at DESC LIMIT 10`),
+          /* 11 */ promiseDb.query(`SELECT name, position, status FROM job_applications ORDER BY created_at DESC LIMIT 10`),
+          /* 12 */ promiseDb.query(`SELECT title, type, location FROM careers WHERE active = 1`),
           /* 13 */ promiseDb.query(`SELECT ROUND(AVG(rating),1) as avg_rating, COUNT(*) as total FROM general_feedback`),
-          /* 14 */ promiseDb.query(`SELECT rating, comment FROM general_feedback ORDER BY created_at DESC LIMIT 5`),
+          /* 14 */ promiseDb.query(`SELECT reviewer_name, rating, comment FROM general_feedback ORDER BY created_at DESC LIMIT 5`),
           /* 15 */ promiseDb.query(`SELECT admin_name, action, details, DATE_FORMAT(created_at,'%Y-%m-%d %H:%i') as time FROM admin_logs ORDER BY created_at DESC LIMIT 20`),
           /* 16 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(created_at,'%H:%i') as time FROM orders WHERE DATE(created_at) = CURDATE() ORDER BY created_at DESC`)
         ]);
@@ -1141,8 +1141,8 @@ app.post('/api/ai-chat', async (req, res) => {
         const inventory       = getRes(7);
         const menuItems       = getRes(8);
         const offers          = getRes(9);
-        const messages        = getRes(10, [{total:0}])[0];
-        const appsByStatus    = getRes(11);
+        const messages        = getRes(10);
+        const applications    = getRes(11);
         const activeJobs      = getRes(12);
         const feedbackSummary = getRes(13, [{avg_rating:'N/A', total:0}])[0];
         const recentFeedback  = getRes(14);
@@ -1185,12 +1185,13 @@ Unavailable: ${menuItems.filter(m => !m.available).map(m => m.name).join(', ') |
 ${offers.map(o => `${o.title}: ${o.discount_percent}% OFF`).join(' | ') || 'No active offers'}
 
 === MESSAGES & JOBS ===
-Messages: ${messages.total} | Applications: ${appsByStatus.map(a => `${a.status}: ${a.count}`).join(', ') || 'None'}
-Job Listings: ${activeJobs.map(j => `${j.title} (${j.type})`).join(', ') || 'None'}
+Recent Messages: ${messages.map(m => `[${m.date}] ${m.name}: "${m.message}"`).join(' | ') || 'None'}
+Job Applications: ${applications.map(a => `${a.name} for ${a.position} (${a.status})`).join(' | ') || 'None'}
+Active Listings: ${activeJobs.map(j => `${j.title} (${j.type}) in ${j.location}`).join(', ') || 'None'}
 
 === FEEDBACK ===
 Avg: ${feedbackSummary.avg_rating}/5 (${feedbackSummary.total} reviews)
-Recent: ${recentFeedback.map(f => `${f.rating}/5: "${f.comment}"`).join(' | ') || 'None'}
+Recent: ${recentFeedback.map(f => `${f.reviewer_name} (${f.rating}/5): "${f.comment}"`).join(' | ') || 'None'}
 
 === TEAM ACTIVITY ===
 ${teamActivity.map(log => `[${log.time}] ${log.admin_name}: ${log.action} — ${log.details}`).join('\n')}
