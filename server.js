@@ -1119,7 +1119,7 @@ app.post('/api/ai-chat', async (req, res) => {
           /* 6 */ promiseDb.query(`SELECT DATE_FORMAT(created_at,'%Y-%m-%d') as date, COUNT(*) as orders, COALESCE(SUM(total_amount),0) as revenue FROM orders WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 15 DAY) GROUP BY DATE(created_at) ORDER BY date DESC`),
           /* 7 */ promiseDb.query(`SELECT item_name, quantity, unit, min_threshold, CASE WHEN quantity <= min_threshold THEN 'LOW' ELSE 'OK' END as stock_status FROM inventory ORDER BY stock_status DESC, item_name`),
           /* 8 */ promiseDb.query(`SELECT name, price_display, available FROM menu_items WHERE available = 1`),
-          /* 9 */ promiseDb.query(`SELECT title, discount_percent FROM offers WHERE active = 1`),
+          /* 9 */ promiseDb.query(`SELECT * FROM offers`),
           /* 10 */ promiseDb.query(`SELECT name, message, DATE_FORMAT(created_at,'%Y-%m-%d') as date FROM contact_messages ORDER BY created_at DESC LIMIT 10`),
           /* 11 */ promiseDb.query(`SELECT name, position, status FROM job_applications ORDER BY created_at DESC LIMIT 10`),
           /* 12 */ promiseDb.query(`SELECT title, type, location FROM careers WHERE active = 1`),
@@ -1184,7 +1184,7 @@ Items: ${menuItems.map(m => `${m.name} (${m.price_display})`).join(', ') || 'Non
 Ratings: ${productRatings.map(p => `${p.product}: ${p.rating}⭐ (${p.count} reviews)`).join(' | ') || 'No ratings yet'}
 
 === OFFERS ===
-${offers.map(o => `${o.title}: ${o.discount_percent}% OFF`).join(' | ') || 'No active offers'}
+${offers.filter(o => o.active == 1).map(o => `${o.product_name}: ${o.discount_percent}% OFF (${o.reason})`).join(' | ') || 'No active offers'}
 
 === MESSAGES & JOBS ===
 Recent Messages: ${messages.map(m => `[${m.date}] ${m.name}: "${m.message}"`).join(' | ') || 'None'}
