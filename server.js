@@ -1118,7 +1118,7 @@ app.post('/api/ai-chat', async (req, res) => {
           /* 5 */ promiseDb.query(`SELECT DATE(created_at) as best_date, SUM(total_amount) as daily_rev FROM orders GROUP BY DATE(created_at) ORDER BY daily_rev DESC LIMIT 1`),
           /* 6 */ promiseDb.query(`SELECT DATE_FORMAT(created_at,'%Y-%m-%d') as date, COUNT(*) as orders, COALESCE(SUM(total_amount),0) as revenue FROM orders WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 15 DAY) GROUP BY DATE(created_at) ORDER BY date DESC`),
           /* 7 */ promiseDb.query(`SELECT item_name, quantity, unit, min_threshold, CASE WHEN quantity <= min_threshold THEN 'LOW' ELSE 'OK' END as stock_status FROM inventory ORDER BY stock_status DESC, item_name`),
-          /* 8 */ promiseDb.query(`SELECT mi.name, mi.price_display, mi.available, c.name as category FROM menu_items mi LEFT JOIN categories c ON mi.category_id = c.id ORDER BY c.name, mi.name`),
+          /* 8 */ promiseDb.query(`SELECT name, price_display, available FROM menu_items WHERE available = 1`),
           /* 9 */ promiseDb.query(`SELECT title, discount_percent FROM offers WHERE active = 1`),
           /* 10 */ promiseDb.query(`SELECT name, message, DATE_FORMAT(created_at,'%Y-%m-%d') as date FROM contact_messages ORDER BY created_at DESC LIMIT 10`),
           /* 11 */ promiseDb.query(`SELECT name, position, status FROM job_applications ORDER BY created_at DESC LIMIT 10`),
@@ -1126,7 +1126,8 @@ app.post('/api/ai-chat', async (req, res) => {
           /* 13 */ promiseDb.query(`SELECT ROUND(AVG(rating),1) as avg_rating, COUNT(*) as total FROM general_feedback`),
           /* 14 */ promiseDb.query(`SELECT reviewer_name, rating, comment FROM general_feedback ORDER BY created_at DESC LIMIT 5`),
           /* 15 */ promiseDb.query(`SELECT admin_name, action, details, DATE_FORMAT(created_at,'%Y-%m-%d %H:%i') as time FROM admin_logs ORDER BY created_at DESC LIMIT 20`),
-          /* 16 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(created_at,'%H:%i') as time FROM orders WHERE DATE(created_at) = CURDATE() ORDER BY created_at DESC`)
+          /* 16 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(created_at,'%H:%i') as time FROM orders WHERE DATE(created_at) = CURDATE() ORDER BY created_at DESC`),
+          /* 17 */ promiseDb.query(`SELECT mi.name as product, ROUND(AVG(pr.rating),1) as rating, COUNT(pr.id) as count FROM menu_items mi LEFT JOIN product_reviews pr ON mi.id = pr.product_id GROUP BY mi.id HAVING count > 0`)
         ]);
 
         const getRes = (idx, def = []) => (results[idx] && results[idx].status === 'fulfilled' ? results[idx].value[0] : def);
@@ -1148,6 +1149,7 @@ app.post('/api/ai-chat', async (req, res) => {
         const recentFeedback  = getRes(14);
         const teamActivity    = getRes(15);
         const todayOrders     = getRes(16);
+        const productRatings  = getRes(17);
 
         const lowStock = inventory.filter(i => i.stock_status === 'LOW');
         const okStock  = inventory.filter(i => i.stock_status === 'OK');
@@ -1177,9 +1179,9 @@ ${salesTrend.map(d => `${d.date}: £${d.revenue} (${d.orders} orders)`).join(' |
 ⚠️ LOW (${lowStock.length}): ${lowStock.map(i => `${i.item_name} ${i.quantity}${i.unit||''}`).join(', ') || 'None'}
 ✅ OK: ${okStock.map(i => `${i.item_name}: ${i.quantity}${i.unit||''}`).join(', ')}
 
-=== MENU ===
-Available: ${menuItems.filter(m => m.available).map(m => `${m.name} (${m.price_display})`).join(', ')}
-Unavailable: ${menuItems.filter(m => !m.available).map(m => m.name).join(', ') || 'None'}
+=== MENU & RATINGS ===
+Items: ${menuItems.map(m => `${m.name} (${m.price_display})`).join(', ') || 'None'}
+Ratings: ${productRatings.map(p => `${p.product}: ${p.rating}⭐ (${p.count} reviews)`).join(' | ') || 'No ratings yet'}
 
 === OFFERS ===
 ${offers.map(o => `${o.title}: ${o.discount_percent}% OFF`).join(' | ') || 'No active offers'}
