@@ -56,7 +56,7 @@ if (API_KEY && API_KEY !== 'your_key_here') {
 const app = express();
 
 // ✅ Azure uses process.env.PORT; locally falls back to SERVER_PORT to avoid conflict with React client
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || process.env.SERVER_PORT || 8080;
 
 // ✅ FIXED: CORS now allows Azure and localhost
 app.use(cors({
@@ -1080,39 +1080,59 @@ app.post('/api/ai-chat', async (req, res) => {
     
     if (isActuallyAdmin) {
       console.log(`[AI] Processing Admin Query with full business context. (UK Time: ${currentDateTime})`);
-      const [
-        [stats], [dailySales], [topProducts], [inventory], 
-        [lowStock], [orders], [latestOrders], [categoryStats],
-        [pendingApps], [messages], [feedback], [offers], [auditLogs]
-      ] = await Promise.all([
-        promiseDb.query("SELECT COUNT(*) as orders, COALESCE(SUM(total_amount),0) as revenue FROM orders"),
-        promiseDb.query("SELECT DATE(created_at) as date, SUM(total_amount) as total FROM orders GROUP BY DATE(created_at) ORDER BY date DESC LIMIT 7"),
-        promiseDb.query("SELECT item_name, COUNT(*) as count FROM order_items GROUP BY item_name ORDER BY count DESC LIMIT 5"),
-        promiseDb.query("SELECT item_name, quantity, min_threshold FROM inventory"),
-        promiseDb.query("SELECT item_name, quantity FROM inventory WHERE quantity <= min_threshold"),
-        promiseDb.query("SELECT COUNT(*) as count FROM orders WHERE status = 'preparing'"),
-        promiseDb.query("SELECT customer_name, total_amount, status FROM orders ORDER BY created_at DESC LIMIT 5"),
-        promiseDb.query("SELECT category_id, COUNT(*) as count FROM menu_items GROUP BY category_id"),
-        promiseDb.query("SELECT COUNT(*) as count FROM job_applications WHERE status = 'new'"),
-        promiseDb.query("SELECT COUNT(*) as count FROM contact_messages WHERE is_read = 0"),
-        promiseDb.query("SELECT AVG(rating) as avg FROM product_reviews"),
-        promiseDb.query("SELECT product_name, discount_percent FROM offers WHERE active = 1"),
-        promiseDb.query("SELECT action, details FROM admin_logs ORDER BY created_at DESC LIMIT 5")
-      ]);
+      try {
+        const promiseDb = db.promise();
+        const results = await Promise.allSettled([
+          promiseDb.query(`SELECT COUNT(*) as total, COALESCE(SUM(total_amount),0) as revenue FROM orders`),
+          promiseDb.query(`SELECT COUNT(*) as total FROM menu_items`),
+          promiseDb.query(`SELECT COUNT(*) as total FROM inventory WHERE quantity <= min_threshold`),
+          promiseDb.query(`SELECT mi.name, COUNT(oi.id) as sold FROM order_items oi JOIN menu_items mi ON oi.product_id = mi.id GROUP BY oi.product_id ORDER BY sold DESC LIMIT 10`),
+          promiseDb.query(`SELECT order_type, COUNT(*) as count FROM orders GROUP BY order_type`),
+          promiseDb.query(`SELECT DATE(created_at) as best_date, SUM(total_amount) as daily_rev FROM orders GROUP BY DATE(created_at) ORDER BY daily_rev DESC LIMIT 1`),
+          promiseDb.query(`SELECT id, customer_name, status, total_amount, order_type, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i') as time FROM orders ORDER BY created_at DESC LIMIT 5`),
+          promiseDb.query(`SELECT item_name, quantity, min_threshold FROM inventory WHERE quantity <= min_threshold LIMIT 10`),
+          promiseDb.query(`SELECT reviewer_name, rating, comment FROM general_feedback ORDER BY created_at DESC LIMIT 5`),
+          promiseDb.query(`SELECT title, type, location FROM careers WHERE active = 1`),
+          promiseDb.query(`SELECT * FROM offers WHERE active = 1`),
+          promiseDb.query(`SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as date, COUNT(*) as count, COALESCE(SUM(total_amount),0) as revenue FROM orders GROUP BY DATE(created_at) ORDER BY date DESC LIMIT 7`),
+          promiseDb.query(`SELECT mi.name, mi.price_display, mi.available, c.name as category_name FROM menu_items mi LEFT JOIN categories c ON mi.category_id = c.id`),
+          promiseDb.query(`SELECT item_name, quantity, unit, min_threshold FROM inventory`),
+          promiseDb.query(`SELECT name, message FROM contact_messages ORDER BY created_at DESC LIMIT 5`),
+          promiseDb.query(`SELECT name, position, status FROM job_applications ORDER BY created_at DESC LIMIT 10`),
+          promiseDb.query(`SELECT mi.name, pr.rating, pr.comment FROM product_reviews pr JOIN menu_items mi ON pr.product_id = mi.id ORDER BY pr.created_at DESC LIMIT 5`)
+        ]);
 
-      businessContext = `You are the CaffAIne Business Intelligence Expert. 
-Current Status:
-- Total Revenue: £${stats[0]?.revenue || 0}
-- Orders To Date: ${stats[0]?.orders || 0}
-- Inventory: ${inventory.length} items total. ${lowStock.length} items need restocking.
-- Today's Orders: ${orders[0]?.count || 0} in progress.
-- Sales History: ${dailySales.map(d => `${d.date}: £${d.total}`).join(', ')}
-- Popular Items: ${topProducts.map(p => `${p.item_name}`).join(', ')}
-- Recruitment: ${pendingApps[0]?.count || 0} new job applications.
-- Feedback: ${Number(feedback[0]?.avg || 0).toFixed(1)}/5 stars.
-- Admin Logs: ${auditLogs.map(l => l.action).join(', ')}.
+        const getRes = (idx, def = []) => (results[idx].status === 'fulfilled' ? results[idx].value[0] : def);
 
-Instructions: Answer the admin's business questions using this data ONLY. Do NOT say you don't have access to data. Be precise and professional.`;
+        const stats = getRes(0, [{total:0, revenue:0}])[0];
+        const lowStockCount = getRes(2, [{total:0}])[0].total;
+        const topProducts = getRes(3);
+        const orderTypes = getRes(4);
+        const bestDay = getRes(5, [null])[0];
+        const recentOrders = getRes(6);
+        const lowStockDetails = getRes(7);
+        const recentFeedback = getRes(8);
+        const careers = getRes(9);
+        const offers = getRes(10);
+        const dailySales = getRes(11);
+        const productReviews = getRes(16);
+
+        businessContext = `You are the CaffAIne Business Intelligence Expert.
+Current Store Insights (UK Time: ${currentDateTime}):
+- Performance: Total Revenue £${stats.revenue}, Total Orders: ${stats.total}.
+- Best Day Ever: ${bestDay ? `${new Date(bestDay.best_date).toLocaleDateString()}: £${bestDay.daily_rev}` : 'N/A'}.
+- Top Items: ${topProducts.map(p => `${p.name} (${p.sold} sold)`).join(', ')}.
+- Inventory: ${lowStockCount} items need attention! Low items: ${lowStockDetails.map(i => i.item_name).join(', ')}.
+- Daily Sales Trend: ${dailySales.map(d => `${d.date}: £${d.revenue}`).join(' | ')}.
+- Customer Sentiment: ${recentFeedback.map(f => `${f.rating}/5 stars: "${f.comment}"`).join(' | ')}.
+- Recent Product Reviews: ${productReviews.map(r => `${r.rating}/5 for ${r.name}`).join(', ')}.
+- Recruitment: ${careers.length} job openings.
+
+Instructions: Be the manager's right-hand AI. Use these specific numbers to give advice. If the manager asks about sales, mention the "Best Day Ever" or "Daily Trend". If they ask about stock, warn them about the ${lowStockCount} items.`;
+      } catch (dbError) {
+        console.error('[AI] Data Merge Error:', dbError);
+        businessContext = `You are the CaffAIne BI Assistant. System status: Operational. Please ask your business questions.`;
+      }
     } else {
       const [menuRes] = await promiseDb.query(`SELECT name, price_display FROM menu_items WHERE available = 1`);
       const menuItems = menuRes.map(m => `${m.name} (${m.price_display})`).join(', ');
