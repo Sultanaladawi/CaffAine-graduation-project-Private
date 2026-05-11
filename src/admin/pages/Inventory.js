@@ -60,8 +60,8 @@ const Inventory = () => {
       }
 
       // Log the export action
-      await axios.post('/api/admin/log', { 
-        action: 'EXPORT PDF', 
+      await axios.post('/api/log-action', { 
+        action: 'Export PDF', 
         details: 'Administrator exported the Inventory/Stock report to PDF.' 
       });
       
@@ -144,8 +144,18 @@ const Inventory = () => {
     try {
       if (modalMode === 'add') {
         await axios.post('/api/inventory', formData);
+        // Log the new registration
+        await axios.post('/api/log-action', {
+          action: 'Inventory Registration',
+          details: `Registered new stock item: ${formData.item_name} (${formData.quantity} ${formData.unit})`
+        });
       } else {
         await axios.put(`/api/update-stock-item/${formData.id}`, formData);
+        // Log the update
+        await axios.post('/api/log-action', {
+          action: 'Inventory Update',
+          details: `Updated ${formData.item_name} to ${formData.quantity} ${formData.unit}`
+        });
       }
       setShowModal(false);
       fetchInventory();
@@ -159,6 +169,11 @@ const Inventory = () => {
     if (window.confirm("Are you sure you want to delete this material?")) {
       try {
         await axios.delete(`/api/inventory/${id}`);
+        // Log the deletion
+        await axios.post('/api/log-action', {
+          action: 'Inventory Deletion',
+          details: `Deleted inventory item ID: ${id}`
+        });
         fetchInventory();
       } catch (err) {
         alert("Error deleting item");

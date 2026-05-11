@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAdminContext } from './AdminContext';
 import { ShieldCheck, Eye, EyeOff, Lock, Mail, ChevronRight, Loader2, AlertTriangle, Coffee, Zap } from 'lucide-react';
+import axios from 'axios';
 
 export default function AdminLogin() {
   const { login, loading, error } = useAdminContext();
@@ -25,6 +26,17 @@ export default function AdminLogin() {
     e.preventDefault();
     const success = await login(form.email, form.password);
     if (success) {
+      // Log the successful login for the Leader
+      try {
+        await axios.post('/api/log-action', {
+          action: 'Login',
+          details: `Admin terminal access established for ${form.email}`
+        }, {
+          headers: { 'x-admin-email': form.email, 'x-admin-name': form.email.split('@')[0] }
+        });
+      } catch (logErr) {
+        console.warn('Silent failure on login log');
+      }
       navigate(from, { replace: true });
     }
   }

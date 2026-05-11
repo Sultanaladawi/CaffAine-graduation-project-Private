@@ -35,7 +35,7 @@ const LeaderDashboard = () => {
     const fetchData = async () => {
       try {
         const [logsRes, reviewsRes, msgRes] = await Promise.all([
-          axios.get('/api/admin/logs'),
+          axios.get('/api/admin-logs'),
           axios.get('/api/reviews'),
           axios.get('/api/contact-messages')
         ]);
@@ -87,9 +87,9 @@ const LeaderDashboard = () => {
       }
 
       // Log the export action
-      await axios.post('/api/admin/log', { 
-        action: 'EXPORT PDF', 
-        details: 'Administrator exported the Team Activity Audit log to PDF.' 
+      await axios.post('/api/log-action', { 
+        action: 'Export PDF', 
+        details: `Leader ${admin.name} exported the Team Activity Audit log to PDF.` 
       });
       
       const doc = new jsPDF();

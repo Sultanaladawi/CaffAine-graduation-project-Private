@@ -182,6 +182,11 @@ const Products = () => {
       await axios.put('/api/products/reorder', {
         order: products.map(p => ({ id: p.id, sort_order: p.sort_order }))
       });
+      // Log the reorder action
+      await axios.post('/api/log-action', {
+        action: 'Menu Reordered',
+        details: 'Administrator updated the product display sequence on the customer menu.'
+      });
       setOrderChanged(false);
       showToast("Inventory sequence updated successfully");
       fetchProducts();
@@ -232,9 +237,19 @@ const Products = () => {
       if (modalMode === 'add') {
         const res = await axios.post('/api/products', cleanFormData);
         productId = res.data.id;
+        // Log the creation
+        await axios.post('/api/log-action', {
+          action: 'Product Created',
+          details: `Added new product: ${cleanFormData.name} (£${cleanFormData.price_num})`
+        });
         showToast("Product created with precision");
       } else {
         await axios.put(`/api/products/${formData.id}`, cleanFormData);
+        // Log the update
+        await axios.post('/api/log-action', {
+          action: 'Product Updated',
+          details: `Modified product: ${cleanFormData.name} (£${cleanFormData.price_num})`
+        });
         showToast("Product details refined");
       }
 
@@ -366,8 +381,8 @@ const Products = () => {
       }
       
       // Log the export action
-      await axios.post('/api/admin/log', { 
-        action: 'EXPORT PDF', 
+      await axios.post('/api/log-action', { 
+        action: 'Export PDF', 
         details: 'Administrator exported the Menu Products report to PDF.' 
       });
 
@@ -426,6 +441,11 @@ const Products = () => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
         await axios.delete(`/api/products/${id}`);
+        // Log the deletion
+        await axios.post('/api/log-action', {
+          action: 'Product Deleted',
+          details: `Deleted product ID: ${id}`
+        });
         fetchProducts();
       } catch (err) {
         console.error("Delete product error:", err);

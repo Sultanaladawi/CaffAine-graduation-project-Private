@@ -55,8 +55,8 @@ const Orders = () => {
       }
 
       // Log the export action
-      await axios.post('/api/admin/log', { 
-        action: 'EXPORT PDF', 
+      await axios.post('/api/log-action', { 
+        action: 'Export PDF', 
         details: 'Administrator exported the Sales/Orders report to PDF.' 
       });
       
@@ -124,6 +124,11 @@ const Orders = () => {
     if (e) e.stopPropagation();
     try {
       await axios.put(`/api/extend-order/${id}`, { minutes: 2 });
+      // Log the time extension
+      await axios.post('/api/log-action', {
+        action: 'Order Time Extension',
+        details: `Added +2 minutes to Order ID: ${id}`
+      });
       showToast("+2 Minutes added to prep time", "success");
       fetchOrders();
     } catch (err) {
@@ -135,6 +140,11 @@ const Orders = () => {
     if (e) e.stopPropagation();
     try {
       await axios.put(`/api/mark-ready/${id}`, { status: 'ready' });
+      // Log the status change
+      await axios.post('/api/log-action', {
+        action: 'Order Status Update',
+        details: `Marked Order ID: ${id} as READY`
+      });
       showToast("Order marked as ready!", "success");
       fetchOrders();
     } catch (err) {
@@ -146,6 +156,11 @@ const Orders = () => {
     if (e) e.stopPropagation();
     try {
       await axios.put(`/api/mark-ready/${id}`, { status: 'completed' });
+      // Log the completion
+      await axios.post('/api/log-action', {
+        action: 'Order Fulfilled',
+        details: `Marked Order ID: ${id} as COMPLETED (Delivered)`
+      });
       showToast("Order marked as completed!", "success");
       fetchOrders();
     } catch (err) {

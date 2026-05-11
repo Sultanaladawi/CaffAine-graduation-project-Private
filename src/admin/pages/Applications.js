@@ -35,9 +35,9 @@ const Applications = () => {
       }
 
       // Log the export action
-      await axios.post('/api/admin/log', { 
-        action: 'EXPORT PDF', 
-        details: 'Administrator exported the Candidate Submissions report to PDF.' 
+      await axios.post('/api/log-action', { 
+        action: 'Export PDF', 
+        details: 'Administrator exported the Job Applications report to PDF.' 
       });
 
       const doc = new jsPDF();

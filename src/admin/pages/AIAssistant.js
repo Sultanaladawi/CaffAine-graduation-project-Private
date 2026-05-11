@@ -118,11 +118,19 @@ const AIAssistant = () => {
       const botMsg = { id: Date.now() + 2, type: 'bot', text: response.data.reply };
       setMessages(prev => [...prev, botMsg]);
 
-      // Save to admin logs
+      // Save to assistant specific logs
       axios.post('/api/ai-assistant-logs', { 
         admin_query: sentMessage, 
         ai_response: response.data.reply 
       }).catch(err => console.error("Log Error:", err));
+
+      // NEW: Log the action for the Leader Audit Log
+      try {
+        await axios.post('/api/log-action', {
+          action: 'AI Business Inquiry',
+          details: `Admin queried AI: "${sentMessage.substring(0, 60)}${sentMessage.length > 60 ? '...' : ''}"`
+        });
+      } catch (logErr) {}
 
     } catch (error) {
       setMessages(prev => prev.filter(m => m.id !== typingId));

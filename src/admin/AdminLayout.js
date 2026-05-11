@@ -157,10 +157,10 @@ const AdminLayout = () => {
 
   const handleLogout = async () => {
     try {
-      // Log the logout event before clearing session
-      await axios.post('/api/admin/log', { 
-        action: 'LOGOUT', 
-        details: 'Administrator manually logged out of the session.' 
+      // Log the logout event before clearing session for the Leader
+      await axios.post('/api/log-action', { 
+        action: 'Logout', 
+        details: `Admin session terminated for ${admin.email}` 
       });
     } catch (e) {
       console.error('Logout logging failed', e);
@@ -314,9 +314,18 @@ const AdminLayout = () => {
 
             {/* Store Status Toggle Button - 3 States */}
             <button
-              onClick={() => {
+              onClick={async () => {
                 console.log("Store status button clicked!");
+                const oldStatus = manualStatus;
                 toggleStatus();
+                // Log status change for the Leader
+                try {
+                  const newStatus = oldStatus === 'auto' ? 'manual_open' : oldStatus === 'manual_open' ? 'manual_closed' : 'auto';
+                  await axios.post('/api/log-action', {
+                    action: 'Store Status Change',
+                    details: `Store mode changed from ${oldStatus} to ${newStatus}`
+                  });
+                } catch (e) {}
               }}
               style={{
                 display: 'flex', alignItems: 'center', gap: '10px',

@@ -97,6 +97,24 @@ app.use((req, res, next) => {
   next();
 });
 
+// Export/Audit Log endpoint for Leader
+app.get('/api/admin-logs', (req, res) => {
+  db.query('SELECT * FROM admin_logs ORDER BY created_at DESC LIMIT 200', (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
+});
+
+app.post('/api/log-action', (req, res) => {
+  const { action, details } = req.body;
+  if (req.logAdminAction) {
+    req.logAdminAction(action, details);
+    res.json({ success: true });
+  } else {
+    res.status(400).json({ error: 'Logging middleware not initialized' });
+  }
+});
+
 // Image upload endpoint
 app.post('/api/upload-image', upload.single('image'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
@@ -1086,20 +1104,22 @@ app.post('/api/ai-chat', async (req, res) => {
           promiseDb.query(`SELECT COUNT(*) as total, COALESCE(SUM(total_amount),0) as revenue FROM orders`),
           promiseDb.query(`SELECT COUNT(*) as total FROM menu_items`),
           promiseDb.query(`SELECT COUNT(*) as total FROM inventory WHERE quantity <= min_threshold`),
-          promiseDb.query(`SELECT mi.name, COUNT(oi.id) as sold FROM order_items oi JOIN menu_items mi ON oi.product_id = mi.id GROUP BY oi.product_id ORDER BY sold DESC LIMIT 10`),
+          promiseDb.query(`SELECT mi.name, COUNT(oi.id) as sold FROM order_items oi JOIN menu_items mi ON oi.product_id = mi.id GROUP BY oi.product_id ORDER BY sold DESC`),
           promiseDb.query(`SELECT order_type, COUNT(*) as count FROM orders GROUP BY order_type`),
-          promiseDb.query(`SELECT DATE(created_at) as best_date, SUM(total_amount) as daily_rev FROM orders GROUP BY DATE(created_at) ORDER BY daily_rev DESC LIMIT 1`),
-          promiseDb.query(`SELECT id, customer_name, status, total_amount, order_type, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i') as time FROM orders ORDER BY created_at DESC LIMIT 5`),
-          promiseDb.query(`SELECT item_name, quantity, min_threshold FROM inventory WHERE quantity <= min_threshold LIMIT 10`),
-          promiseDb.query(`SELECT reviewer_name, rating, comment FROM general_feedback ORDER BY created_at DESC LIMIT 5`),
+          promiseDb.query(`SELECT DATE(created_at) as best_date, SUM(total_amount) as daily_rev FROM orders GROUP BY DATE(created_at) ORDER BY daily_rev DESC`),
+          promiseDb.query(`SELECT id, customer_name, status, total_amount, order_type, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i') as time FROM orders ORDER BY created_at DESC LIMIT 50`),
+          promiseDb.query(`SELECT item_name, quantity, min_threshold FROM inventory WHERE quantity <= min_threshold`),
+          promiseDb.query(`SELECT reviewer_name, rating, comment FROM general_feedback ORDER BY created_at DESC`),
           promiseDb.query(`SELECT title, type, location FROM careers WHERE active = 1`),
           promiseDb.query(`SELECT * FROM offers WHERE active = 1`),
-          promiseDb.query(`SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as date, COUNT(*) as count, COALESCE(SUM(total_amount),0) as revenue FROM orders GROUP BY DATE(created_at) ORDER BY date DESC LIMIT 7`),
+          promiseDb.query(`SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as date, COUNT(*) as count, COALESCE(SUM(total_amount),0) as revenue FROM orders GROUP BY DATE(created_at) ORDER BY date DESC`),
           promiseDb.query(`SELECT mi.name, mi.price_display, mi.available, c.name as category_name FROM menu_items mi LEFT JOIN categories c ON mi.category_id = c.id`),
           promiseDb.query(`SELECT item_name, quantity, unit, min_threshold FROM inventory`),
-          promiseDb.query(`SELECT name, message FROM contact_messages ORDER BY created_at DESC LIMIT 5`),
-          promiseDb.query(`SELECT name, position, status FROM job_applications ORDER BY created_at DESC LIMIT 10`),
-          promiseDb.query(`SELECT mi.name, pr.rating, pr.comment FROM product_reviews pr JOIN menu_items mi ON pr.product_id = mi.id ORDER BY pr.created_at DESC LIMIT 5`)
+          promiseDb.query(`SELECT name, message FROM contact_messages ORDER BY created_at DESC`),
+          promiseDb.query(`SELECT name, position, status FROM job_applications ORDER BY created_at DESC`),
+          promiseDb.query(`SELECT mi.name, pr.rating, pr.comment FROM product_reviews pr JOIN menu_items mi ON pr.product_id = mi.id ORDER BY pr.created_at DESC`),
+          promiseDb.query(`SELECT DATE(MAX(created_at)) as latest_date FROM orders`),
+          promiseDb.query(`SELECT admin_name, action, details, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i') as time FROM admin_logs ORDER BY created_at DESC LIMIT 50`)
         ]);
 
         const getRes = (idx, def = []) => (results[idx].status === 'fulfilled' ? results[idx].value[0] : def);
@@ -1107,28 +1127,42 @@ app.post('/api/ai-chat', async (req, res) => {
         const stats = getRes(0, [{total:0, revenue:0}])[0];
         const lowStockCount = getRes(2, [{total:0}])[0].total;
         const topProducts = getRes(3);
-        const orderTypes = getRes(4);
         const bestDay = getRes(5, [null])[0];
-        const recentOrders = getRes(6);
         const lowStockDetails = getRes(7);
         const recentFeedback = getRes(8);
-        const careers = getRes(9);
-        const offers = getRes(10);
         const dailySales = getRes(11);
         const productReviews = getRes(16);
+        const dataLatestDate = getRes(17, [{latest_date: null}])[0].latest_date;
+        const teamActivity = getRes(18); // Latest 50 admin logs
 
-        businessContext = `You are the CaffAIne Business Intelligence Expert.
-Current Store Insights (UK Time: ${currentDateTime}):
+        // Smart logic to identify "Today" and "Yesterday" relative to the actual database records
+        const baselineDate = dataLatestDate ? new Date(dataLatestDate) : new Date();
+        const yesterdayDate = new Date(baselineDate);
+        yesterdayDate.setDate(baselineDate.getDate() - 1);
+
+        const todayFormatted = baselineDate.toISOString().split('T')[0];
+        const yesterdayFormatted = yesterdayDate.toISOString().split('T')[0];
+
+        const todaySalesRow = dailySales.find(d => d.date === todayFormatted);
+        const yesterdaySalesRow = dailySales.find(d => d.date === yesterdayFormatted);
+
+        const todayRevenue = todaySalesRow ? todaySalesRow.revenue : 0;
+        const yesterdayRevenue = yesterdaySalesRow ? yesterdaySalesRow.revenue : 0;
+
+        businessContext = `You are the CaffAIne Business Intelligence Expert. 
+Current Store Activity Baseline (Last Activity Date: ${todayFormatted}):
 - Performance: Total Revenue £${stats.revenue}, Total Orders: ${stats.total}.
-- Best Day Ever: ${bestDay ? `${new Date(bestDay.best_date).toLocaleDateString()}: £${bestDay.daily_rev}` : 'N/A'}.
-- Top Items: ${topProducts.map(p => `${p.name} (${p.sold} sold)`).join(', ')}.
+- Latest Active Day Sales (${todayFormatted}): £${todayRevenue}.
+- Previous Day Sales (${yesterdayFormatted}): £${yesterdayRevenue}.
+- Best Sales Day Ever: ${bestDay ? `${new Date(bestDay.best_date).toLocaleDateString()}: £${bestDay.daily_rev}` : 'N/A'}.
+- Top Items Sold: ${topProducts.slice(0,5).map(p => `${p.name} (${p.sold})`).join(', ')}.
 - Inventory: ${lowStockCount} items need attention! Low items: ${lowStockDetails.map(i => i.item_name).join(', ')}.
-- Daily Sales Trend: ${dailySales.map(d => `${d.date}: £${d.revenue}`).join(' | ')}.
-- Customer Sentiment: ${recentFeedback.map(f => `${f.rating}/5 stars: "${f.comment}"`).join(' | ')}.
-- Recent Product Reviews: ${productReviews.map(r => `${r.rating}/5 for ${r.name}`).join(', ')}.
-- Recruitment: ${careers.length} job openings.
+- Sales Trend (Last 10 Days): ${dailySales.slice(0,10).map(d => `${d.date}: £${d.revenue}`).join(' | ')}.
+- Customer Sentiment: ${recentFeedback.slice(0,5).map(f => `${f.rating}/5 stars: "${f.comment}"`).join(' | ')}.
+- Recent Team Activity (Administrative Oversight): ${teamActivity.slice(0,10).map(log => `[${log.time}] ${log.admin_name}: ${log.action} (${log.details})`).join('; ')}.
 
-Instructions: Be the manager's right-hand AI. Use these specific numbers to give advice. If the manager asks about sales, mention the "Best Day Ever" or "Daily Trend". If they ask about stock, warn them about the ${lowStockCount} items.`;
+Instructions: The user's database records might be historical. Treat ${todayFormatted} as "Today". 
+As a BI expert, help the Leader monitor the store. If they ask about team performance or recent actions, use the "Recent Team Activity" logs provided above. Be concise and professional.`;
       } catch (dbError) {
         console.error('[AI] Data Merge Error:', dbError);
         businessContext = `You are the CaffAIne BI Assistant. System status: Operational. Please ask your business questions.`;
@@ -1188,6 +1222,11 @@ app.post('/api/ai-assistant-logs', (req, res) => {
 
 // ✅ Serve React build files
 app.use(express.static(path.join(__dirname, 'build')));
+
+// ✅ SERVE GRADUATION PRESENTATION
+app.get('/presentation', (req, res) => {
+  res.sendFile(path.join(__dirname, 'Coffaine_Premium_Presentation_2.html'));
+});
 
 // ✅ Catch-all for React Router
 app.get(/.*/, (req, res) => {

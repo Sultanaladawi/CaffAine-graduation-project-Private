@@ -16,8 +16,8 @@ const Offers = () => {
       }
 
       // Log the export action
-      await axios.post('/api/admin/log', { 
-        action: 'EXPORT PDF', 
+      await axios.post('/api/log-action', { 
+        action: 'Export PDF', 
         details: 'Administrator exported Marketing Offers & Discounts to PDF.' 
       });
 
