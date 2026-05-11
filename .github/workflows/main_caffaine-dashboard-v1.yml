@@ -27,7 +27,7 @@ jobs:
           npm prune --production
 
       - name: Zip artifact for deployment
-        run: zip -r release.zip . --exclude "*.git*" --exclude ".env*"
+        run: zip -r release.zip . --exclude "*.git*" --exclude ".env*" --exclude "node_modules/*" --exclude "src/*" --exclude ".github/*"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
