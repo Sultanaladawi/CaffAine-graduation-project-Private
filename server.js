@@ -81,11 +81,11 @@ app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
 
 // Serving the presentation file with a short, professional URL
 app.get('/presentation', (req, res) => {
-  res.sendFile(path.join(__dirname, 'Coffaine_Final_Presentation.html'));
+  res.sendFile(path.join(__dirname, 'Coffaine_Premium_Presentation.html'));
 });
 
-app.get('/Coffaine_Final_Presentation.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'Coffaine_Final_Presentation.html'));
+app.get('/Coffaine_Premium_Presentation.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'Coffaine_Premium_Presentation.html'));
 });
 
 app.use((req, res, next) => {
@@ -1110,71 +1110,92 @@ app.post('/api/ai-chat', async (req, res) => {
       try {
         const promiseDb = db.promise();
         const results = await Promise.allSettled([
-          promiseDb.query(`SELECT COUNT(*) as total, COALESCE(SUM(total_amount),0) as revenue FROM orders`),
-          promiseDb.query(`SELECT COUNT(*) as total FROM menu_items`),
-          promiseDb.query(`SELECT COUNT(*) as total FROM inventory WHERE quantity <= min_threshold`),
-          promiseDb.query(`SELECT mi.name, COUNT(oi.id) as sold FROM order_items oi JOIN menu_items mi ON oi.product_id = mi.id GROUP BY oi.product_id ORDER BY sold DESC`),
-          promiseDb.query(`SELECT order_type, COUNT(*) as count FROM orders GROUP BY order_type`),
-          promiseDb.query(`SELECT DATE(created_at) as best_date, SUM(total_amount) as daily_rev FROM orders GROUP BY DATE(created_at) ORDER BY daily_rev DESC`),
-          promiseDb.query(`SELECT id, customer_name, status, total_amount, order_type, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i') as time FROM orders ORDER BY created_at DESC LIMIT 50`),
-          promiseDb.query(`SELECT item_name, quantity, min_threshold FROM inventory WHERE quantity <= min_threshold`),
-          promiseDb.query(`SELECT reviewer_name, rating, comment FROM general_feedback ORDER BY created_at DESC`),
-          promiseDb.query(`SELECT title, type, location FROM careers WHERE active = 1`),
-          promiseDb.query(`SELECT * FROM offers WHERE active = 1`),
-          promiseDb.query(`SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as date, COUNT(*) as count, COALESCE(SUM(total_amount),0) as revenue FROM orders GROUP BY DATE(created_at) ORDER BY date DESC`),
-          promiseDb.query(`SELECT mi.name, mi.price_display, mi.available, c.name as category_name FROM menu_items mi LEFT JOIN categories c ON mi.category_id = c.id`),
-          promiseDb.query(`SELECT item_name, quantity, unit, min_threshold FROM inventory`),
-          promiseDb.query(`SELECT name, message FROM contact_messages ORDER BY created_at DESC`),
-          promiseDb.query(`SELECT name, position, status FROM job_applications ORDER BY created_at DESC`),
-          promiseDb.query(`SELECT mi.name, pr.rating, pr.comment FROM product_reviews pr JOIN menu_items mi ON pr.product_id = mi.id ORDER BY pr.created_at DESC`),
-          promiseDb.query(`SELECT DATE(MAX(created_at)) as latest_date FROM orders`),
-          promiseDb.query(`SELECT admin_name, action, details, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i') as time FROM admin_logs ORDER BY created_at DESC LIMIT 50`)
+          /* 0 */ promiseDb.query(`SELECT COUNT(*) as total_orders, COALESCE(SUM(total_amount),0) as total_revenue FROM orders`),
+          /* 1 */ promiseDb.query(`SELECT COUNT(*) as today_orders, COALESCE(SUM(total_amount),0) as today_revenue FROM orders WHERE DATE(created_at) = CURDATE()`),
+          /* 2 */ promiseDb.query(`SELECT COUNT(*) as yesterday_orders, COALESCE(SUM(total_amount),0) as yesterday_revenue FROM orders WHERE DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)`),
+          /* 3 */ promiseDb.query(`SELECT status, COUNT(*) as count FROM orders GROUP BY status`),
+          /* 4 */ promiseDb.query(`SELECT mi.name, COUNT(oi.id) as sold FROM order_items oi JOIN menu_items mi ON oi.product_id = mi.id GROUP BY oi.product_id ORDER BY sold DESC LIMIT 8`),
+          /* 5 */ promiseDb.query(`SELECT DATE(created_at) as best_date, SUM(total_amount) as daily_rev FROM orders GROUP BY DATE(created_at) ORDER BY daily_rev DESC LIMIT 1`),
+          /* 6 */ promiseDb.query(`SELECT DATE_FORMAT(created_at,'%Y-%m-%d') as date, COUNT(*) as orders, COALESCE(SUM(total_amount),0) as revenue FROM orders WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 15 DAY) GROUP BY DATE(created_at) ORDER BY date DESC`),
+          /* 7 */ promiseDb.query(`SELECT item_name, quantity, unit, min_threshold, CASE WHEN quantity <= min_threshold THEN 'LOW' ELSE 'OK' END as stock_status FROM inventory ORDER BY stock_status DESC, item_name`),
+          /* 8 */ promiseDb.query(`SELECT mi.name, mi.price_display, mi.available, c.name as category FROM menu_items mi LEFT JOIN categories c ON mi.category_id = c.id ORDER BY c.name, mi.name`),
+          /* 9 */ promiseDb.query(`SELECT title, discount_percent FROM offers WHERE active = 1`),
+          /* 10 */ promiseDb.query(`SELECT COUNT(*) as total FROM contact_messages`),
+          /* 11 */ promiseDb.query(`SELECT status, COUNT(*) as count FROM job_applications GROUP BY status`),
+          /* 12 */ promiseDb.query(`SELECT title, type FROM careers WHERE active = 1`),
+          /* 13 */ promiseDb.query(`SELECT ROUND(AVG(rating),1) as avg_rating, COUNT(*) as total FROM general_feedback`),
+          /* 14 */ promiseDb.query(`SELECT rating, comment FROM general_feedback ORDER BY created_at DESC LIMIT 5`),
+          /* 15 */ promiseDb.query(`SELECT admin_name, action, details, DATE_FORMAT(created_at,'%Y-%m-%d %H:%i') as time FROM admin_logs ORDER BY created_at DESC LIMIT 20`),
+          /* 16 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(created_at,'%H:%i') as time FROM orders WHERE DATE(created_at) = CURDATE() ORDER BY created_at DESC`)
         ]);
 
         const getRes = (idx, def = []) => (results[idx].status === 'fulfilled' ? results[idx].value[0] : def);
 
-        const stats = getRes(0, [{total:0, revenue:0}])[0];
-        const lowStockCount = getRes(2, [{total:0}])[0].total;
-        const topProducts = getRes(3);
-        const bestDay = getRes(5, [null])[0];
-        const lowStockDetails = getRes(7);
-        const recentFeedback = getRes(8);
-        const dailySales = getRes(11);
-        const productReviews = getRes(16);
-        const dataLatestDate = getRes(17, [{latest_date: null}])[0].latest_date;
-        const allInventory = getRes(13); // Full inventory list
-        const teamActivity = getRes(18); // Latest 50 admin logs
+        const allTime         = getRes(0,  [{total_orders:0, total_revenue:0}])[0];
+        const todayRow        = getRes(1,  [{today_orders:0, today_revenue:0}])[0];
+        const yesterdayRow    = getRes(2,  [{yesterday_orders:0, yesterday_revenue:0}])[0];
+        const orderStatuses   = getRes(3);
+        const topProducts     = getRes(4);
+        const bestDay         = getRes(5,  [null])[0];
+        const salesTrend      = getRes(6);
+        const inventory       = getRes(7);
+        const menuItems       = getRes(8);
+        const offers          = getRes(9);
+        const messages        = getRes(10, [{total:0}])[0];
+        const appsByStatus    = getRes(11);
+        const activeJobs      = getRes(12);
+        const feedbackSummary = getRes(13, [{avg_rating:'N/A', total:0}])[0];
+        const recentFeedback  = getRes(14);
+        const teamActivity    = getRes(15);
+        const todayOrders     = getRes(16);
 
-        // Use actual current UK date as "Today" for accurate daily sales reporting
-        const ukNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/London' }));
-        const baselineDate = ukNow;
-        const yesterdayDate = new Date(ukNow);
-        yesterdayDate.setDate(ukNow.getDate() - 1);
+        const lowStock = inventory.filter(i => i.stock_status === 'LOW');
+        const okStock  = inventory.filter(i => i.stock_status === 'OK');
 
-        const todayFormatted = ukNow.toISOString().split('T')[0];
-        const yesterdayFormatted = yesterdayDate.toISOString().split('T')[0];
+        businessContext = `You are the CaffAIne Business Intelligence Expert for Faculty Coffee, Birmingham.
+Current UK Date/Time: ${currentDateTime}
 
-        const todaySalesRow = dailySales.find(d => d.date === todayFormatted);
-        const yesterdaySalesRow = dailySales.find(d => d.date === yesterdayFormatted);
+=== TODAY ===
+Revenue: £${parseFloat(todayRow.today_revenue).toFixed(2)} | Orders: ${todayRow.today_orders}
+Orders Detail: ${todayOrders.map(o => `${o.customer_name} £${o.total_amount} (${o.status}) at ${o.time}`).join(' | ') || 'None yet'}
 
-        const todayRevenue = todaySalesRow ? todaySalesRow.revenue : 0;
-        const yesterdayRevenue = yesterdaySalesRow ? yesterdaySalesRow.revenue : 0;
+=== YESTERDAY ===
+Revenue: £${parseFloat(yesterdayRow.yesterday_revenue).toFixed(2)} | Orders: ${yesterdayRow.yesterday_orders}
 
-        businessContext = `You are the CaffAIne Business Intelligence Expert. 
-Current Store Activity Baseline (Last Activity Date: ${todayFormatted}):
-- Performance: Total Revenue £${stats.revenue}, Total Orders: ${stats.total}.
-- Latest Active Day Sales (${todayFormatted}): £${todayRevenue}.
-- Previous Day Sales (${yesterdayFormatted}): £${yesterdayRevenue}.
-- Best Sales Day Ever: ${bestDay ? `${new Date(bestDay.best_date).toLocaleDateString()}: £${bestDay.daily_rev}` : 'N/A'}.
-- Top Items Sold: ${topProducts.slice(0,5).map(p => `${p.name} (${p.sold})`).join(', ')}.
-- Full Inventory Status: ${allInventory.map(i => `${i.item_name}: ${i.quantity} ${i.unit || ''}`).join(', ')}.
-- Low Stock Alerts: ${lowStockCount} items need attention! Low items: ${lowStockDetails.map(i => i.item_name).join(', ')}.
-- Sales Trend (Last 10 Days): ${dailySales.slice(0,10).map(d => `${d.date}: £${d.revenue}`).join(' | ')}.
-- Customer Sentiment: ${recentFeedback.slice(0,5).map(f => `${f.rating}/5 stars: "${f.comment}"`).join(' | ')}.
-- Recent Team Activity (Administrative Oversight): ${teamActivity.slice(0,10).map(log => `[${log.time}] ${log.admin_name}: ${log.action} (${log.details})`).join('; ')}.
+=== ALL-TIME ===
+Total Revenue: £${allTime.total_revenue} | Total Orders: ${allTime.total_orders}
+Best Day Ever: ${bestDay ? `${bestDay.best_date}: £${bestDay.daily_rev}` : 'N/A'}
+By Status: ${orderStatuses.map(s => `${s.status}: ${s.count}`).join(', ')}
 
-Instructions: The user's database records might be historical. Treat ${todayFormatted} as "Today". 
-As a BI expert, help the Leader monitor the store. If they ask about specific stock items like "Sugar" or "Apples", refer to the "Full Inventory Status" provided above. Be concise and professional.`;
+=== TOP PRODUCTS ===
+${topProducts.map((p,i) => `${i+1}. ${p.name} (${p.sold} sold)`).join(' | ')}
+
+=== SALES TREND (15 DAYS) ===
+${salesTrend.map(d => `${d.date}: £${d.revenue} (${d.orders} orders)`).join(' | ')}
+
+=== INVENTORY ===
+⚠️ LOW (${lowStock.length}): ${lowStock.map(i => `${i.item_name} ${i.quantity}${i.unit||''}`).join(', ') || 'None'}
+✅ OK: ${okStock.map(i => `${i.item_name}: ${i.quantity}${i.unit||''}`).join(', ')}
+
+=== MENU ===
+Available: ${menuItems.filter(m => m.available).map(m => `${m.name} (${m.price_display})`).join(', ')}
+Unavailable: ${menuItems.filter(m => !m.available).map(m => m.name).join(', ') || 'None'}
+
+=== OFFERS ===
+${offers.map(o => `${o.title}: ${o.discount_percent}% OFF`).join(' | ') || 'No active offers'}
+
+=== MESSAGES & JOBS ===
+Messages: ${messages.total} | Applications: ${appsByStatus.map(a => `${a.status}: ${a.count}`).join(', ') || 'None'}
+Job Listings: ${activeJobs.map(j => `${j.title} (${j.type})`).join(', ') || 'None'}
+
+=== FEEDBACK ===
+Avg: ${feedbackSummary.avg_rating}/5 (${feedbackSummary.total} reviews)
+Recent: ${recentFeedback.map(f => `${f.rating}/5: "${f.comment}"`).join(' | ') || 'None'}
+
+=== TEAM ACTIVITY ===
+${teamActivity.map(log => `[${log.time}] ${log.admin_name}: ${log.action} — ${log.details}`).join('\n')}
+
+Rule: Answer ONLY from the data above. Be precise and professional.`;
       } catch (dbError) {
         console.error('[AI] Data Merge Error:', dbError);
         businessContext = `You are the CaffAIne BI Assistant. System status: Operational. Please ask your business questions.`;
