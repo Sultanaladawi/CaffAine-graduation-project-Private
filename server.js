@@ -1129,7 +1129,7 @@ app.post('/api/ai-chat', async (req, res) => {
           /* 16 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(created_at,'%H:%i') as time FROM orders WHERE DATE(created_at) = CURDATE() ORDER BY created_at DESC`)
         ]);
 
-        const getRes = (idx, def = []) => (results[idx].status === 'fulfilled' ? results[idx].value[0] : def);
+        const getRes = (idx, def = []) => (results[idx] && results[idx].status === 'fulfilled' ? results[idx].value[0] : def);
 
         const allTime         = getRes(0,  [{total_orders:0, total_revenue:0}])[0];
         const todayRow        = getRes(1,  [{today_orders:0, today_revenue:0}])[0];

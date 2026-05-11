@@ -20,16 +20,13 @@ jobs:
         with:
           node-version: '20.x'
 
-      - name: npm install and build React
+      - name: npm install and build
         run: |
           npm install
           npm run build --if-present
-          # Remove everything and only keep production modules to save space
-          rm -rf node_modules
-          npm install --production
 
       - name: Zip artifact for deployment
-        run: zip -r release.zip build/ node_modules/ server.js package.json package-lock.json .env* Coffaine_Premium_Presentation.html
+        run: zip -r release.zip . --exclude "*.git*"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
