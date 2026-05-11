@@ -23,7 +23,7 @@ const InstaIcon = () => (
 );
 
 const StarIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style={{verticalAlign:'middle'}}>
+  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="#c4a484" style={{verticalAlign:'middle', margin: '0 10px'}}>
     <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
   </svg>
 );
@@ -99,7 +99,7 @@ export default function Navbar({ onCartOpen }) {
             opacity: 0.9
           }}>
             <div className="marquee-container" style={{ display: 'inline-block', animation: 'marquee 25s linear infinite' }}>
-              {offers.map((offer, idx) => (
+              {offers.map((offer) => (
                 <span key={offer.id} style={{ margin: '0 40px' }}>
                   <StarIcon />
                   <span style={{ color: '#8a6240' }}>{offer.product_name === 'All' ? 'STOREWIDE:' : offer.product_name}</span> &mdash; {offer.reason} <span style={{ color: '#c4a484', border: '1px solid #c4a484', padding: '2px 8px', borderRadius: '12px', marginLeft: '5px' }}>{offer.discount_percent}% OFF</span>
