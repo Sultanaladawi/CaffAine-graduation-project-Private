@@ -405,7 +405,14 @@ export default function Menu() {
                 </div>
                 <div style={{ display: 'flex', gap: '10px' }}>
                   <input type="text" className={styles.feedbackInputCompact} placeholder="Leave a note..." value={reviewComment} onChange={(e) => setReviewComment(e.target.value)} />
-                  <button className={styles.submitReviewBtnCompact} onClick={submitReview}><i className="fas fa-paper-plane" /></button>
+                  <button 
+                    className={styles.submitReviewBtnCompact} 
+                    onClick={submitReview}
+                    disabled={reviewStatus === 'Submitting...'}
+                    style={{ opacity: reviewStatus === 'Submitting...' ? 0.5 : 1, cursor: reviewStatus === 'Submitting...' ? 'not-allowed' : 'pointer' }}
+                  >
+                    <i className="fas fa-paper-plane" />
+                  </button>
                 </div>
                 {reviewStatus && <span style={{ fontSize: '0.8rem', color: reviewStatus.includes('Error') ? 'red' : 'green' }}>{reviewStatus}</span>}
               </div>

@@ -268,24 +268,11 @@ export default function Checkout({ onClose, onBack }) {
     await new Promise(r => setTimeout(r, 1500));
     const success = await saveOrderToBackend();
 
-    // Submit feedback if a rating was given
-    if (storeRating > 0 || storeComment.trim()) {
-      await fetch('/api/feedback/general', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          reviewer_name: form.name.trim() || 'Customer',
-          comment: storeComment,
-          rating: storeRating
-        })
-      });
-    }
-
     if (success) {
       clearCart();
       setStep('success');
 
-      // Submit feedback after success
+      // Submit feedback if a rating was given (only once)
       if (storeRating > 0 || storeComment.trim()) {
         fetch('/api/feedback/general', {
           method: 'POST',
@@ -702,24 +689,29 @@ export default function Checkout({ onClose, onBack }) {
               />
             </div>
 
-            <button type="submit" className={`btn btn-primary ${styles.payBtn}`} style={{
-              background: 'linear-gradient(135deg, #2c1810, #5a3500)',
-              padding: '20px',
-              borderRadius: '15px',
-              fontSize: '1.2rem',
-              fontWeight: '800',
-              boxShadow: '0 10px 25px rgba(44, 24, 16, 0.3)',
-              border: 'none',
-              cursor: 'pointer',
-              color: '#fff',
-              width: '100%',
-              transition: 'all 0.3s'
-            }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+            <button 
+              type="submit" 
+              className={`btn btn-primary ${styles.payBtn}`} 
+              disabled={step === 'processing'}
+              style={{
+                background: step === 'processing' ? '#ccc' : 'linear-gradient(135deg, #2c1810, #5a3500)',
+                padding: '20px',
+                borderRadius: '15px',
+                fontSize: '1.2rem',
+                fontWeight: '800',
+                boxShadow: step === 'processing' ? 'none' : '0 10px 25px rgba(44, 24, 16, 0.3)',
+                border: 'none',
+                cursor: step === 'processing' ? 'not-allowed' : 'pointer',
+                color: '#fff',
+                width: '100%',
+                transition: 'all 0.3s',
+                opacity: step === 'processing' ? 0.7 : 1
+              }}
+              onMouseEnter={(e) => { if(step !== 'processing') e.currentTarget.style.transform = 'translateY(-3px)'; }}
+              onMouseLeave={(e) => { if(step !== 'processing') e.currentTarget.style.transform = 'translateY(0)'; }}
             >
-              Confirm & Pay {formatPrice(finalPrice)}
-              {selectedOffer && <span style={{ fontSize: '0.85rem', opacity: 0.9, marginLeft: '8px', fontWeight: 'normal' }}>(Offer Applied)</span>}
+              {step === 'processing' ? 'Processing...' : `Confirm & Pay ${formatPrice(finalPrice)}`}
+              {selectedOffer && step !== 'processing' && <span style={{ fontSize: '0.85rem', opacity: 0.9, marginLeft: '8px', fontWeight: 'normal' }}>(Offer Applied)</span>}
             </button>
 
             {/* Security Badges */}
