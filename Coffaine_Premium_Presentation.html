@@ -335,15 +335,19 @@
       backdrop-filter: blur(16px) saturate(1.2);
       box-shadow: 0 4px 28px rgba(100, 60, 20, .08), inset 0 1px 0 rgba(255, 255, 255, .6);
       transition: transform .35s cubic-bezier(.4, 0, .2, 1), box-shadow .35s;
-      cursor: pointer;
+      cursor: default; /* Changed default cursor to normal arrow */
     }
 
-    .card:hover {
+    .card[data-url] {
+      cursor: pointer; /* Only cards with links show the pointer hand */
+    }
+
+    .card[data-url]:hover {
       transform: translateY(-4px);
       box-shadow: 0 14px 40px rgba(100, 60, 20, .13), inset 0 1px 0 rgba(255, 255, 255, .7);
     }
 
-    .card:active {
+    .card[data-url]:active {
       transform: translateY(-2px) scale(0.98);
     }
 
