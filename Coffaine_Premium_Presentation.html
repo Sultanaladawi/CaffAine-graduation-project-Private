@@ -953,6 +953,49 @@
       color: var(--text3);
     }
 
+    /* DB TABLE VISUALS */
+    .db-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      height: 100%;
+    }
+    .db-table {
+      background: rgba(255,255,255,0.4);
+      border: 1px solid rgba(196,164,132,0.15);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    }
+    .db-h {
+      background: linear-gradient(135deg, var(--caramel), var(--text));
+      color: #fff;
+      padding: 8px 10px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .db-b {
+      padding: 6px;
+      flex: 1;
+    }
+    .db-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 6px;
+      border-bottom: 1px solid rgba(0,0,0,0.03);
+      font-size: 8.5px;
+    }
+    .db-row:last-child { border-bottom: none; }
+    .db-f { font-weight: 700; color: var(--text); }
+    .db-t { color: var(--text3); font-style: italic; font-size: 7.5px; }
+    .db-pk { color: #d97706; font-size: 6px; margin-left: 2px; }
+
     /* ═══════════════════════════════════════
    CONCLUSION
 ═══════════════════════════════════════ */
