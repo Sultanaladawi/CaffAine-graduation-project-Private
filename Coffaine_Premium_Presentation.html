@@ -1,1279 +1,2925 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Coffaine — Graduation Project 2026</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-:root{
-  --c1:#F8F2E8;--c2:#F0E6D3;--c3:#E8D9C0;--c4:#DCCAAA;
-  --gold:#C49A3C;--gold2:#B8832A;--caramel:#C4874A;--warm:#A67C52;
-  --text:#2E1F0E;--text2:#5C3D20;--text3:#8B6340;--text4:#B09070;
-}
-html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;cursor:none;}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coffaine — Graduation Project 2026</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-/* ── CANVAS BACKGROUND ── */
-#bg-canvas{position:fixed;inset:0;z-index:0;}
+    :root {
+      --c1: #F8F2E8;
+      --c2: #F0E6D3;
+      --c3: #E8D9C0;
+      --c4: #DCCAAA;
+      --gold: #C49A3C;
+      --gold2: #B8832A;
+      --caramel: #C4874A;
+      --warm: #A67C52;
+      --text: #2E1F0E;
+      --text2: #5C3D20;
+      --text3: #8B6340;
+      --text4: #B09070;
+    }
 
-/* ── CUSTOM CURSOR ── */
-#cur{position:fixed;width:10px;height:10px;border-radius:50%;background:var(--gold);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply;}
-#cur2{position:fixed;width:36px;height:36px;border-radius:50%;border:1.5px solid var(--caramel);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);opacity:.5;transition:left .09s,top .09s;}
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Jost', sans-serif;
+      cursor: none;
+    }
 
-/* ── DECK ── */
-.deck{width:100vw;height:100vh;position:relative;overflow:hidden;z-index:1;}
-.slide{
-  position:absolute;inset:0;display:flex;flex-direction:column;
-  opacity:0;pointer-events:none;
-  transition:opacity .7s cubic-bezier(.4,0,.2,1),transform .7s cubic-bezier(.4,0,.2,1);
-  transform:translateY(32px) scale(.985);
-  overflow:hidden;
-}
-.slide.active{opacity:1;pointer-events:all;transform:translateY(0) scale(1);}
-.slide.prev{opacity:0;transform:translateY(-32px) scale(.985);}
+    /* ── CANVAS BACKGROUND ── */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
 
-/* ── GLASS LAYER ── */
-.slide-glass{
-  position:absolute;inset:0;
-  background:rgba(248,242,232,.72);
-  backdrop-filter:blur(40px) saturate(1.4);
-  -webkit-backdrop-filter:blur(40px) saturate(1.4);
-  z-index:0;
-}
-.slide>*:not(.slide-glass){position:relative;z-index:1;}
+    /* ── CUSTOM CURSOR ── */
+    #cur {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--gold);
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      mix-blend-mode: multiply;
+    }
 
-/* ── TOP GOLD LINE ── */
-.gtop{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--caramel) 30%,var(--gold) 70%,transparent);z-index:10;animation:shimmer-line 3s ease-in-out infinite;}
-@keyframes shimmer-line{0%,100%{opacity:.7;}50%{opacity:1;}}
+    #cur2 {
+      position: fixed;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1.5px solid var(--caramel);
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      opacity: .5;
+      transition: left .09s, top .09s;
+    }
 
-/* ── SLIDE HEADER ── */
-.sh{padding:30px 56px 16px;border-bottom:1px solid rgba(196,135,74,.18);}
-.sh .stag{display:inline-flex;align-items:center;gap:6px;font-size:9px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--caramel);margin-bottom:10px;}
-.sh .stag::before{content:'';width:18px;height:1.5px;background:var(--caramel);}
-.sh h2{font-family:'Playfair Display',serif;font-size:36px;color:var(--text);line-height:1.1;margin-bottom:5px;}
-.sh p{font-size:12px;color:var(--text3);font-weight:300;}
-.sb{flex:1;padding:18px 56px 24px;overflow:hidden;}
+    /* ── DECK ── */
+    .deck {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
 
-/* ── ANIMATIONS ── */
-@keyframes fu{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
-@keyframes fl{from{opacity:0;transform:translateX(-18px);}to{opacity:1;transform:translateX(0);}}
-@keyframes fr{from{opacity:0;transform:translateX(18px);}to{opacity:1;transform:translateX(0);}}
-@keyframes sc{from{opacity:0;transform:scale(.93);}to{opacity:1;transform:scale(1);}}
-@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
-@keyframes pulse-dot{0%,100%{transform:scale(1);opacity:.7;}50%{transform:scale(1.4);opacity:1;}}
-@keyframes rotate-slow{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
-@keyframes shimmer{0%{background-position:-200% center;}100%{background-position:200% center;}}
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .7s cubic-bezier(.4, 0, .2, 1), transform .7s cubic-bezier(.4, 0, .2, 1);
+      transform: translateY(32px) scale(.985);
+      overflow: hidden;
+    }
 
-.slide.active .a1{animation:fu .65s .05s both cubic-bezier(.4,0,.2,1);}
-.slide.active .a2{animation:fu .65s .15s both cubic-bezier(.4,0,.2,1);}
-.slide.active .a3{animation:fu .65s .25s both cubic-bezier(.4,0,.2,1);}
-.slide.active .a4{animation:fu .65s .35s both cubic-bezier(.4,0,.2,1);}
-.slide.active .a5{animation:fu .65s .45s both cubic-bezier(.4,0,.2,1);}
-.slide.active .a6{animation:fu .65s .55s both cubic-bezier(.4,0,.2,1);}
-.slide.active .a7{animation:fu .65s .65s both cubic-bezier(.4,0,.2,1);}
-.slide.active .a8{animation:fu .65s .75s both cubic-bezier(.4,0,.2,1);}
-.slide.active .al{animation:fl .65s .1s both cubic-bezier(.4,0,.2,1);}
-.slide.active .ar{animation:fr .65s .1s both cubic-bezier(.4,0,.2,1);}
-.slide.active .asc{animation:sc .55s .1s both cubic-bezier(.4,0,.2,1);}
+    .slide.active {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateY(0) scale(1);
+    }
 
-/* ── GLASS CARD ── */
-.card{
-  background:rgba(255,255,255,.45);
-  border:1px solid rgba(196,135,74,.2);
-  border-radius:18px;
-  backdrop-filter:blur(16px) saturate(1.2);
-  box-shadow:0 4px 28px rgba(100,60,20,.08),inset 0 1px 0 rgba(255,255,255,.6);
-  transition:transform .35s cubic-bezier(.4,0,.2,1),box-shadow .35s;
-  cursor:pointer;
-}
-.card:hover{transform:translateY(-4px);box-shadow:0 14px 40px rgba(100,60,20,.13),inset 0 1px 0 rgba(255,255,255,.7);}
-.card:active{transform:translateY(-2px) scale(0.98);}
-.card-glow{box-shadow:0 4px 28px rgba(196,135,74,.15),inset 0 1px 0 rgba(255,255,255,.6);}
+    .slide.prev {
+      opacity: 0;
+      transform: translateY(-32px) scale(.985);
+    }
 
-/* ── TAG ── */
-.tag{display:inline-block;font-size:9px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--caramel);border:1px solid rgba(196,135,74,.4);padding:4px 14px;border-radius:20px;backdrop-filter:blur(8px);}
+    /* ── GLASS LAYER ── */
+    .slide-glass {
+      position: absolute;
+      inset: 0;
+      background: rgba(248, 242, 232, .72);
+      backdrop-filter: blur(40px) saturate(1.4);
+      -webkit-backdrop-filter: blur(40px) saturate(1.4);
+      z-index: 0;
+    }
 
-/* ── GOLD TEXT ── */
-.gold-text{
-  background:linear-gradient(135deg,var(--gold2) 0%,var(--gold) 40%,var(--caramel) 70%,var(--gold) 100%);
-  background-size:200% auto;
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  animation:shimmer 4s linear infinite;
-}
+    .slide>*:not(.slide-glass) {
+      position: relative;
+      z-index: 1;
+    }
 
-/* ── NAV ── */
-#prog{position:fixed;bottom:0;left:0;height:2.5px;background:linear-gradient(90deg,var(--caramel),var(--gold));transition:width .5s ease;z-index:999;}
-#ctr{position:fixed;bottom:22px;right:32px;font-size:10px;letter-spacing:3px;color:var(--text4);z-index:999;font-weight:500;}
-#dots{position:fixed;right:16px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:999;}
-.dot{width:5px;height:5px;border-radius:50%;background:rgba(196,135,74,.3);cursor:pointer;transition:all .3s;border:1px solid rgba(196,135,74,.3);}
-.dot.on{background:var(--caramel);transform:scale(1.7);border-color:var(--caramel);box-shadow:0 0 8px rgba(196,135,74,.4);}
-#hint{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:3px;color:var(--text4);z-index:999;display:flex;gap:8px;align-items:center;}
-.kbd{width:20px;height:20px;border-radius:5px;border:1px solid rgba(196,135,74,.3);background:rgba(255,255,255,.4);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text3);}
+    /* ── TOP GOLD LINE ── */
+    .gtop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--caramel) 30%, var(--gold) 70%, transparent);
+      z-index: 10;
+      animation: shimmer-line 3s ease-in-out infinite;
+    }
 
-/* ── LIST ITEM ── */
-.li{display:flex;gap:10px;margin-bottom:10px;font-size:11px;color:var(--text2);line-height:1.55;}
-.li-dot{width:5px;height:5px;border-radius:50%;background:var(--caramel);margin-top:5px;flex-shrink:0;}
-.li-num{width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,var(--c4),var(--caramel));display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;margin-top:1px;}
+    @keyframes shimmer-line {
 
-/* ── GRIDS ── */
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
-.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;}
-.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+      0%,
+      100% {
+        opacity: .7;
+      }
 
-/* ── FEATURE CARD ── */
-.fc{border-radius:16px;padding:18px;}
-.fc-icon{font-size:24px;margin-bottom:10px;}
-.fc-line{width:26px;height:2px;background:linear-gradient(90deg,var(--caramel),var(--gold));margin-bottom:10px;border-radius:2px;}
-.fc-title{font-family:'Playfair Display',serif;font-size:17px;color:var(--text);margin-bottom:5px;}
-.fc-text{font-size:9.5px;color:var(--text2);line-height:1.7;font-weight:300;}
+      50% {
+        opacity: 1;
+      }
+    }
 
-/* ── TECH CARD ── */
-.tc{border-radius:14px;padding:17px 19px;}
-.tc-layer{font-size:8px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--caramel);margin-bottom:4px;}
-.tc-name{font-family:'Playfair Display',serif;font-size:17px;color:var(--text);margin-bottom:5px;}
-.tc-bar{height:1.5px;background:linear-gradient(90deg,var(--caramel),transparent);margin-bottom:9px;}
-.tc-detail{font-size:9px;color:var(--text2);line-height:1.65;font-weight:300;}
+    /* ── SLIDE HEADER ── */
+    .sh {
+      padding: 30px 56px 16px;
+      border-bottom: 1px solid rgba(196, 135, 74, .18);
+    }
 
-/* ── STAT ── */
-.stat{border-radius:14px;padding:16px 12px;text-align:center;}
-.stat-val{font-family:'Playfair Display',serif;font-size:30px;color:var(--caramel);line-height:1;margin-bottom:4px;}
-.stat-label{font-size:8.5px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);}
+    .sh .stag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--caramel);
+      margin-bottom: 10px;
+    }
 
-/* ── SEC TITLE ── */
-.sec-title{font-family:'Playfair Display',serif;font-size:19px;color:var(--text);margin-bottom:4px;}
-.sec-sub{font-size:9px;color:var(--text3);margin-bottom:12px;font-style:italic;}
+    .sh .stag::before {
+      content: '';
+      width: 18px;
+      height: 1.5px;
+      background: var(--caramel);
+    }
 
-/* ── CHAT ── */
-.chat{border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:10px;justify-content:center;}
-.bubble{padding:11px 15px;border-radius:14px;font-size:10.5px;line-height:1.55;max-width:88%;}
-.bubble.user{background:linear-gradient(135deg,var(--caramel),var(--warm));color:#fff;align-self:flex-end;border-radius:14px 14px 4px 14px;}
-.bubble.bot{background:rgba(255,255,255,.65);color:var(--text2);align-self:flex-start;border-radius:14px 14px 14px 4px;border:1px solid rgba(196,135,74,.2);backdrop-filter:blur(8px);}
-.bubble-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text4);margin-bottom:3px;}
+    .sh h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
+      color: var(--text);
+      line-height: 1.1;
+      margin-bottom: 5px;
+    }
 
-/* ── ADMIN CARD ── */
-.adm{border-radius:13px;padding:14px 11px;text-align:center;transition:transform .3s;}
-.adm:hover{transform:translateY(-4px);}
-.adm-icon{font-size:22px;margin-bottom:8px;}
-.adm-title{font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:3px;}
-.adm-desc{font-size:8px;color:var(--text3);line-height:1.4;}
+    .sh p {
+      font-size: 12px;
+      color: var(--text3);
+      font-weight: 300;
+    }
 
-/* ── BAR CHART ── */
-.bar-chart{display:flex;flex-direction:column;gap:7px;}
-.bar-row{display:flex;align-items:center;gap:10px;font-size:9px;color:var(--text3);}
-.bar-label{width:80px;text-align:right;flex-shrink:0;}
-.bar-track{flex:1;height:12px;background:rgba(196,135,74,.1);border-radius:6px;overflow:hidden;}
-.bar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--caramel),var(--gold));transition:width 1s ease;}
-.bar-val{width:50px;font-weight:600;color:var(--text2);}
+    .sb {
+      flex: 1;
+      padding: 18px 56px 24px;
+      overflow: hidden;
+    }
 
-/* ── FLOW ── */
-.flow{display:flex;align-items:center;}
-.fs{flex:1;border-radius:12px;padding:13px 7px;text-align:center;}
-.fs-icon{font-size:18px;margin-bottom:5px;}
-.fs-t{font-size:9px;font-weight:600;color:var(--text);}
-.fa{font-size:16px;color:var(--caramel);padding:0 3px;flex-shrink:0;}
+    /* ── ANIMATIONS ── */
+    @keyframes fu {
+      from {
+        opacity: 0;
+        transform: translateY(22px);
+      }
 
-/* ═══════════════════════════════════════
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fl {
+      from {
+        opacity: 0;
+        transform: translateX(-18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes fr {
+      from {
+        opacity: 0;
+        transform: translateX(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes sc {
+      from {
+        opacity: 0;
+        transform: scale(.93);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-12px);
+      }
+    }
+
+    @keyframes pulse-dot {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: .7;
+      }
+
+      50% {
+        transform: scale(1.4);
+        opacity: 1;
+      }
+    }
+
+    @keyframes rotate-slow {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -200% center;
+      }
+
+      100% {
+        background-position: 200% center;
+      }
+    }
+
+    .slide.active .a1 {
+      animation: fu .65s .05s both cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .slide.active .a2 {
+      animation: fu .65s .15s both cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .slide.active .a3 {
+      animation: fu .65s .25s both cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .slide.active .a4 {
+      animation: fu .65s .35s both cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .slide.active .a5 {
+      animation: fu .65s .45s both cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .slide.active .a6 {
+      animation: fu .65s .55s both cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .slide.active .a7 {
+      animation: fu .65s .65s both cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .slide.active .a8 {
+      animation: fu .65s .75s both cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .slide.active .al {
+      animation: fl .65s .1s both cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .slide.active .ar {
+      animation: fr .65s .1s both cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .slide.active .asc {
+      animation: sc .55s .1s both cubic-bezier(.4, 0, .2, 1);
+    }
+
+    /* ── GLASS CARD ── */
+    .card {
+      background: rgba(255, 255, 255, .45);
+      border: 1px solid rgba(196, 135, 74, .2);
+      border-radius: 18px;
+      backdrop-filter: blur(16px) saturate(1.2);
+      box-shadow: 0 4px 28px rgba(100, 60, 20, .08), inset 0 1px 0 rgba(255, 255, 255, .6);
+      transition: transform .35s cubic-bezier(.4, 0, .2, 1), box-shadow .35s;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 40px rgba(100, 60, 20, .13), inset 0 1px 0 rgba(255, 255, 255, .7);
+    }
+
+    .card:active {
+      transform: translateY(-2px) scale(0.98);
+    }
+
+    .card-glow {
+      box-shadow: 0 4px 28px rgba(196, 135, 74, .15), inset 0 1px 0 rgba(255, 255, 255, .6);
+    }
+
+    /* ── TAG ── */
+    .tag {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--caramel);
+      border: 1px solid rgba(196, 135, 74, .4);
+      padding: 4px 14px;
+      border-radius: 20px;
+      backdrop-filter: blur(8px);
+    }
+
+    /* ── GOLD TEXT ── */
+    .gold-text {
+      background: linear-gradient(135deg, var(--gold2) 0%, var(--gold) 40%, var(--caramel) 70%, var(--gold) 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 4s linear infinite;
+    }
+
+    /* ── NAV ── */
+    #prog {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      height: 2.5px;
+      background: linear-gradient(90deg, var(--caramel), var(--gold));
+      transition: width .5s ease;
+      z-index: 999;
+    }
+
+    #ctr {
+      position: fixed;
+      bottom: 22px;
+      right: 32px;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--text4);
+      z-index: 999;
+      font-weight: 500;
+    }
+
+    #dots {
+      position: fixed;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 999;
+    }
+
+    .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: rgba(196, 135, 74, .3);
+      cursor: pointer;
+      transition: all .3s;
+      border: 1px solid rgba(196, 135, 74, .3);
+    }
+
+    .dot.on {
+      background: var(--caramel);
+      transform: scale(1.7);
+      border-color: var(--caramel);
+      box-shadow: 0 0 8px rgba(196, 135, 74, .4);
+    }
+
+    #hint {
+      position: fixed;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: var(--text4);
+      z-index: 999;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .kbd {
+      width: 20px;
+      height: 20px;
+      border-radius: 5px;
+      border: 1px solid rgba(196, 135, 74, .3);
+      background: rgba(255, 255, 255, .4);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      color: var(--text3);
+    }
+
+    /* ── LIST ITEM ── */
+    .li {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 11px;
+      color: var(--text2);
+      line-height: 1.55;
+    }
+
+    .li-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--caramel);
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+
+    .li-num {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--c4), var(--caramel));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── GRIDS ── */
+    .g2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .g3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+    }
+
+    .g4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 11px;
+    }
+
+    .g5 {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    /* ── FEATURE CARD ── */
+    .fc {
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .fc-icon {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .fc-line {
+      width: 26px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--caramel), var(--gold));
+      margin-bottom: 10px;
+      border-radius: 2px;
+    }
+
+    .fc-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px;
+      color: var(--text);
+      margin-bottom: 5px;
+    }
+
+    .fc-text {
+      font-size: 9.5px;
+      color: var(--text2);
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    /* ── TECH CARD ── */
+    .tc {
+      border-radius: 14px;
+      padding: 17px 19px;
+    }
+
+    .tc-layer {
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--caramel);
+      margin-bottom: 4px;
+    }
+
+    .tc-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px;
+      color: var(--text);
+      margin-bottom: 5px;
+    }
+
+    .tc-bar {
+      height: 1.5px;
+      background: linear-gradient(90deg, var(--caramel), transparent);
+      margin-bottom: 9px;
+    }
+
+    .tc-detail {
+      font-size: 9px;
+      color: var(--text2);
+      line-height: 1.65;
+      font-weight: 300;
+    }
+
+    /* ── STAT ── */
+    .stat {
+      border-radius: 14px;
+      padding: 16px 12px;
+      text-align: center;
+    }
+
+    .stat-val {
+      font-family: 'Playfair Display', serif;
+      font-size: 30px;
+      color: var(--caramel);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 8.5px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+
+    /* ── SEC TITLE ── */
+    .sec-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 19px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .sec-sub {
+      font-size: 9px;
+      color: var(--text3);
+      margin-bottom: 12px;
+      font-style: italic;
+    }
+
+    /* ── CHAT ── */
+    .chat {
+      border-radius: 18px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .bubble {
+      padding: 11px 15px;
+      border-radius: 14px;
+      font-size: 10.5px;
+      line-height: 1.55;
+      max-width: 88%;
+    }
+
+    .bubble.user {
+      background: linear-gradient(135deg, var(--caramel), var(--warm));
+      color: #fff;
+      align-self: flex-end;
+      border-radius: 14px 14px 4px 14px;
+    }
+
+    .bubble.bot {
+      background: rgba(255, 255, 255, .65);
+      color: var(--text2);
+      align-self: flex-start;
+      border-radius: 14px 14px 14px 4px;
+      border: 1px solid rgba(196, 135, 74, .2);
+      backdrop-filter: blur(8px);
+    }
+
+    .bubble-label {
+      font-size: 8px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text4);
+      margin-bottom: 3px;
+    }
+
+    /* ── ADMIN CARD ── */
+    .adm {
+      border-radius: 13px;
+      padding: 14px 11px;
+      text-align: center;
+      transition: transform .3s;
+    }
+
+    .adm:hover {
+      transform: translateY(-4px);
+    }
+
+    .adm-icon {
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+
+    .adm-title {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+
+    .adm-desc {
+      font-size: 8px;
+      color: var(--text3);
+      line-height: 1.4;
+    }
+
+    /* ── BAR CHART ── */
+    .bar-chart {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 9px;
+      color: var(--text3);
+    }
+
+    .bar-label {
+      width: 80px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .bar-track {
+      flex: 1;
+      height: 12px;
+      background: rgba(196, 135, 74, .1);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      background: linear-gradient(90deg, var(--caramel), var(--gold));
+      transition: width 1s ease;
+    }
+
+    .bar-val {
+      width: 50px;
+      font-weight: 600;
+      color: var(--text2);
+    }
+
+    /* ── FLOW ── */
+    .flow {
+      display: flex;
+      align-items: center;
+    }
+
+    .fs {
+      flex: 1;
+      border-radius: 12px;
+      padding: 13px 7px;
+      text-align: center;
+    }
+
+    .fs-icon {
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+
+    .fs-t {
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .fa {
+      font-size: 16px;
+      color: var(--caramel);
+      padding: 0 3px;
+      flex-shrink: 0;
+    }
+
+    /* ═══════════════════════════════════════
    SLIDE 1 — COVER
 ═══════════════════════════════════════ */
-#s1 .slide-glass{background:rgba(248,242,232,.65);}
-#s1 .cover-center{display:flex;justify-content:center;align-items:center;height:100%;flex-direction:column;text-align:center;padding:0 40px;}
-#s1 .brand-wrap{margin-bottom:6px;}
-#s1 .brand-name{font-family:'Playfair Display',serif;font-size:100px;line-height:.9;letter-spacing:-3px;}
-#s1 .brand-dot{font-family:'Playfair Display',serif;font-size:100px;line-height:.9;}
-#s1 .brand-sub{font-family:'Cormorant Garamond',serif;font-size:16px;letter-spacing:7px;text-transform:uppercase;color:var(--text3);margin-bottom:7px;}
-#s1 .brand-tag{font-family:'Cormorant Garamond',serif;font-size:19px;font-style:italic;color:var(--text2);margin-bottom:34px;}
-#s1 .cover-divider{width:100px;height:1px;background:linear-gradient(90deg,transparent,var(--caramel),transparent);margin:0 auto 32px;}
-#s1 .cover-meta{font-size:9.5px;letter-spacing:4px;text-transform:uppercase;color:var(--text3);margin-bottom:36px;}
-#s1 .team-panel{
-  background:rgba(255,255,255,.45);border:1px solid rgba(196,135,74,.22);
-  border-radius:22px;padding:24px 44px;backdrop-filter:blur(20px);
-  box-shadow:0 12px 50px rgba(100,60,20,.1),inset 0 1px 0 rgba(255,255,255,.6);
-  max-width:640px;
-}
-#s1 .team-panel-title{font-size:8px;letter-spacing:5px;text-transform:uppercase;color:var(--text4);margin-bottom:14px;}
-#s1 .team-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px 44px;}
-#s1 .tm{display:flex;align-items:center;gap:9px;}
-#s1 .tm-dot{width:7px;height:7px;border-radius:50%;background:var(--caramel);flex-shrink:0;animation:pulse-dot 2s ease-in-out infinite;}
-#s1 .tm-dot.gold{background:var(--gold);box-shadow:0 0 8px rgba(196,154,60,.5);}
-#s1 .tm-name{font-size:12.5px;font-weight:600;color:var(--text);}
-#s1 .tm-role{font-size:8.5px;color:var(--text4);letter-spacing:1.5px;text-transform:uppercase;}
-#s1 .sv-row{grid-column:1/-1;text-align:center;padding-top:11px;border-top:1px solid rgba(196,135,74,.15);margin-top:6px;}
-#s1 .sv-label{font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--text4);margin-bottom:2px;}
-#s1 .sv-name{font-size:13px;font-weight:600;color:var(--text2);}
+    #s1 .slide-glass {
+      background: rgba(248, 242, 232, .65);
+    }
 
-/* ═══════════════════════════════════════
+    #s1 .cover-center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      flex-direction: column;
+      text-align: center;
+      padding: 0 40px 60px; /* Lifted content visually */
+    }
+
+    #s1 .brand-wrap {
+      margin-bottom: 6px;
+    }
+
+    #s1 .brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 100px;
+      line-height: .9;
+      letter-spacing: -3px;
+    }
+
+    #s1 .brand-dot {
+      font-family: 'Playfair Display', serif;
+      font-size: 100px;
+      line-height: .9;
+    }
+
+    #s1 .brand-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 16px;
+      letter-spacing: 7px;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 7px;
+    }
+
+    #s1 .brand-tag {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 19px;
+      font-style: italic;
+      color: var(--text2);
+      margin-bottom: 34px;
+    }
+
+    #s1 .cover-divider {
+      width: 100px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--caramel), transparent);
+      margin: 0 auto 32px;
+    }
+
+    #s1 .cover-meta {
+      font-size: 9.5px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 36px;
+    }
+
+    #s1 .team-panel {
+      background: rgba(255, 255, 255, .45);
+      border: 1px solid rgba(196, 135, 74, .22);
+      border-radius: 22px;
+      padding: 24px 44px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 12px 50px rgba(100, 60, 20, .1), inset 0 1px 0 rgba(255, 255, 255, .6);
+      max-width: 640px;
+    }
+
+    #s1 .team-panel-title {
+      font-size: 8px;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--text4);
+      margin-bottom: 14px;
+    }
+
+    #s1 .team-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px 44px;
+    }
+
+    #s1 .tm {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    #s1 .tm-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--caramel);
+      flex-shrink: 0;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    #s1 .tm-dot.gold {
+      background: var(--gold);
+      box-shadow: 0 0 8px rgba(196, 154, 60, .5);
+    }
+
+    #s1 .tm-name {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    #s1 .tm-role {
+      font-size: 8.5px;
+      color: var(--text4);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    #s1 .sv-row {
+      grid-column: 1/-1;
+      text-align: center;
+      padding-top: 11px;
+      border-top: 1px solid rgba(196, 135, 74, .15);
+      margin-top: 6px;
+    }
+
+    #s1 .sv-label {
+      font-size: 8px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--text4);
+      margin-bottom: 2px;
+    }
+
+    #s1 .sv-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text2);
+    }
+
+    /* ═══════════════════════════════════════
    SLIDE 2 — AGENDA
 ═══════════════════════════════════════ */
-#s2 .ag-wrap{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
-#s2 .ag{padding:14px 10px;border-radius:14px;text-align:center;cursor:default;transition:transform .3s,box-shadow .3s;}
-#s2 .ag:hover{transform:translateY(-5px);box-shadow:0 12px 32px rgba(100,60,20,.12);}
-#s2 .ag-num{font-family:'Playfair Display',serif;font-size:26px;color:var(--caramel);line-height:1;margin-bottom:6px;}
-#s2 .ag-t{font-size:9.5px;font-weight:600;color:var(--text);margin-bottom:2px;}
-#s2 .ag-d{font-size:7.5px;color:var(--text3);}
+    #s2 .ag-wrap {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
 
-/* ═══════════════════════════════════════
+    #s2 .ag {
+      padding: 14px 10px;
+      border-radius: 14px;
+      text-align: center;
+      cursor: default;
+      transition: transform .3s, box-shadow .3s;
+    }
+
+    #s2 .ag:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 32px rgba(100, 60, 20, .12);
+    }
+
+    #s2 .ag-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      color: var(--caramel);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    #s2 .ag-t {
+      font-size: 9.5px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    #s2 .ag-d {
+      font-size: 7.5px;
+      color: var(--text3);
+    }
+
+    /* ═══════════════════════════════════════
    CONCLUSION
 ═══════════════════════════════════════ */
-#s22 .slide-glass{background:rgba(248,242,232,.68);}
-#s22 .conc-center{display:flex;justify-content:center;align-items:center;height:100%;flex-direction:column;text-align:center;padding:0 40px 60px;} /* Added 60px bottom padding to lift content visually */
-#s22 .conc-title{font-family:'Playfair Display',serif;font-size:56px;color:var(--text);line-height:1;margin-bottom:10px;}
-#s22 .conc-italic{font-family:'Cormorant Garamond',serif;font-size:19px;font-style:italic;color:var(--text2);margin-bottom:26px;}
-#s22 .conc-div{width:80px;height:1px;background:linear-gradient(90deg,transparent,var(--caramel),transparent);margin:0 auto 26px;}
-#s22 .fg-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:28px;max-width:640px;}
-#s22 .fg{background:rgba(255,255,255,.45);border:1px solid rgba(196,135,74,.2);border-radius:13px;padding:13px 16px;text-align:left;backdrop-filter:blur(12px);}
-#s22 .fg strong{font-size:11.5px;color:var(--text);display:block;margin-bottom:2px;}
-#s22 .fg span{font-size:9px;color:var(--text3);}
-#s22 .thanks-names{font-family:'Playfair Display',serif;font-size:18px;color:var(--caramel);letter-spacing:1px;}
-#s22 .thanks-meta{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--text4);margin-top:5px;}
+    #s22 .slide-glass {
+      background: rgba(248, 242, 232, .68);
+    }
 
-/* ── ORB (cover decorative rings) ── */
-.orb-ring{position:absolute;border-radius:50%;border:1px solid rgba(196,135,74,.15);animation:rotate-slow linear infinite;pointer-events:none;}
-</style>
+    #s22 .conc-center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      flex-direction: column;
+      text-align: center;
+      padding: 0 40px 60px;
+    }
+
+    /* Added 60px bottom padding to lift content visually */
+    #s22 .conc-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 56px;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    #s22 .conc-italic {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 19px;
+      font-style: italic;
+      color: var(--text2);
+      margin-bottom: 26px;
+    }
+
+    #s22 .conc-div {
+      width: 80px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--caramel), transparent);
+      margin: 0 auto 26px;
+    }
+
+    #s22 .fg-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 28px;
+      max-width: 640px;
+    }
+
+    #s22 .fg {
+      background: rgba(255, 255, 255, .45);
+      border: 1px solid rgba(196, 135, 74, .2);
+      border-radius: 13px;
+      padding: 13px 16px;
+      text-align: left;
+      backdrop-filter: blur(12px);
+    }
+
+    #s22 .fg strong {
+      font-size: 11.5px;
+      color: var(--text);
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    #s22 .fg span {
+      font-size: 9px;
+      color: var(--text3);
+    }
+
+    #s22 .thanks-names {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      color: var(--caramel);
+      letter-spacing: 1px;
+    }
+
+    #s22 .thanks-meta {
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text4);
+      margin-top: 5px;
+    }
+
+    /* ── ORB (cover decorative rings) ── */
+    .orb-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(196, 135, 74, .15);
+      animation: rotate-slow linear infinite;
+      pointer-events: none;
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- ANIMATED CANVAS BACKGROUND -->
-<canvas id="bg-canvas"></canvas>
+  <!-- ANIMATED CANVAS BACKGROUND -->
+  <canvas id="bg-canvas"></canvas>
 
-<!-- CURSOR -->
-<div id="cur"></div><div id="cur2"></div>
+  <!-- CURSOR -->
+  <div id="cur"></div>
+  <div id="cur2"></div>
 
-<!-- NAV -->
-<div id="prog"></div>
-<div id="ctr">01 / 22</div>
-<div id="dots"></div>
-<div id="hint"><span class="kbd">←</span><span class="kbd">→</span>&nbsp;navigate</div>
+  <!-- NAV -->
+  <div id="prog"></div>
+  <div id="ctr">01 / 22</div>
+  <div id="dots"></div>
+  <div id="hint"><span class="kbd">←</span><span class="kbd">→</span>&nbsp;navigate</div>
 
-<div class="deck">
+  <div class="deck">
 
-<!-- ══ S1 COVER ══ -->
-<div class="slide" id="s1">
-  <div class="slide-glass"></div>
-  <div class="gtop"></div>
-  <!-- Decorative rings -->
-  <div class="orb-ring" style="width:600px;height:600px;top:-120px;right:-120px;animation-duration:30s;"></div>
-  <div class="orb-ring" style="width:400px;height:400px;top:-60px;right:-60px;animation-duration:20s;animation-direction:reverse;"></div>
-  <div class="orb-ring" style="width:300px;height:300px;bottom:-80px;left:-80px;animation-duration:25s;"></div>
-  <div class="cover-center">
-    <div class="a1">
-      <div class="brand-wrap">
-        <span class="brand-name gold-text">Coffaine</span>
+    <!-- ══ S1 COVER ══ -->
+    <div class="slide" id="s1">
+      <div class="slide-glass"></div>
+      <div class="gtop"></div>
+      <!-- Decorative rings -->
+      <div class="orb-ring" style="width:600px;height:600px;top:-120px;right:-120px;animation-duration:30s;"></div>
+      <div class="orb-ring"
+        style="width:400px;height:400px;top:-60px;right:-60px;animation-duration:20s;animation-direction:reverse;">
       </div>
-    </div>
-    <div class="a1"><div class="brand-sub">Faculty Coffee · Birmingham, UK</div></div>
-    <div class="a2"><div class="brand-tag">"Independent specialty coffee at the heart of Birmingham's Piccadilly Arcade"</div></div>
-    <div class="a2"><div class="cover-divider"></div></div>
-    <div class="a3"><div class="cover-meta">Graduation Project &nbsp;·&nbsp; Full-Stack Web Application &nbsp;·&nbsp; React.js + Node.js + MySQL + AI &nbsp;·&nbsp; 2026</div></div>
-    <div class="a4">
-      <div class="team-panel">
-        <div class="team-panel-title">Project Team</div>
-        <div class="team-grid">
-          <div class="tm" style="grid-column:1/-1;justify-content:center;margin-bottom:5px;">
-            <div class="tm-dot gold"></div>
-            <div><div class="tm-name" style="font-size:15px;color:var(--gold2)">Omar Al-Ajarma</div><div class="tm-role">Team Leader · Super Admin</div></div>
-          </div>
-          <div class="tm"><div class="tm-dot"></div><div><div class="tm-name">Sultan Al-Adawi</div><div class="tm-role">Full-Stack Developer</div></div></div>
-          <div class="tm"><div class="tm-dot"></div><div><div class="tm-name">Mohammad Al-Hadidi</div><div class="tm-role">Full-Stack Developer</div></div></div>
-          <div class="tm" style="grid-column:1/-1;justify-content:center;"><div class="tm-dot"></div><div><div class="tm-name">Bashar Al-Dabbas</div><div class="tm-role">Full-Stack Developer</div></div></div>
-          <div class="sv-row">
-            <div class="sv-label">Academic Supervisor</div>
-            <div class="sv-name">Dr. Mohammad Al-Riyalat</div>
+      <div class="orb-ring" style="width:300px;height:300px;bottom:-80px;left:-80px;animation-duration:25s;"></div>
+      <div class="cover-center">
+        <div class="a1">
+          <div class="brand-wrap">
+            <span class="brand-name gold-text">Coffaine</span>
           </div>
         </div>
+        <div class="a1">
+          <div class="brand-sub">Faculty Coffee · Birmingham, UK</div>
+        </div>
+        <div class="a2">
+          <div class="brand-tag">"Independent specialty coffee at the heart of Birmingham's Piccadilly Arcade"</div>
+        </div>
+        <div class="a2">
+          <div class="cover-divider"></div>
+        </div>
+        <div class="a3">
+          <div class="cover-meta">Graduation Project &nbsp;·&nbsp; Full-Stack Web Application &nbsp;·&nbsp; React.js +
+            Node.js + MySQL + AI &nbsp;·&nbsp; 2026</div>
+        </div>
+        <div class="a4">
+          <div class="team-panel">
+            <div class="team-panel-title">Project Team</div>
+            <div class="team-grid">
+              <div class="tm" style="grid-column:1/-1;justify-content:center;margin-bottom:5px;">
+                <div class="tm-dot gold"></div>
+                <div>
+                  <div class="tm-name" style="font-size:15px;color:var(--gold2)">Omar Al-Ajarma</div>
+                  <div class="tm-role">Team Leader · Super Admin</div>
+                </div>
+              </div>
+              <div class="tm">
+                <div class="tm-dot"></div>
+                <div>
+                  <div class="tm-name">Sultan Al-Adawi</div>
+                  <div class="tm-role">Full-Stack Developer</div>
+                </div>
+              </div>
+              <div class="tm">
+                <div class="tm-dot"></div>
+                <div>
+                  <div class="tm-name">Mohammad Al-Hadidi</div>
+                  <div class="tm-role">Full-Stack Developer</div>
+                </div>
+              </div>
+              <div class="tm" style="grid-column:1/-1;justify-content:center;">
+                <div class="tm-dot"></div>
+                <div>
+                  <div class="tm-name">Bashar Al-Dabbas</div>
+                  <div class="tm-role">Full-Stack Developer</div>
+                </div>
+              </div>
+              <div class="sv-row">
+                <div class="sv-label">Academic Supervisor</div>
+                <div class="sv-name">Dr. Mohammad Al-Riyalat</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+      <div class="gtop" style="top:auto;bottom:0;transform:rotate(180deg);"></div>
     </div>
-  </div>
-  <div class="gtop" style="top:auto;bottom:0;transform:rotate(180deg);"></div>
-</div>
 
-<!-- ══ S2 AGENDA ══ -->
-<div class="slide" id="s2">
-  <div class="slide-glass"></div><div class="gtop"></div>
-  <div class="sh">
-    <div class="stag a1">Roadmap</div>
-    <h2 class="a2">Presentation Agenda</h2>
-    <p class="a3">22 slides — complete walkthrough of Coffaine from concept to deployment</p>
-  </div>
-  <div class="sb">
-    <div class="ag-wrap">
-      <div class="ag card a1"><div class="ag-num">01</div><div class="ag-t">Problem & Vision</div><div class="ag-d">Why we built this</div></div>
-      <div class="ag card a2"><div class="ag-num">02</div><div class="ag-t">Tech Stack</div><div class="ag-d">React + Node + MySQL</div></div>
-      <div class="ag card a3"><div class="ag-num">03</div><div class="ag-t">Database Design</div><div class="ag-d">14 tables, auto-migrate</div></div>
-      <div class="ag card a4"><div class="ag-num">04</div><div class="ag-t">Public Website</div><div class="ag-d">6 sections, smooth scroll</div></div>
-      <div class="ag card a5"><div class="ag-num">05</div><div class="ag-t">Menu System</div><div class="ag-d">Voice search, EN+AR</div></div>
-      <div class="ag card a1"><div class="ag-num">06</div><div class="ag-t">Cart & Checkout</div><div class="ag-d">Atomic transactions</div></div>
-      <div class="ag card a2"><div class="ag-num">07</div><div class="ag-t">Sophie AI</div><div class="ag-d">Customer chatbot</div></div>
-      <div class="ag card a3"><div class="ag-num">08</div><div class="ag-t">CaffAIne AI</div><div class="ag-d">19 DB queries, live</div></div>
-      <div class="ag card a4"><div class="ag-num">09</div><div class="ag-t">Admin Panel</div><div class="ag-d">12 live modules</div></div>
-      <div class="ag card a5"><div class="ag-num">10</div><div class="ag-t">Dashboard</div><div class="ag-d">KPIs, 30s refresh</div></div>
-      <div class="ag card a1"><div class="ag-num">11</div><div class="ag-t">Orders Module</div><div class="ag-d">Timer, lifecycle</div></div>
-      <div class="ag card a2"><div class="ag-num">12</div><div class="ag-t">Products CRUD</div><div class="ag-d">Add-ons, tags, images</div></div>
-      <div class="ag card a3"><div class="ag-num">13</div><div class="ag-t">Inventory</div><div class="ag-d">Recipes, auto-deduct</div></div>
-      <div class="ag card a4"><div class="ag-num">14</div><div class="ag-t">Analytics</div><div class="ag-d">Weekly charts, KPIs</div></div>
-      <div class="ag card a5"><div class="ag-num">15</div><div class="ag-t">Offers & Feedback</div><div class="ag-d">Promos & reviews</div></div>
-      <div class="ag card a1"><div class="ag-num">16</div><div class="ag-t">Careers</div><div class="ag-d">Jobs & applications</div></div>
-      <div class="ag card a2"><div class="ag-num">17</div><div class="ag-t">Security</div><div class="ag-d">Auth, roles, audit</div></div>
-      <div class="ag card a3"><div class="ag-num">18</div><div class="ag-t">Leader Dashboard</div><div class="ag-d">Super admin + PDF</div></div>
-      <div class="ag card a4"><div class="ag-num">19</div><div class="ag-t">UX Details</div><div class="ag-d">Lenis, cursor, loader</div></div>
-      <div class="ag card a5"><div class="ag-num">20</div><div class="ag-t">Challenges Solved</div><div class="ag-d">Real engineering</div></div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ S3 PROBLEM & VISION ══ -->
-<div class="slide" id="s3">
-  <div class="slide-glass"></div><div class="gtop"></div>
-  <div class="sh">
-    <div class="stag a1">01 · Overview</div>
-    <h2 class="a2">Problem & Vision</h2>
-    <p class="a3">Faculty Coffee — 14 Piccadilly Arcade, Birmingham — needed a complete digital transformation</p>
-  </div>
-  <div class="sb">
-    <div class="g2" style="height:100%">
-      <div class="fc card a1" style="height:100%" data-url="/#home">
-        <div class="fc-icon">⚡</div><div class="fc-line"></div>
-        <div class="fc-title">The Problem</div>
-        <div class="li"><div class="li-dot"></div>No online ordering — customers had to visit in person only</div>
-        <div class="li"><div class="li-dot"></div>Inventory tracked manually on paper — error-prone and slow</div>
-        <div class="li"><div class="li-dot"></div>No analytics — zero visibility into sales trends or top products</div>
-        <div class="li"><div class="li-dot"></div>No customer communication platform — inquiries completely untracked</div>
-        <div class="li"><div class="li-dot"></div>Staff hiring done manually — no digital application system</div>
-        <div class="li"><div class="li-dot"></div>Store open/closed communicated only physically — no automation</div>
+    <!-- ══ S2 AGENDA ══ -->
+    <div class="slide" id="s2">
+      <div class="slide-glass"></div>
+      <div class="gtop"></div>
+      <div class="sh">
+        <div class="stag a1">Roadmap</div>
+        <h2 class="a2">Presentation Agenda</h2>
+        <p class="a3">22 slides — complete walkthrough of Coffaine from concept to deployment</p>
       </div>
-      <div class="fc card a2" style="height:100%" data-url="/#home">
-        <div class="fc-icon">☕</div><div class="fc-line"></div>
-        <div class="fc-title">Our Vision</div>
-        <div class="li"><div class="li-dot"></div>A cinematic public site where customers browse, order, and interact</div>
-        <div class="li"><div class="li-dot"></div>A powerful admin dashboard with 12 modules — full operational control</div>
-        <div class="li"><div class="li-dot"></div>Dual AI: Sophie for customers, CaffAIne for business intelligence</div>
-        <div class="li"><div class="li-dot"></div>Real-time inventory with recipe-based auto-deduction on every order</div>
-        <div class="li"><div class="li-dot"></div>Voice search in English and Arabic — bilingual dictionary built-in</div>
-        <div class="li"><div class="li-dot"></div>Auto open/close: Mon–Fri 07:30–17:00, Sat 09:00–18:00, Sun 10:00–16:00</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ S4 TECH STACK ══ -->
-<div class="slide" id="s4">
-  <div class="slide-glass"></div><div class="gtop"></div>
-  <div class="sh">
-    <div class="stag a1">02 · Architecture</div>
-    <h2 class="a2">Technology Stack</h2>
-    <p class="a3">Modern, scalable, production-ready — chosen for performance and maintainability</p>
-  </div>
-  <div class="sb">
-    <div class="g3">
-      <div class="tc card a1" data-url="/#tech"><div class="tc-layer">Frontend</div><div class="tc-name">React.js 18</div><div class="tc-bar"></div><div class="tc-detail">React Router v7, Context API (Cart + Store + Admin), custom Hooks (useReveal, useAdminAuth), Lenis smooth scroll, animated loader, custom cursor</div></div>
-      <div class="tc card a2" data-url="/#tech"><div class="tc-layer">Backend</div><div class="tc-name">Node.js + Express 5</div><div class="tc-bar"></div><div class="tc-detail">40+ REST endpoints, Multer file uploads (10MB, images only), MySQL2 pool (10 connections), CORS, audit log middleware on every request</div></div>
-      <div class="tc card a3" data-url="/admin/database"><div class="tc-layer">Database</div><div class="tc-name">MySQL + Auto-Migration</div><div class="tc-bar"></div><div class="tc-detail">14 tables with FK constraints, schema migration on startup, prepared statements (SQL injection proof), atomic transactions with full ROLLBACK</div></div>
-      <div class="tc card a4" data-url="/admin/ai-assistant"><div class="tc-layer">Artificial Intelligence</div><div class="tc-name">OpenAI GPT-4o-mini</div><div class="tc-bar"></div><div class="tc-detail">Dual mode: Sophie (customer) + CaffAIne (admin). GitHub Models/Azure fallback. 19 parallel DB queries for admin. 45s timeout + AbortController</div></div>
-      <div class="tc card a5" data-url="/#tech"><div class="tc-layer">UI / Icons</div><div class="tc-name">Lucide + CSS Modules</div><div class="tc-bar"></div><div class="tc-detail">Lucide in admin, Font Awesome in public, CSS Modules for scoped styles, 30+ tag types with unique gradient colour systems</div></div>
-      <div class="tc card a6" data-url="/#tech"><div class="tc-layer">Dev Tools</div><div class="tc-name">Concurrently + dotenv</div><div class="tc-bar"></div><div class="tc-detail">Parallel frontend + backend dev, .env config, jsPDF + autoTable for PDF export, axios for admin API, supabaseClient for storage</div></div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ S5 DATABASE ══ -->
-<div class="slide" id="s5">
-  <div class="slide-glass"></div><div class="gtop"></div>
-  <div class="sh">
-    <div class="stag a1">03 · Database</div>
-    <h2 class="a2">Database Design</h2>
-    <p class="a3">MySQL — 14 tables, auto-migrating on startup, FK constraints, atomic order transactions</p>
-  </div>
-  <div class="sb">
-    <div class="g4" style="margin-bottom:12px;">
-      <div class="stat card a1" style="padding:12px 8px;" data-url="/admin/database"><div style="font-size:16px;margin-bottom:5px;">👤</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">admin_logs</div><div style="font-size:7.5px;color:var(--text3);">Every action logged</div></div>
-      <div class="stat card a2" style="padding:12px 8px;" data-url="/admin/products"><div style="font-size:16px;margin-bottom:5px;">🛍</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">menu_items</div><div style="font-size:7.5px;color:var(--text3);">Products + sort_order</div></div>
-      <div class="stat card a3" style="padding:12px 8px;" data-url="/admin/orders"><div style="font-size:16px;margin-bottom:5px;">📋</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">orders + items</div><div style="font-size:7.5px;color:var(--text3);">Full order lifecycle</div></div>
-      <div class="stat card a4" style="padding:12px 8px;" data-url="/admin/inventory"><div style="font-size:16px;margin-bottom:5px;">📦</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">inventory + recipes</div><div style="font-size:7.5px;color:var(--text3);">Ingredient → product</div></div>
-      <div class="stat card a1" style="padding:12px 8px;" data-url="/admin/products"><div style="font-size:16px;margin-bottom:5px;">➕</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">addons + tags</div><div style="font-size:7.5px;color:var(--text3);">Bridge tables M2M</div></div>
-      <div class="stat card a2" style="padding:12px 8px;" data-url="/admin/offers"><div style="font-size:16px;margin-bottom:5px;">🎁</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">offers</div><div style="font-size:7.5px;color:var(--text3);">Discounts + end_date</div></div>
-      <div class="stat card a3" style="padding:12px 8px;" data-url="/admin/applications"><div style="font-size:16px;margin-bottom:5px;">💼</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">careers + apps</div><div style="font-size:7.5px;color:var(--text3);">Jobs & applicants</div></div>
-      <div class="stat card a4" style="padding:12px 8px;" data-url="/admin/messages"><div style="font-size:16px;margin-bottom:5px;">✉️</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">contact_messages</div><div style="font-size:7.5px;color:var(--text3);">is_read flag</div></div>
-      <div class="stat card a1" style="padding:12px 8px;" data-url="/admin/feedback"><div style="font-size:16px;margin-bottom:5px;">⭐</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">product_reviews</div><div style="font-size:7.5px;color:var(--text3);">FK CASCADE DELETE</div></div>
-      <div class="stat card a2" style="padding:12px 8px;" data-url="/admin/dashboard"><div style="font-size:16px;margin-bottom:5px;">🏪</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">site_settings</div><div style="font-size:7.5px;color:var(--text3);">auto/manual mode</div></div>
-      <div class="stat card a3" style="padding:12px 8px;" data-url="/admin/ai-assistant"><div style="font-size:16px;margin-bottom:5px;">💬</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">chat_messages</div><div style="font-size:7.5px;color:var(--text3);">Sophie conv. logs</div></div>
-      <div class="stat card a4" style="padding:12px 8px;" data-url="/admin/ai-assistant"><div style="font-size:16px;margin-bottom:5px;">🤖</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">ai_assistant_msgs</div><div style="font-size:7.5px;color:var(--text3);">CaffAIne logs</div></div>
-    </div>
-    <div class="g3">
-      <div class="fc card a5" style="padding:13px 16px;" data-url="/admin/database"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🔄 Auto-Migration on Startup</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">Checks and adds missing columns (phone, delivery_address, estimated_ready_at) on every server start. Zero manual SQL</div></div>
-      <div class="fc card a6" style="padding:13px 16px;" data-url="/admin/database"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🔗 M2M Bridge Tables</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">menu_item_addons + menu_item_tags bridge tables — fully normalised. GROUP_CONCAT in queries → parsed to arrays</div></div>
-      <div class="fc card a7" style="padding:13px 16px;" data-url="/cart"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">⚡ Atomic Order Transaction</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">BEGIN → check stock → insert order → insert items → deduct inventory → deduct addons → COMMIT. Full ROLLBACK on failure</div></div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ S6 PUBLIC SITE ══ -->
-<div class="slide" id="s6">
-  <div class="slide-glass"></div><div class="gtop"></div>
-  <div class="sh">
-    <div class="stag a1">04 · Public Website</div>
-    <h2 class="a2">The Public-Facing Website</h2>
-    <p class="a3">One-page React SPA — cinematic, immersive, crafted for engagement at every scroll</p>
-  </div>
-  <div class="sb">
-    <div class="g3">
-      <div class="fc card a1" data-url="/"><div class="fc-icon">🏠</div><div class="fc-line"></div><div class="fc-title">Hero Section</div><div class="fc-text">Mouse-parallax image (±10px/8px). Live store open/closed from API. "Specialty Coffee · Birmingham" eyebrow. CTAs: View Menu + Find Us. Hours strip: Mon–Fri 07:30, Sat 09:00, Sun 10:00.</div></div>
-      <div class="fc card a2" data-url="/menu"><div class="fc-icon">☕</div><div class="fc-line"></div><div class="fc-title">Menu Section</div><div class="fc-text">DB-driven categories with icons + colours. Featured cards row. Full item list with modal, add-ons selector, real-time price, star rating, and review submission inline.</div></div>
-      <div class="fc card a3" data-url="/#gallery"><div class="fc-icon">🖼</div><div class="fc-line"></div><div class="fc-title">Gallery</div><div class="fc-text">Photo grid from /public/images/ managed via admin panel. Lazy-loaded with fallback to coffee-beans.png on error. Scroll-reveal via useReveal hook.</div></div>
-      <div class="fc card a4" data-url="/#about"><div class="fc-icon">📖</div><div class="fc-line"></div><div class="fc-title">About Us</div><div class="fc-text">"Precision-crafted drinks, warm welcome, unhurried pace." Brand story with scroll-reveal animations. useReveal IntersectionObserver adds 'vis' class on entry.</div></div>
-      <div class="fc card a5" data-url="/careers"><div class="fc-icon">💼</div><div class="fc-line"></div><div class="fc-title">Careers Page</div><div class="fc-text">Live listings from /api/careers?active=1. Customers apply: name, email, phone, position, cover letter → job_applications table. Status tracked in admin.</div></div>
-      <div class="fc card a6" data-url="/#contact"><div class="fc-icon">✉️</div><div class="fc-line"></div><div class="fc-title">Contact Section</div><div class="fc-text">POST /api/contact → contact_messages with is_read flag. Location: 14 Piccadilly Arcade, Birmingham. Managed in admin Messages module.</div></div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ S7 MENU SYSTEM ══ -->
-<div class="slide" id="s7">
-  <div class="slide-glass"></div><div class="gtop"></div>
-  <div class="sh">
-    <div class="stag a1">05 · Menu System</div>
-    <h2 class="a2">Dynamic Menu System</h2>
-    <p class="a3">Real DB-driven menu with voice search, bilingual filtering, and full customisation</p>
-  </div>
-  <div class="sb">
-    <div class="g2">
-      <div class="card a1" style="padding:20px;" data-url="/menu">
-        <div class="sec-title">📋 Real Menu Items</div>
-        <div class="sec-sub">Actual products at Faculty Coffee, Birmingham</div>
-        <div class="li"><div class="li-dot"></div><strong>Coffee:</strong> Espresso £2.80, Flat White £3.60, Cappuccino £3.40, Latte £3.80, Long Black £3.00, V60 Pour-Over £4.50, Hot Chocolate £4.00</div>
-        <div class="li"><div class="li-dot"></div><strong>Tea:</strong> Loose Leaf £3.00, Peppermint £3.50, English Breakfast £3.00, Pot of Breakfast Tea £4.85</div>
-        <div class="li"><div class="li-dot"></div><strong>Food:</strong> Sandwich £6.00, Brunch Plate £8.50, Vegan Pastry £3.50, Eggs Royale, Mushroom Melt, Avocado + Poached Egg</div>
-        <div class="li"><div class="li-dot"></div><strong>Cold Drinks:</strong> Palestine Cola, Gaza Cola SF, Fresh OJ, Apple Juice, Beetroot Juice, 330ml Still</div>
-        <div class="li"><div class="li-dot"></div><strong>Sweets:</strong> Freshly Baked Pastry £3.50, Cake of the Day £4.50, Raspberry & Custard Pastry £3.45, Basque Cheesecake</div>
-      </div>
-      <div class="card a2" style="padding:20px;" data-url="/menu">
-        <div class="sec-title">🔍 Smart Features Built</div>
-        <div class="sec-sub">All from Menu.js source code</div>
-        <div class="li"><div class="li-num">1</div>Voice search — Web Speech API, EN (en-GB) & AR (ar-SA) toggle</div>
-        <div class="li"><div class="li-num">2</div>Bilingual dictionary: "قهوة"→coffee, "شاي"→tea, "حلى"→sweet/cake, "بارد"→cold</div>
-        <div class="li"><div class="li-num">3</div>30+ tag types: Vegan 🌿, Best Seller 🌟, New 🆕, Iced 🧊, Hot 🌶️ with unique gradients</div>
-        <div class="li"><div class="li-num">4</div>Product modal: image, add-ons selector with live price, star rating + review submit</div>
-        <div class="li"><div class="li-num">5</div>Cart inline ±qty controls styled per category colour without leaving page</div>
-        <div class="li"><div class="li-num">6</div>Skeleton loader — 4 animated placeholders while API loads</div>
-        <div class="li"><div class="li-num">7</div>Context-aware add-ons strip at bottom of each category view</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ S8 CART & CHECKOUT ══ -->
-<div class="slide" id="s8">
-  <div class="slide-glass"></div><div class="gtop"></div>
-  <div class="sh">
-    <div class="stag a1">06 · Cart & Checkout</div>
-    <h2 class="a2">Cart & Full Order Flow</h2>
-    <p class="a3">From browse to kitchen — atomic transactions, stock validation, live timer</p>
-  </div>
-  <div class="sb">
-    <div class="flow a1" style="margin-bottom:16px;">
-      <div class="fs card" data-url="/menu"><div class="fs-icon">🛒</div><div class="fs-t">Browse</div></div><div class="fa">›</div>
-      <div class="fs card" data-url="/menu"><div class="fs-icon">➕</div><div class="fs-t">Add + Add-ons</div></div><div class="fa">›</div>
-      <div class="fs card" data-url="/cart"><div class="fs-icon">💳</div><div class="fs-t">Checkout</div></div><div class="fa">›</div>
-      <div class="fs card" data-url="/cart"><div class="fs-icon">✅</div><div class="fs-t">Order POST</div></div><div class="fa">›</div>
-      <div class="fs card" data-url="/admin/inventory"><div class="fs-icon">📦</div><div class="fs-t">Stock Deducted</div></div><div class="fa">›</div>
-      <div class="fs card" data-url="/admin/orders"><div class="fs-icon">⏱</div><div class="fs-t">Admin Timer</div></div><div class="fa">›</div>
-      <div class="fs card" data-url="/admin/orders"><div class="fs-icon">✅</div><div class="fs-t">Complete</div></div>
-    </div>
-    <div class="g3">
-      <div class="fc card a2" style="padding:14px 16px;" data-url="/cart"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🛒 CartContext</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">React Context persists cart across navigation. addItem, setQty, removeItem. Live price with all add-ons included</div></div>
-      <div class="fc card a3" style="padding:14px 16px;" data-url="/cart"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">💳 Checkout Fields</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">customer_name (req), phone (req), email (opt), order_type: takeaway / dine-in / delivery, delivery_address</div></div>
-      <div class="fc card a4" style="padding:14px 16px;" data-url="/cart"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🔒 Atomic Transaction</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">BEGIN → check stock → insert order → insert items → deduct inventory → deduct addons → COMMIT. Full ROLLBACK on failure</div></div>
-      <div class="fc card a2" style="padding:14px 16px;" data-url="/admin/orders"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">⏱ Prep Timer</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">estimated_ready_at = NOW() + 2 MIN. Live countdown in admin. Extend N minutes via /api/extend-order/:id</div></div>
-      <div class="fc card a3" style="padding:14px 16px;" data-url="/"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🏪 Store Gating</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">StoreContext checks /api/store-status. Closed = full-screen overlay with hours. Orders completely blocked</div></div>
-      <div class="fc card a4" style="padding:14px 16px;" data-url="/admin/orders"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🔔 Notification Log</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">Order 'ready': logs SMS + email notification template for customer_name, phone, and email</div></div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ S9 SOPHIE ══ -->
-<div class="slide" id="s9">
-  <div class="slide-glass"></div><div class="gtop"></div>
-  <div class="sh">
-    <div class="stag a1">07 · AI · Customer-Facing</div>
-    <h2 class="a2">Sophie — Customer AI Chatbot</h2>
-    <p class="a3">Bilingual, voice-enabled, connected to live menu and offers data</p>
-  </div>
-  <div class="sb">
-    <div class="g2" style="height:100%">
-      <div class="card a1" style="padding:20px;height:100%" data-url="/#ai-sophie">
-        <div style="display:inline-block;font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:var(--caramel);color:#fff;padding:4px 12px;border-radius:20px;margin-bottom:13px;">Customer-Facing AI</div>
-        <div style="font-family:'Playfair Display',serif;font-size:42px;color:var(--text);line-height:.95;margin-bottom:5px;" class="gold-text">Sophie</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--text2);margin-bottom:18px;">Faculty Coffee · Barista Bot</div>
-        <div class="li"><div class="li-dot"></div>Reads live menu from DB via /api/ai-chat: name, price, add-ons, tags</div>
-        <div class="li"><div class="li-dot"></div>Shows active offers from offers table in real-time</div>
-        <div class="li"><div class="li-dot"></div>Hours: Mon–Fri 07:30–17:00, Sat 09:00–18:00, Sun 10:00–16:00</div>
-        <div class="li"><div class="li-dot"></div>UK time-aware — knows if store is open right now</div>
-        <div class="li"><div class="li-dot"></div>Voice input EN/AR + SpeechSynthesis audio output</div>
-        <div class="li"><div class="li-dot"></div>45s timeout with AbortController — graceful fallback</div>
-        <div class="li"><div class="li-dot"></div>All conversations saved to chat_messages table</div>
-        <div class="li"><div class="li-dot"></div>Quick reply chips shown on first open</div>
-        <div style="margin-top:10px;font-size:8.5px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(196,135,74,.2);padding:6px;border-radius:8px;text-align:center;">GPT-4o-mini · GitHub Models fallback (Azure)</div>
-      </div>
-      <div class="chat card a2" style="height:100%" data-url="/#ai-sophie">
-        <div><div class="bubble-label">Customer</div><div class="bubble user">Hi! What's your most popular drink?</div></div>
-        <div><div class="bubble-label">Sophie</div><div class="bubble bot">Our Flat White (£3.60) is a crowd favourite ☕ Silky microfoam with our house espresso blend. Want to add it to your cart?</div></div>
-        <div><div class="bubble-label">Customer</div><div class="bubble user">Does it have dairy? I'm vegan 🌿</div></div>
-        <div><div class="bubble-label">Sophie</div><div class="bubble bot">Whole milk by default — but we offer oat, almond, and soy milk as add-ons! Want me to help you customise it?</div></div>
-        <div><div class="bubble-label">Customer</div><div class="bubble user">Are you open Sunday?</div></div>
-        <div><div class="bubble-label">Sophie</div><div class="bubble bot">Yes! Sunday 10:00–16:00 ☀️ Come in and we'll have a fresh brew waiting!</div></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ S10 CAFFAINE ══ -->
-<div class="slide" id="s10">
-  <div class="slide-glass"></div><div class="gtop"></div>
-  <div class="sh">
-    <div class="stag a1">08 · AI · Admin-Facing</div>
-    <h2 class="a2">CaffAIne — Business Intelligence AI</h2>
-    <p class="a3">19 parallel DB queries — sales, stock, reviews, applications, messages, audit data fed to GPT</p>
-  </div>
-  <div class="sb">
-    <div class="g2" style="height:100%">
-      <div class="chat card a1" style="height:100%" data-url="/admin/ai-assistant">
-        <div><div class="bubble-label">Admin</div><div class="bubble user">What were our top sellers this week?</div></div>
-        <div><div class="bubble-label">CaffAIne</div><div class="bubble bot">Flat White led with 47 orders, Iced Americano (31), Vegan Pastry (28). Week revenue: £342. Best day was Thursday.</div></div>
-        <div><div class="bubble-label">Admin</div><div class="bubble user">Any ingredients running low?</div></div>
-        <div><div class="bubble-label">CaffAIne</div><div class="bubble bot">Oat milk at 8% of threshold — reorder immediately. Vanilla syrup at 12%. All other items healthy.</div></div>
-        <div><div class="bubble-label">Admin</div><div class="bubble user">Any new job applications?</div></div>
-        <div><div class="bubble-label">CaffAIne</div><div class="bubble bot">3 new applications for Barista this week. 1 still unreviewed (submitted 2 days ago).</div></div>
-      </div>
-      <div class="card a2" style="padding:20px;height:100%" data-url="/admin/ai-assistant">
-        <div style="display:inline-block;font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:var(--warm);color:#fff;padding:4px 12px;border-radius:20px;margin-bottom:13px;">Admin-Facing AI</div>
-        <div style="font-family:'Playfair Display',serif;font-size:42px;color:var(--text);line-height:.95;margin-bottom:5px;" class="gold-text">CaffAIne</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--text2);margin-bottom:18px;">Real-time Business Intelligence</div>
-        <div class="li"><div class="li-dot"></div>19 parallel Promise.allSettled() DB queries per request</div>
-        <div class="li"><div class="li-dot"></div>Reads: orders, revenue, top products, 15-day daily sales</div>
-        <div class="li"><div class="li-dot"></div>Reads: low stock, approaching threshold, full menu catalog</div>
-        <div class="li"><div class="li-dot"></div>Reads: applications, contact messages, active offers, careers</div>
-        <div class="li"><div class="li-dot"></div>9 strict rules: no hallucinations, Arabic date format</div>
-        <div class="li"><div class="li-dot"></div>Logs saved to ai_assistant_messages table</div>
-        <div class="li"><div class="li-dot"></div>Returns 200 even on AI failure — local summary fallback</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ S11 ADMIN OVERVIEW ══ -->
-<div class="slide" id="s11">
-  <div class="slide-glass"></div><div class="gtop"></div>
-  <div class="sh">
-    <div class="stag a1">09 · Admin Panel</div>
-    <h2 class="a2">Admin Dashboard — 12 Modules</h2>
-    <p class="a3">Complete business management — role-protected, audit-logged, real-time</p>
-  </div>
-  <div class="sb">
-    <div class="g4">
-      <div class="adm card a1" data-url="/admin/dashboard"><div class="adm-icon">📊</div><div class="adm-title">Dashboard</div><div class="adm-desc">Live KPIs, 7-day chart, store toggle, 30s auto-refresh</div></div>
-      <div class="adm card a2" data-url="/admin/orders"><div class="adm-icon">📋</div><div class="adm-title">Orders</div><div class="adm-desc">Live timer, status lifecycle, extend time, order items</div></div>
-      <div class="adm card a3" data-url="/admin/products"><div class="adm-icon">🛍</div><div class="adm-title">Products</div><div class="adm-desc">CRUD, image upload, add-ons, tags, drag reorder</div></div>
-      <div class="adm card a4" data-url="/admin/inventory"><div class="adm-icon">📦</div><div class="adm-title">Inventory</div><div class="adm-desc">Stock levels, threshold alerts, Arabic numeral input</div></div>
-      <div class="adm card a1" data-url="/admin/analytics"><div class="adm-icon">📈</div><div class="adm-title">Analytics</div><div class="adm-desc">7-day SVG chart, category %, top products</div></div>
-      <div class="adm card a2" data-url="/admin/offers"><div class="adm-icon">🎁</div><div class="adm-title">Offers</div><div class="adm-desc">Discount %, product, reason, end_date, toggle</div></div>
-      <div class="adm card a3" data-url="/admin/jobs"><div class="adm-icon">💼</div><div class="adm-title">Jobs</div><div class="adm-desc">Title, type, location, description, active flag</div></div>
-      <div class="adm card a4" data-url="/admin/applications"><div class="adm-icon">📄</div><div class="adm-title">Applications</div><div class="adm-desc">Review applicants, status update, cover letter</div></div>
-      <div class="adm card a1" data-url="/admin/messages"><div class="adm-icon">✉️</div><div class="adm-title">Messages</div><div class="adm-desc">Contact inbox, mark read/unread, delete, search</div></div>
-      <div class="adm card a2" data-url="/admin/feedback"><div class="adm-icon">⭐</div><div class="adm-title">Feedback</div><div class="adm-desc">Product + store + general reviews in one view</div></div>
-      <div class="adm card a3" data-url="/admin/ai-assistant"><div class="adm-icon">🤖</div><div class="adm-title">CaffAIne AI</div><div class="adm-desc">Business intelligence with live DB data</div></div>
-      <div class="adm card a4" data-url="/admin/leader-dashboard"><div class="adm-icon">👑</div><div class="adm-title">Leader Dashboard</div><div class="adm-desc">Super admin: audit logs, critical feedback, PDF</div></div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ S12 DASHBOARD ══ -->
-<div class="slide" id="s12">
-  <div class="slide-glass"></div><div class="gtop"></div>
-  <div class="sh">
-    <div class="stag a1">10 · Dashboard</div>
-    <h2 class="a2">Live Admin Dashboard</h2>
-    <p class="a3">Auto-refreshes every 30 seconds — real KPIs, revenue chart, live clock, store control</p>
-  </div>
-  <div class="sb">
-    <div class="g4" style="margin-bottom:14px;">
-      <div class="stat card a1" data-url="/admin/dashboard"><div class="stat-val">£ Live</div><div class="stat-label">Gross Revenue</div></div>
-      <div class="stat card a2" data-url="/admin/dashboard"><div class="stat-val">Live</div><div class="stat-label">Total Orders</div></div>
-      <div class="stat card a3" data-url="/admin/dashboard"><div class="stat-val">Live</div><div class="stat-label">Today's Sales</div></div>
-      <div class="stat card a4" data-url="/admin/inventory"><div class="stat-val">⚠️</div><div class="stat-label">Low Stock Items</div></div>
-    </div>
-    <div class="g3">
-      <div class="fc card a5" style="padding:14px 16px;" data-url="/admin/analytics"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">📊 Revenue Bar Chart</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">Last 7 days, custom SVG bars. Real dailySales data. Today highlighted. Full date on hover.</div></div>
-      <div class="fc card a6" style="padding:14px 16px;" data-url="/admin/dashboard"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🏪 Store Toggle (3 Modes)</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">auto (schedule) / manual_open / manual_closed. Updates site_settings table instantly.</div></div>
-      <div class="fc card a7" style="padding:14px 16px;" data-url="/admin/dashboard"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">⏰ Live Clock + 30s Poll</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">setInterval(1000ms) for clock. setInterval(30000ms) for data. Two separate intervals cleaned up on unmount.</div></div>
-      <div class="fc card a5" style="padding:14px 16px;" data-url="/admin/analytics"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">📅 Today vs Yesterday</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">todayOrders, todaySales, yesterdayOrders, yesterdaySales — all from /api/dashboard-stats</div></div>
-      <div class="fc card a6" style="padding:14px 16px;" data-url="/admin/inventory"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🔔 Low Stock Alert Panel</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">lowStockItems array: item_name, quantity, min_threshold. Clickable → navigates to Inventory module.</div></div>
-      <div class="fc card a7" style="padding:14px 16px;" data-url="/admin/dashboard"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🎨 Theme Variables</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">bg:#070504, accent:#c4a484, success:#38ef7d, warning:#f59e0b, danger:#ff4d4d — admin dark theme.</div></div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ S13 ORDERS ══ -->
-<div class="slide" id="s13">
-  <div class="slide-glass"></div><div class="gtop"></div>
-  <div class="sh">
-    <div class="stag a1">11 · Orders Module</div>
-    <h2 class="a2">Real-Time Order Management</h2>
-    <p class="a3">Live countdown, status lifecycle, atomic stock-checked transactions</p>
-  </div>
-  <div class="sb">
-    <div class="g2">
-      <div class="card a1" style="padding:20px;">
-        <div class="sec-title">📋 Order Lifecycle</div>
-        <div class="sec-sub">Statuses: preparing → ready → completed</div>
-        <div class="li"><div class="li-num">1</div>POST /api/orders — BEGIN transaction, check stock per ingredient</div>
-        <div class="li"><div class="li-num">2</div>Insert order: status='preparing', estimated_ready_at = NOW() + 2 MIN</div>
-        <div class="li"><div class="li-num">3</div>Admin sees TIMESTAMPDIFF(SECOND, NOW(), estimated_ready_at) countdown</div>
-        <div class="li"><div class="li-num">4</div>Extend: PUT /api/extend-order/:id → adds N minutes to timer</div>
-        <div class="li"><div class="li-num">5</div>Mark ready: PUT /api/mark-ready/:id → notification log fired</div>
-        <div class="li"><div class="li-num">6</div>Items fetched: /api/order-items/:orderId with JOIN to menu_items</div>
-        <div class="li"><div class="li-num">7</div>Total recalculated server-side if client total is lower than expected</div>
-      </div>
-      <div class="card a2" style="padding:20px;">
-        <div class="sec-title">💳 Data Captured per Order</div>
-        <div class="sec-sub">Everything stored and linked</div>
-        <div class="li"><div class="li-dot"></div>customer_name, phone (required), email (optional)</div>
-        <div class="li"><div class="li-dot"></div>order_type: takeaway / dine-in / delivery</div>
-        <div class="li"><div class="li-dot"></div>delivery_address if delivery selected</div>
-        <div class="li"><div class="li-dot"></div>Each item: product_id, item_name, quantity, price per row</div>
-        <div class="li"><div class="li-dot"></div>Add-ons: separate order_items rows with addon price</div>
-        <div class="li"><div class="li-dot"></div>Auto-fix: 0-price addons looked up from addons table</div>
-        <div class="li"><div class="li-dot"></div>Inventory: GREATEST(quantity - deduct, 0) prevents negatives</div>
-        <div class="li"><div class="li-dot"></div>Recipe deduction: quantity_required × qty + addon inventory_id</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ S14 PRODUCTS ══ -->
-<div class="slide" id="s14">
-  <div class="slide-glass"></div><div class="gtop"></div>
-  <div class="sh">
-    <div class="stag a1">12 · Products CRUD</div>
-    <h2 class="a2">Product Management</h2>
-    <p class="a3">Full CRUD — image upload, add-ons, tags, reorder, availability control</p>
-  </div>
-  <div class="sb">
-    <div class="g2">
-      <div class="card a1" style="padding:20px;" data-url="/admin/products">
-        <div class="sec-title">🛍 Product CRUD</div>
-        <div class="sec-sub">Every field editable, changes instant on public site</div>
-        <div class="li"><div class="li-num">1</div>Fields: name, price_num, description, category_id, available, image_url, tags, addons, sort_order</div>
-        <div class="li"><div class="li-num">2</div>Image: POST /api/upload-image — Multer saves to /public/images/ (10MB max)</div>
-        <div class="li"><div class="li-num">3</div>Add-ons: DELETE all from menu_item_addons → INSERT new on every save</div>
-        <div class="li"><div class="li-num">4</div>Tags: same pattern — DELETE all → INSERT from menu_item_tags bridge</div>
-        <div class="li"><div class="li-num">5</div>Delete: removes from recipes first, then menu_items — cascade-safe</div>
-        <div class="li"><div class="li-num">6</div>Reorder: PUT /api/products/reorder — batch sort_order update</div>
-        <div class="li"><div class="li-num">7</div>available=0 marks product unavailable on public menu instantly</div>
-      </div>
-      <div class="card a2" style="padding:20px;" data-url="/admin/products">
-        <div class="sec-title">➕ Add-ons & Tags</div>
-        <div class="sec-sub">Fully normalised — no string hacks</div>
-        <div class="li"><div class="li-dot"></div>addons table: id, name, price, inventory_id (links to stock)</div>
-        <div class="li"><div class="li-dot"></div>tags table: id, name — 30+ visual types with gradient colours</div>
-        <div class="li"><div class="li-dot"></div>Bridge tables: menu_item_addons, menu_item_tags (M2M)</div>
-        <div class="li"><div class="li-dot"></div>Products API: GROUP_CONCAT with pipe → parsed to arrays client</div>
-        <div class="li"><div class="li-dot"></div>Out-of-stock: recipe ingredient check in products query</div>
-        <div class="li"><div class="li-dot"></div>Legacy fallback: comma-separated addons field still supported</div>
-        <div class="li"><div class="li-dot"></div>On startup: addons with price=0 → SET price=0.50 (prevents free)</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ S15 INVENTORY ══ -->
-<div class="slide" id="s15">
-  <div class="slide-glass"></div><div class="gtop"></div>
-  <div class="sh">
-    <div class="stag a1">13 · Inventory</div>
-    <h2 class="a2">Inventory & Recipe System</h2>
-    <p class="a3">Recipe-linked auto-deduction on every order — zero manual counting</p>
-  </div>
-  <div class="sb">
-    <div class="g2">
-      <div class="card a1" style="padding:20px;" data-url="/admin/inventory">
-        <div class="sec-title">📦 Stock Control</div>
-        <div class="sec-sub">Real-time ingredient tracking</div>
-        <div class="li"><div class="li-num">1</div>inventory table: item_name, quantity, unit, min_threshold</div>
-        <div class="li"><div class="li-num">2</div>Admin sets threshold — Dashboard + Inventory flag below it</div>
-        <div class="li"><div class="li-num">3</div>PUT /api/update-stock-item/:id — admin adjusts quantity + unit</div>
-        <div class="li"><div class="li-num">4</div>convertNumerals() — supports Arabic input (٠١٢٣٤٥٦٧٨٩)</div>
-        <div class="li"><div class="li-num">5</div>CaffAIne reads critical (below threshold) + approaching (within 150%)</div>
-        <div class="li"><div class="li-num">6</div>Out-of-stock flag in products query: marks isOutOfStock=true</div>
-      </div>
-      <div class="card a2" style="padding:20px;" data-url="/admin/inventory">
-        <div class="sec-title">🧪 Recipe System</div>
-        <div class="sec-sub">Automated deduction on every sale</div>
-        <div class="li"><div class="li-num">1</div>recipes table: menu_item_id, inventory_id, quantity_required</div>
-        <div class="li"><div class="li-num">2</div>GET /api/products/:id/recipe — view ingredient map per product</div>
-        <div class="li"><div class="li-num">3</div>POST /api/products/:id/recipe — clears old, inserts new array</div>
-        <div class="li"><div class="li-num">4</div>On order: deduct quantity_required × qty from each ingredient</div>
-        <div class="li"><div class="li-num">5</div>On order: deduct 1 × qty from each addon's inventory_id</div>
-        <div class="li"><div class="li-num">6</div>GREATEST(quantity - deduct, 0) — prevents negative stock values</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ S16 ANALYTICS ══ -->
-<div class="slide" id="s16">
-  <div class="slide-glass"></div><div class="gtop"></div>
-  <div class="sh">
-    <div class="stag a1">14 · Analytics</div>
-    <h2 class="a2">Sales Analytics</h2>
-    <p class="a3">7-day revenue chart, category distribution, top products, period comparisons</p>
-  </div>
-  <div class="sb">
-    <div class="g2">
-      <div class="card a1" style="padding:20px;" data-url="/admin/analytics">
-        <div class="sec-title">📈 What's Tracked</div>
-        <div class="sec-sub">From /api/dashboard-stats — real SQL aggregations</div>
-        <div class="li"><div class="li-dot"></div>Total revenue: SUM(total_amount) all-time</div>
-        <div class="li"><div class="li-dot"></div>Daily sales: last 15 days — GROUP BY DATE(created_at)</div>
-        <div class="li"><div class="li-dot"></div>7-day chart: custom SVG bars rendered in Analytics.js</div>
-        <div class="li"><div class="li-dot"></div>Category stats: JOIN order_items → menu_items → categories</div>
-        <div class="li"><div class="li-dot"></div>Top category: sorted by count, percentage of total orders</div>
-        <div class="li"><div class="li-dot"></div>Today vs yesterday: separate COUNT + SUM queries</div>
-        <div class="li"><div class="li-dot"></div>CaffAIne: top 50 products by sold count for AI context</div>
-      </div>
-      <div class="card a2" style="padding:20px;" data-url="/admin/analytics">
-        <div class="sec-title">🏆 Top Products Sample</div>
-        <div class="sec-sub">Actual Faculty Coffee bestsellers</div>
-        <div class="bar-chart">
-          <div class="bar-row"><div class="bar-label">Flat White</div><div class="bar-track"><div class="bar-fill" style="width:92%"></div></div><div class="bar-val">£3.60</div></div>
-          <div class="bar-row"><div class="bar-label">Iced Americano</div><div class="bar-track"><div class="bar-fill" style="width:74%"></div></div><div class="bar-val">£3.80</div></div>
-          <div class="bar-row"><div class="bar-label">Latte</div><div class="bar-track"><div class="bar-fill" style="width:65%"></div></div><div class="bar-val">£3.80</div></div>
-          <div class="bar-row"><div class="bar-label">V60 Pour-Over</div><div class="bar-track"><div class="bar-fill" style="width:52%"></div></div><div class="bar-val">£4.50</div></div>
-          <div class="bar-row"><div class="bar-label">Vegan Pastry</div><div class="bar-track"><div class="bar-fill" style="width:42%"></div></div><div class="bar-val">£3.50</div></div>
-          <div class="bar-row"><div class="bar-label">Cake of the Day</div><div class="bar-track"><div class="bar-fill" style="width:32%"></div></div><div class="bar-val">£4.50</div></div>
+      <div class="sb">
+        <div class="ag-wrap">
+          <div class="ag card a1">
+            <div class="ag-num">01</div>
+            <div class="ag-t">Problem & Vision</div>
+            <div class="ag-d">Why we built this</div>
+          </div>
+          <div class="ag card a2">
+            <div class="ag-num">02</div>
+            <div class="ag-t">Tech Stack</div>
+            <div class="ag-d">React + Node + MySQL</div>
+          </div>
+          <div class="ag card a3">
+            <div class="ag-num">03</div>
+            <div class="ag-t">Database Design</div>
+            <div class="ag-d">14 tables, auto-migrate</div>
+          </div>
+          <div class="ag card a4">
+            <div class="ag-num">04</div>
+            <div class="ag-t">Public Website</div>
+            <div class="ag-d">6 sections, smooth scroll</div>
+          </div>
+          <div class="ag card a5">
+            <div class="ag-num">05</div>
+            <div class="ag-t">Menu System</div>
+            <div class="ag-d">Voice search, EN+AR</div>
+          </div>
+          <div class="ag card a1">
+            <div class="ag-num">06</div>
+            <div class="ag-t">Cart & Checkout</div>
+            <div class="ag-d">Atomic transactions</div>
+          </div>
+          <div class="ag card a2">
+            <div class="ag-num">07</div>
+            <div class="ag-t">Sophie AI</div>
+            <div class="ag-d">Customer chatbot</div>
+          </div>
+          <div class="ag card a3">
+            <div class="ag-num">08</div>
+            <div class="ag-t">CaffAIne AI</div>
+            <div class="ag-d">19 DB queries, live</div>
+          </div>
+          <div class="ag card a4">
+            <div class="ag-num">09</div>
+            <div class="ag-t">Admin Panel</div>
+            <div class="ag-d">12 live modules</div>
+          </div>
+          <div class="ag card a5">
+            <div class="ag-num">10</div>
+            <div class="ag-t">Dashboard</div>
+            <div class="ag-d">KPIs, 30s refresh</div>
+          </div>
+          <div class="ag card a1">
+            <div class="ag-num">11</div>
+            <div class="ag-t">Orders Module</div>
+            <div class="ag-d">Timer, lifecycle</div>
+          </div>
+          <div class="ag card a2">
+            <div class="ag-num">12</div>
+            <div class="ag-t">Products CRUD</div>
+            <div class="ag-d">Add-ons, tags, images</div>
+          </div>
+          <div class="ag card a3">
+            <div class="ag-num">13</div>
+            <div class="ag-t">Inventory</div>
+            <div class="ag-d">Recipes, auto-deduct</div>
+          </div>
+          <div class="ag card a4">
+            <div class="ag-num">14</div>
+            <div class="ag-t">Analytics</div>
+            <div class="ag-d">Weekly charts, KPIs</div>
+          </div>
+          <div class="ag card a5">
+            <div class="ag-num">15</div>
+            <div class="ag-t">Offers & Feedback</div>
+            <div class="ag-d">Promos & reviews</div>
+          </div>
+          <div class="ag card a1">
+            <div class="ag-num">16</div>
+            <div class="ag-t">Careers</div>
+            <div class="ag-d">Jobs & applications</div>
+          </div>
+          <div class="ag card a2">
+            <div class="ag-num">17</div>
+            <div class="ag-t">Security</div>
+            <div class="ag-d">Auth, roles, audit</div>
+          </div>
+          <div class="ag card a3">
+            <div class="ag-num">18</div>
+            <div class="ag-t">Leader Dashboard</div>
+            <div class="ag-d">Super admin + PDF</div>
+          </div>
+          <div class="ag card a4">
+            <div class="ag-num">19</div>
+            <div class="ag-t">UX Details</div>
+            <div class="ag-d">Lenis, cursor, loader</div>
+          </div>
+          <div class="ag card a5">
+            <div class="ag-num">20</div>
+            <div class="ag-t">Challenges Solved</div>
+            <div class="ag-d">Real engineering</div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- ══ S17 OFFERS & FEEDBACK ══ -->
-<div class="slide" id="s17">
-  <div class="slide-glass"></div><div class="gtop"></div>
-  <div class="sh">
-    <div class="stag a1">15 · Offers & Feedback</div>
-    <h2 class="a2">Promotions & Customer Reviews</h2>
-    <p class="a3">Discount engine + three-tier review system — product, store, and general</p>
-  </div>
-  <div class="sb">
-    <div class="g2">
-      <div class="card a1" style="padding:20px;" data-url="/admin/offers">
-        <div class="sec-title">🎁 Offers System</div>
-        <div class="sec-sub">Full CRUD — GET, POST, PUT, DELETE /api/offers</div>
-        <div class="li"><div class="li-dot"></div>Fields: product_name, discount_percent, reason, end_date, active</div>
-        <div class="li"><div class="li-dot"></div>Active offers shown inline on public menu page</div>
-        <div class="li"><div class="li-dot"></div>Sophie reads active offers from DB in real-time</div>
-        <div class="li"><div class="li-dot"></div>CaffAIne shows full offer JSON in admin context</div>
-        <div class="li"><div class="li-dot"></div>All offer changes logged in audit trail automatically</div>
-        <div class="li"><div class="li-dot"></div>end_date field — schedule automatic expiry per offer</div>
+    <!-- ══ S3 PROBLEM & VISION ══ -->
+    <div class="slide" id="s3">
+      <div class="slide-glass"></div>
+      <div class="gtop"></div>
+      <div class="sh">
+        <div class="stag a1">01 · Overview</div>
+        <h2 class="a2">Problem & Vision</h2>
+        <p class="a3">Faculty Coffee — 14 Piccadilly Arcade, Birmingham — needed a complete digital transformation</p>
       </div>
-      <div class="card a2" style="padding:20px;" data-url="/admin/feedback">
-        <div class="sec-title">⭐ Three-Tier Review System</div>
-        <div class="sec-sub">GET /api/feedback returns all three types merged</div>
-        <div class="li"><div class="li-num">1</div>Product Reviews: FK → menu_items CASCADE DELETE. Rating 1–5 + comment</div>
-        <div class="li"><div class="li-num">2</div>Store Reviews (store_reviews): Overall café experience rating</div>
-        <div class="li"><div class="li-num">3</div>General Feedback (general_feedback): Open-ended, no product link</div>
-        <div class="li"><div class="li-num">4</div>Submitted from product modal — POST /api/feedback/product</div>
-        <div class="li"><div class="li-num">5</div>Admin Feedback module: all three types in one filterable view</div>
-        <div class="li"><div class="li-num">6</div>Leader Dashboard: flags reviews ≤ 3 stars as critical</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ S18 CAREERS ══ -->
-<div class="slide" id="s18">
-  <div class="slide-glass"></div><div class="gtop"></div>
-  <div class="sh">
-    <div class="stag a1">16 · Careers & Communication</div>
-    <h2 class="a2">Careers, Applications & Messages</h2>
-    <p class="a3">End-to-end hiring pipeline and customer communication — all in-platform</p>
-  </div>
-  <div class="sb">
-    <div class="g3">
-      <div class="fc card a1" data-url="/admin/jobs">
-        <div class="fc-icon">💼</div><div class="fc-line"></div>
-        <div class="fc-title">Jobs Module</div>
-        <div class="fc-text">careers table: title, type, location, description, active. Admin creates/closes listings. Active jobs on public Careers page via GET /api/careers?active=1. DELETE removes permanently.</div>
-      </div>
-      <div class="fc card a2" data-url="/admin/applications">
-        <div class="fc-icon">📄</div><div class="fc-line"></div>
-        <div class="fc-title">Applications</div>
-        <div class="fc-text">Apply via public form → POST /api/apply. Stored: name, email, phone, position, cover_letter, resume_url, status. Admin updates status via PUT /api/applications/:id/status. CaffAIne reads latest 20.</div>
-      </div>
-      <div class="fc card a3" data-url="/admin/messages">
-        <div class="fc-icon">✉️</div><div class="fc-line"></div>
-        <div class="fc-title">Messages</div>
-        <div class="fc-text">Contact form → POST /api/contact. contact_messages: name, email, message, is_read, created_at. Mark read: PUT /api/contact/:id/read. DELETE removes. CaffAIne reads last 7 messages.</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ S19 SECURITY ══ -->
-<div class="slide" id="s19">
-  <div class="slide-glass"></div><div class="gtop"></div>
-  <div class="sh">
-    <div class="stag a1">17 · Security</div>
-    <h2 class="a2">Security & Access Control</h2>
-    <p class="a3">Role-based auth, server-side validation, audit trail on every action</p>
-  </div>
-  <div class="sb">
-    <div class="g2" style="height:100%">
-      <div style="display:grid;grid-template-columns:1fr;gap:13px;height:100%">
-        <div class="card a1" style="padding:18px;" data-url="/admin/login">
-          <div class="sec-title">🔐 Authentication</div>
-          <div class="sec-sub">POST /api/admin/login — 4 team accounts</div>
-          <div class="li"><div class="li-dot"></div>omar@coffee.com (super_admin), sultan@coffee.com, mohammad@coffee.com, bashar@coffee.com (admin)</div>
-          <div class="li"><div class="li-dot"></div>AdminContext stores: id, email, name, role throughout session</div>
-          <div class="li"><div class="li-dot"></div>AdminRoute wraps all /admin/* — redirects to login if no context</div>
-          <div class="li"><div class="li-dot"></div>Every login action inserted into admin_logs automatically</div>
-        </div>
-        <div class="card a2" style="padding:18px;" data-url="/admin/leader-dashboard">
-          <div class="sec-title">📋 Audit Log Middleware</div>
-          <div class="sec-sub">req.logAdminAction on every route</div>
-          <div class="li"><div class="li-dot"></div>Reads x-admin-email + x-admin-name headers on every request</div>
-          <div class="li"><div class="li-dot"></div>admin_logs: admin_email, admin_name, action, details, created_at</div>
-          <div class="li"><div class="li-dot"></div>GET /api/admin/logs → latest 200 entries to Leader Dashboard</div>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr;gap:13px;height:100%">
-        <div class="card a3" style="padding:18px;" data-url="/admin/leader-dashboard">
-          <div class="sec-title">👥 Role-Based Access</div>
-          <div class="sec-sub">super_admin vs admin</div>
-          <div class="li"><div class="li-dot"></div>LeaderDashboard: if role !== 'super_admin' → navigate('/admin/dashboard')</div>
-          <div class="li"><div class="li-dot"></div>Leader auto-refreshes every 15s — always current data</div>
-          <div class="li"><div class="li-dot"></div>Regular admins: no audit logs, no critical feedback panel</div>
-        </div>
-        <div class="card a4" style="padding:18px;" data-url="/admin/login">
-          <div class="sec-title">🛡 Data Integrity</div>
-          <div class="sec-sub">Server-side validation everywhere</div>
-          <div class="li"><div class="li-dot"></div>Multer: fileFilter — jpeg/jpg/png/webp/gif only, rejects others</div>
-          <div class="li"><div class="li-dot"></div>Prepared statements across all MySQL queries — SQL injection proof</div>
-          <div class="li"><div class="li-dot"></div>CORS: only localhost origins allowed via regex pattern</div>
-          <div class="li"><div class="li-dot"></div>Order: customer_name + phone + cartItems required — 400 if missing</div>
+      <div class="sb">
+        <div class="g2" style="height:100%">
+          <div class="fc card a1" style="height:100%">
+            <div class="fc-icon">⚡</div>
+            <div class="fc-line"></div>
+            <div class="fc-title">The Problem</div>
+            <div class="li">
+              <div class="li-dot"></div>No online ordering — customers had to visit in person only
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Inventory tracked manually on paper — error-prone and slow
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>No analytics — zero visibility into sales trends or top products
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>No customer communication platform — inquiries completely untracked
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Staff hiring done manually — no digital application system
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Store open/closed communicated only physically — no automation
+            </div>
+          </div>
+          <div class="fc card a2" style="height:100%">
+            <div class="fc-icon">☕</div>
+            <div class="fc-line"></div>
+            <div class="fc-title">Our Vision</div>
+            <div class="li">
+              <div class="li-dot"></div>A cinematic public site where customers browse, order, and interact
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>A powerful admin dashboard with 12 modules — full operational control
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Dual AI: Sophie for customers, CaffAIne for business intelligence
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Real-time inventory with recipe-based auto-deduction on every order
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Voice search in English and Arabic — bilingual dictionary built-in
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Auto open/close: Mon–Fri 07:30–17:00, Sat 09:00–18:00, Sun 10:00–16:00
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- ══ S20 LEADER DASHBOARD ══ -->
-<div class="slide" id="s20">
-  <div class="slide-glass"></div><div class="gtop"></div>
-  <div class="sh">
-    <div class="stag a1">18 · Leader Dashboard</div>
-    <h2 class="a2">Leader Dashboard & PDF Export</h2>
-    <p class="a3">Super admin exclusive — audit logs, critical feedback, one-click PDF report</p>
-  </div>
-  <div class="sb">
-    <div class="g2">
-      <div class="card a1" style="padding:20px;" data-url="/admin/leader-dashboard">
-        <div class="sec-title">👑 Leader-Only Features</div>
-        <div class="sec-sub">Omar Al-Ajarma — super_admin only</div>
-        <div class="li"><div class="li-num">1</div>3 parallel API calls: /api/admin/logs + /api/reviews + /api/contact-messages</div>
-        <div class="li"><div class="li-num">2</div>Auto-refresh every 15 seconds — always live activity</div>
-        <div class="li"><div class="li-num">3</div>Full audit table: admin_name, action, details, timestamp — searchable</div>
-        <div class="li"><div class="li-num">4</div>Search across name + action + details simultaneously</div>
-        <div class="li"><div class="li-num">5</div>Hoverable row highlight for fast scanning</div>
-        <div class="li"><div class="li-num">6</div>Non-super-admin visit → instant redirect to /admin/dashboard</div>
+    <!-- ══ S4 TECH STACK ══ -->
+    <div class="slide" id="s4">
+      <div class="slide-glass"></div>
+      <div class="gtop"></div>
+      <div class="sh">
+        <div class="stag a1">02 · Architecture</div>
+        <h2 class="a2">Technology Stack</h2>
+        <p class="a3">Modern, scalable, production-ready — chosen for performance and maintainability</p>
       </div>
-      <div class="card a2" style="padding:20px;" data-url="/admin/leader-dashboard">
-        <div class="sec-title">📊 Critical Detection + PDF</div>
-        <div class="sec-sub">Automated bad-experience surfacing</div>
-        <div class="li"><div class="li-dot"></div>Combines product_reviews (rating ≤ 3) + contact messages with bad keywords</div>
-        <div class="li"><div class="li-dot"></div>Bad keywords: bad, terrible, worst, awful, angry, complaint, ruined, disgusting, sick</div>
-        <div class="li"><div class="li-dot"></div>Sorted by created_at DESC — most recent critical issues first</div>
-        <div class="li"><div class="li-dot"></div>PDF export: jsPDF + autoTable — one-click full audit report</div>
-        <div class="li"><div class="li-dot"></div>PDF includes: all audit log columns, auto-sized, formatted</div>
-        <div class="li"><div class="li-dot"></div>Download button with Filter + Search icons from Lucide React</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ S21 UX & CHALLENGES ══ -->
-<div class="slide" id="s21">
-  <div class="slide-glass"></div><div class="gtop"></div>
-  <div class="sh">
-    <div class="stag a1">19 · UX & Challenges</div>
-    <h2 class="a2">Premium UX & Real Challenges Solved</h2>
-    <p class="a3">The thoughtful details and real engineering problems we solved during development</p>
-  </div>
-  <div class="sb">
-    <div class="g2">
-      <div class="card a1" style="padding:20px;" data-url="/#ux">
-        <div class="sec-title">✨ UX Details Built</div>
-        <div class="sec-sub">Every detail from the actual codebase</div>
-        <div class="li"><div class="li-dot"></div><strong>Lenis Smooth Scroll:</strong> @studio-freight/lenis, duration 1.25s, custom easing</div>
-        <div class="li"><div class="li-dot"></div><strong>Custom Cursor:</strong> #cursor-dot + #cursor-ring — replaces browser default</div>
-        <div class="li"><div class="li-dot"></div><strong>Loading Screen:</strong> LoadingScreen component with onComplete → fades to hero</div>
-        <div class="li"><div class="li-dot"></div><strong>Mouse Parallax:</strong> Hero image ±10px/8px based on cursor position in section</div>
-        <div class="li"><div class="li-dot"></div><strong>useReveal Hook:</strong> IntersectionObserver adds 'vis' class on viewport entry</div>
-        <div class="li"><div class="li-dot"></div><strong>Voice Search:</strong> Web Speech API + bilingual Arabic dictionary in Menu + Sophie</div>
-        <div class="li"><div class="li-dot"></div><strong>MobileNav:</strong> Separate mobile navigation component for responsive layout</div>
-        <div class="li"><div class="li-dot"></div><strong>Scroll Progress:</strong> #scroll-progress bar shows reading position on public site</div>
-      </div>
-      <div class="card a2" style="padding:20px;" data-url="/#challenges">
-        <div class="sec-title">⚡ Real Engineering Challenges</div>
-        <div class="sec-sub">Actual problems we hit and solved</div>
-        <div class="li"><div class="li-dot"></div><strong>0-Price Addons:</strong> Migration fixes historical order_items price=0 → lookup from addons table</div>
-        <div class="li"><div class="li-dot"></div><strong>Category Migration:</strong> Legacy string IDs → numeric IDs with recovery keyword mapping</div>
-        <div class="li"><div class="li-dot"></div><strong>19 AI Queries:</strong> Promise.allSettled() — one failure never breaks the full context</div>
-        <div class="li"><div class="li-dot"></div><strong>Dual AI Provider:</strong> Auto-detects ghp_/github_ prefix → switches baseURL to GitHub/Azure</div>
-        <div class="li"><div class="li-dot"></div><strong>Arabic Numerals:</strong> convertNumerals() converts ١٢٣ → 123 for inventory inputs</div>
-        <div class="li"><div class="li-dot"></div><strong>FK Delete Conflict:</strong> Product in orders → returns 400 "mark as Unavailable instead"</div>
-        <div class="li"><div class="li-dot"></div><strong>Addon Price Fix:</strong> Startup UPDATE: addons SET price=0.50 WHERE price=0</div>
-        <div class="li"><div class="li-dot"></div><strong>Store Auto-Mode:</strong> Server calculates open/closed from schedule — no manual daily toggle</div>
+      <div class="sb">
+        <div class="g3">
+          <div class="tc card a1">
+            <div class="tc-layer">Frontend</div>
+            <div class="tc-name">React.js 18</div>
+            <div class="tc-bar"></div>
+            <div class="tc-detail">React Router v7, Context API (Cart + Store + Admin), custom Hooks (useReveal,
+              useAdminAuth), Lenis smooth scroll, animated loader, custom cursor</div>
+          </div>
+          <div class="tc card a2">
+            <div class="tc-layer">Backend</div>
+            <div class="tc-name">Node.js + Express 5</div>
+            <div class="tc-bar"></div>
+            <div class="tc-detail">40+ REST endpoints, Multer file uploads (10MB, images only), MySQL2 pool (10
+              connections), CORS, audit log middleware on every request</div>
+          </div>
+          <div class="tc card a3">
+            <div class="tc-layer">Database</div>
+            <div class="tc-name">MySQL + Auto-Migration</div>
+            <div class="tc-bar"></div>
+            <div class="tc-detail">14 tables with FK constraints, schema migration on startup, prepared statements (SQL
+              injection proof), atomic transactions with full ROLLBACK</div>
+          </div>
+          <div class="tc card a4">
+            <div class="tc-layer">Artificial Intelligence</div>
+            <div class="tc-name">OpenAI GPT-4o-mini</div>
+            <div class="tc-bar"></div>
+            <div class="tc-detail">Dual mode: Sophie (customer) + CaffAIne (admin). GitHub Models/Azure fallback. 19
+              parallel DB queries for admin. 45s timeout + AbortController</div>
+          </div>
+          <div class="tc card a5">
+            <div class="tc-layer">UI / Icons</div>
+            <div class="tc-name">Lucide + CSS Modules</div>
+            <div class="tc-bar"></div>
+            <div class="tc-detail">Lucide in admin, Font Awesome in public, CSS Modules for scoped styles, 30+ tag types
+              with unique gradient colour systems</div>
+          </div>
+          <div class="tc card a6">
+            <div class="tc-layer">Dev Tools</div>
+            <div class="tc-name">Concurrently + dotenv</div>
+            <div class="tc-bar"></div>
+            <div class="tc-detail">Parallel frontend + backend dev, .env config, jsPDF + autoTable for PDF export, axios
+              for admin API, supabaseClient for storage</div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- ══ S22 CONCLUSION ══ -->
-<div class="slide" id="s22">
-  <div class="slide-glass"></div>
-  <div class="gtop"></div>
-  <div class="orb-ring" style="width:600px;height:600px;top:-120px;right:-120px;animation-duration:30s;"></div>
-  <div class="orb-ring" style="width:380px;height:380px;bottom:-80px;left:-80px;animation-duration:22s;animation-direction:reverse;"></div>
-  <div class="conc-center">
-    <div class="a1"><span class="tag">Conclusion</span></div>
-    <div class="a2" style="margin-top:16px;"><div class="conc-title gold-text">Thank You</div></div>
-    <div class="a3"><div class="conc-italic">Coffaine — built with passion, precision, and purpose at Faculty Coffee, Birmingham</div></div>
-    <div class="a3"><div class="conc-div"></div></div>
-    <div class="fg-grid a4">
-      <div class="fg"><strong>📱 Native Mobile App</strong><span>iOS & Android with push notifications for live order updates</span></div>
-      <div class="fg"><strong>💳 Payment Gateway</strong><span>Stripe integration for online card payments at checkout</span></div>
-      <div class="fg"><strong>🌍 Multi-Branch</strong><span>Scale to multiple Faculty Coffee locations under one system</span></div>
-      <div class="fg"><strong>🔔 Real-Time WebSockets</strong><span>Live order status without polling — instant kitchen alerts</span></div>
+    <!-- ══ S5 DATABASE ══ -->
+    <div class="slide" id="s5">
+      <div class="slide-glass"></div>
+      <div class="gtop"></div>
+      <div class="sh">
+        <div class="stag a1">03 · Database</div>
+        <h2 class="a2">Database Design</h2>
+        <p class="a3">MySQL — 14 tables, auto-migrating on startup, FK constraints, atomic order transactions</p>
+      </div>
+      <div class="sb">
+        <div class="g4" style="margin-bottom:12px;">
+          <div class="stat card a1" style="padding:12px 8px;" data-url="/admin/database">
+            <div style="font-size:16px;margin-bottom:5px;">👤</div>
+            <div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">admin_logs</div>
+            <div style="font-size:7.5px;color:var(--text3);">Every action logged</div>
+          </div>
+          <div class="stat card a2" style="padding:12px 8px;" data-url="/admin/products">
+            <div style="font-size:16px;margin-bottom:5px;">🛍</div>
+            <div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">menu_items</div>
+            <div style="font-size:7.5px;color:var(--text3);">Products + sort_order</div>
+          </div>
+          <div class="stat card a3" style="padding:12px 8px;" data-url="/admin/orders">
+            <div style="font-size:16px;margin-bottom:5px;">📋</div>
+            <div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">orders + items</div>
+            <div style="font-size:7.5px;color:var(--text3);">Full order lifecycle</div>
+          </div>
+          <div class="stat card a4" style="padding:12px 8px;" data-url="/admin/inventory">
+            <div style="font-size:16px;margin-bottom:5px;">📦</div>
+            <div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">inventory + recipes</div>
+            <div style="font-size:7.5px;color:var(--text3);">Ingredient → product</div>
+          </div>
+          <div class="stat card a1" style="padding:12px 8px;" data-url="/admin/products">
+            <div style="font-size:16px;margin-bottom:5px;">➕</div>
+            <div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">addons + tags</div>
+            <div style="font-size:7.5px;color:var(--text3);">Bridge tables M2M</div>
+          </div>
+          <div class="stat card a2" style="padding:12px 8px;" data-url="/admin/offers">
+            <div style="font-size:16px;margin-bottom:5px;">🎁</div>
+            <div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">offers</div>
+            <div style="font-size:7.5px;color:var(--text3);">Discounts + end_date</div>
+          </div>
+          <div class="stat card a3" style="padding:12px 8px;" data-url="/admin/applications">
+            <div style="font-size:16px;margin-bottom:5px;">💼</div>
+            <div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">careers + apps</div>
+            <div style="font-size:7.5px;color:var(--text3);">Jobs & applicants</div>
+          </div>
+          <div class="stat card a4" style="padding:12px 8px;" data-url="/admin/messages">
+            <div style="font-size:16px;margin-bottom:5px;">✉️</div>
+            <div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">contact_messages</div>
+            <div style="font-size:7.5px;color:var(--text3);">is_read flag</div>
+          </div>
+          <div class="stat card a1" style="padding:12px 8px;" data-url="/admin/feedback">
+            <div style="font-size:16px;margin-bottom:5px;">⭐</div>
+            <div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">product_reviews</div>
+            <div style="font-size:7.5px;color:var(--text3);">FK CASCADE DELETE</div>
+          </div>
+          <div class="stat card a2" style="padding:12px 8px;" data-url="/admin/dashboard">
+            <div style="font-size:16px;margin-bottom:5px;">🏪</div>
+            <div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">site_settings</div>
+            <div style="font-size:7.5px;color:var(--text3);">auto/manual mode</div>
+          </div>
+          <div class="stat card a3" style="padding:12px 8px;" data-url="/admin/ai-assistant">
+            <div style="font-size:16px;margin-bottom:5px;">💬</div>
+            <div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">chat_messages</div>
+            <div style="font-size:7.5px;color:var(--text3);">Sophie conv. logs</div>
+          </div>
+          <div class="stat card a4" style="padding:12px 8px;" data-url="/admin/ai-assistant">
+            <div style="font-size:16px;margin-bottom:5px;">🤖</div>
+            <div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">ai_assistant_msgs</div>
+            <div style="font-size:7.5px;color:var(--text3);">CaffAIne logs</div>
+          </div>
+        </div>
+        <div class="g3">
+          <div class="fc card a5" style="padding:13px 16px;" data-url="/admin/database">
+            <div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🔄 Auto-Migration on
+              Startup</div>
+            <div style="font-size:9px;color:var(--text2);line-height:1.6;">Checks and adds missing columns (phone,
+              delivery_address, estimated_ready_at) on every server start. Zero manual SQL</div>
+          </div>
+          <div class="fc card a6" style="padding:13px 16px;" data-url="/admin/database">
+            <div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🔗 M2M Bridge Tables
+            </div>
+            <div style="font-size:9px;color:var(--text2);line-height:1.6;">menu_item_addons + menu_item_tags bridge
+              tables — fully normalised. GROUP_CONCAT in queries → parsed to arrays</div>
+          </div>
+          <div class="fc card a7" style="padding:13px 16px;" data-url="/cart">
+            <div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">⚡ Atomic Order
+              Transaction</div>
+            <div style="font-size:9px;color:var(--text2);line-height:1.6;">BEGIN → check stock → insert order → insert
+              items → deduct inventory → deduct addons → COMMIT. Full ROLLBACK on failure</div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="a5">
-      <div class="thanks-names">Omar · Sultan · Mohammad · Bashar</div>
-      <div class="thanks-meta">Supervised by Dr. Mohammad Al-Riyalat &nbsp;·&nbsp; Software Engineering &nbsp;·&nbsp; 2026</div>
+
+    <!-- ══ S6 PUBLIC SITE ══ -->
+    <div class="slide" id="s6">
+      <div class="slide-glass"></div>
+      <div class="gtop"></div>
+      <div class="sh">
+        <div class="stag a1">04 · Public Website</div>
+        <h2 class="a2">The Public-Facing Website</h2>
+        <p class="a3">One-page React SPA — cinematic, immersive, crafted for engagement at every scroll</p>
+      </div>
+      <div class="sb">
+        <div class="g3">
+          <div class="fc card a1" data-url="/">
+            <div class="fc-icon">🏠</div>
+            <div class="fc-line"></div>
+            <div class="fc-title">Hero Section</div>
+            <div class="fc-text">Mouse-parallax image (±10px/8px). Live store open/closed from API. "Specialty Coffee ·
+              Birmingham" eyebrow. CTAs: View Menu + Find Us. Hours strip: Mon–Fri 07:30, Sat 09:00, Sun 10:00.</div>
+          </div>
+          <div class="fc card a2" data-url="/menu">
+            <div class="fc-icon">☕</div>
+            <div class="fc-line"></div>
+            <div class="fc-title">Menu Section</div>
+            <div class="fc-text">DB-driven categories with icons + colours. Featured cards row. Full item list with
+              modal, add-ons selector, real-time price, star rating, and review submission inline.</div>
+          </div>
+          <div class="fc card a3" data-url="/#gallery">
+            <div class="fc-icon">🖼</div>
+            <div class="fc-line"></div>
+            <div class="fc-title">Gallery</div>
+            <div class="fc-text">Photo grid from /public/images/ managed via admin panel. Lazy-loaded with fallback to
+              coffee-beans.png on error. Scroll-reveal via useReveal hook.</div>
+          </div>
+          <div class="fc card a4" data-url="/#about">
+            <div class="fc-icon">📖</div>
+            <div class="fc-line"></div>
+            <div class="fc-title">About Us</div>
+            <div class="fc-text">"Precision-crafted drinks, warm welcome, unhurried pace." Brand story with
+              scroll-reveal animations. useReveal IntersectionObserver adds 'vis' class on entry.</div>
+          </div>
+          <div class="fc card a5" data-url="/careers">
+            <div class="fc-icon">💼</div>
+            <div class="fc-line"></div>
+            <div class="fc-title">Careers Page</div>
+            <div class="fc-text">Live listings from /api/careers?active=1. Customers apply: name, email, phone,
+              position, cover letter → job_applications table. Status tracked in admin.</div>
+          </div>
+          <div class="fc card a6" data-url="/#contact">
+            <div class="fc-icon">✉️</div>
+            <div class="fc-line"></div>
+            <div class="fc-title">Contact Section</div>
+            <div class="fc-text">POST /api/contact → contact_messages with is_read flag. Location: 14 Piccadilly Arcade,
+              Birmingham. Managed in admin Messages module.</div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="gtop" style="top:auto;bottom:0;transform:rotate(180deg);"></div>
-</div>
 
-</div><!-- /deck -->
+    <!-- ══ S7 MENU SYSTEM ══ -->
+    <div class="slide" id="s7">
+      <div class="slide-glass"></div>
+      <div class="gtop"></div>
+      <div class="sh">
+        <div class="stag a1">05 · Menu System</div>
+        <h2 class="a2">Dynamic Menu System</h2>
+        <p class="a3">Real DB-driven menu with voice search, bilingual filtering, and full customisation</p>
+      </div>
+      <div class="sb">
+        <div class="g2">
+          <div class="card a1" style="padding:20px;" data-url="/menu">
+            <div class="sec-title">📋 Real Menu Items</div>
+            <div class="sec-sub">Actual products at Faculty Coffee, Birmingham</div>
+            <div class="li">
+              <div class="li-dot"></div><strong>Coffee:</strong> Espresso £2.80, Flat White £3.60, Cappuccino £3.40,
+              Latte £3.80, Long Black £3.00, V60 Pour-Over £4.50, Hot Chocolate £4.00
+            </div>
+            <div class="li">
+              <div class="li-dot"></div><strong>Tea:</strong> Loose Leaf £3.00, Peppermint £3.50, English Breakfast
+              £3.00, Pot of Breakfast Tea £4.85
+            </div>
+            <div class="li">
+              <div class="li-dot"></div><strong>Food:</strong> Sandwich £6.00, Brunch Plate £8.50, Vegan Pastry £3.50,
+              Eggs Royale, Mushroom Melt, Avocado + Poached Egg
+            </div>
+            <div class="li">
+              <div class="li-dot"></div><strong>Cold Drinks:</strong> Palestine Cola, Gaza Cola SF, Fresh OJ, Apple
+              Juice, Beetroot Juice, 330ml Still
+            </div>
+            <div class="li">
+              <div class="li-dot"></div><strong>Sweets:</strong> Freshly Baked Pastry £3.50, Cake of the Day £4.50,
+              Raspberry & Custard Pastry £3.45, Basque Cheesecake
+            </div>
+          </div>
+          <div class="card a2" style="padding:20px;" data-url="/menu">
+            <div class="sec-title">🔍 Smart Features Built</div>
+            <div class="sec-sub">All from Menu.js source code</div>
+            <div class="li">
+              <div class="li-num">1</div>Voice search — Web Speech API, EN (en-GB) & AR (ar-SA) toggle
+            </div>
+            <div class="li">
+              <div class="li-num">2</div>Bilingual dictionary: "قهوة"→coffee, "شاي"→tea, "حلى"→sweet/cake, "بارد"→cold
+            </div>
+            <div class="li">
+              <div class="li-num">3</div>30+ tag types: Vegan 🌿, Best Seller 🌟, New 🆕, Iced 🧊, Hot 🌶️ with unique
+              gradients
+            </div>
+            <div class="li">
+              <div class="li-num">4</div>Product modal: image, add-ons selector with live price, star rating + review
+              submit
+            </div>
+            <div class="li">
+              <div class="li-num">5</div>Cart inline ±qty controls styled per category colour without leaving page
+            </div>
+            <div class="li">
+              <div class="li-num">6</div>Skeleton loader — 4 animated placeholders while API loads
+            </div>
+            <div class="li">
+              <div class="li-num">7</div>Context-aware add-ons strip at bottom of each category view
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-<script>
-// ── CURSOR ──
-const cur=document.getElementById('cur'),cur2=document.getElementById('cur2');
-document.addEventListener('mousemove',e=>{
-  cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';
-  setTimeout(()=>{cur2.style.left=e.clientX+'px';cur2.style.top=e.clientY+'px';},60);
-});
+    <!-- ══ S8 CART & CHECKOUT ══ -->
+    <div class="slide" id="s8">
+      <div class="slide-glass"></div>
+      <div class="gtop"></div>
+      <div class="sh">
+        <div class="stag a1">06 · Cart & Checkout</div>
+        <h2 class="a2">Cart & Full Order Flow</h2>
+        <p class="a3">From browse to kitchen — atomic transactions, stock validation, live timer</p>
+      </div>
+      <div class="sb">
+        <div class="flow a1" style="margin-bottom:16px;">
+          <div class="fs card" data-url="/menu">
+            <div class="fs-icon">🛒</div>
+            <div class="fs-t">Browse</div>
+          </div>
+          <div class="fa">›</div>
+          <div class="fs card" data-url="/menu">
+            <div class="fs-icon">➕</div>
+            <div class="fs-t">Add + Add-ons</div>
+          </div>
+          <div class="fa">›</div>
+          <div class="fs card" data-url="/cart">
+            <div class="fs-icon">💳</div>
+            <div class="fs-t">Checkout</div>
+          </div>
+          <div class="fa">›</div>
+          <div class="fs card" data-url="/cart">
+            <div class="fs-icon">✅</div>
+            <div class="fs-t">Order POST</div>
+          </div>
+          <div class="fa">›</div>
+          <div class="fs card" data-url="/admin/inventory">
+            <div class="fs-icon">📦</div>
+            <div class="fs-t">Stock Deducted</div>
+          </div>
+          <div class="fa">›</div>
+          <div class="fs card" data-url="/admin/orders">
+            <div class="fs-icon">⏱</div>
+            <div class="fs-t">Admin Timer</div>
+          </div>
+          <div class="fa">›</div>
+          <div class="fs card" data-url="/admin/orders">
+            <div class="fs-icon">✅</div>
+            <div class="fs-t">Complete</div>
+          </div>
+        </div>
+        <div class="g3">
+          <div class="fc card a2" style="padding:14px 16px;" data-url="/cart">
+            <div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🛒 CartContext</div>
+            <div style="font-size:9px;color:var(--text2);line-height:1.6;">React Context persists cart across
+              navigation. addItem, setQty, removeItem. Live price with all add-ons included</div>
+          </div>
+          <div class="fc card a3" style="padding:14px 16px;" data-url="/cart">
+            <div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">💳 Checkout Fields</div>
+            <div style="font-size:9px;color:var(--text2);line-height:1.6;">customer_name (req), phone (req), email
+              (opt), order_type: takeaway / dine-in / delivery, delivery_address</div>
+          </div>
+          <div class="fc card a4" style="padding:14px 16px;" data-url="/cart">
+            <div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🔒 Atomic Transaction
+            </div>
+            <div style="font-size:9px;color:var(--text2);line-height:1.6;">BEGIN → check stock → insert order → insert
+              items → deduct inventory → deduct addons → COMMIT. Full ROLLBACK on failure</div>
+          </div>
+          <div class="fc card a2" style="padding:14px 16px;" data-url="/admin/orders">
+            <div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">⏱ Prep Timer</div>
+            <div style="font-size:9px;color:var(--text2);line-height:1.6;">estimated_ready_at = NOW() + 2 MIN. Live
+              countdown in admin. Extend N minutes via /api/extend-order/:id</div>
+          </div>
+          <div class="fc card a3" style="padding:14px 16px;" data-url="/">
+            <div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🏪 Store Gating</div>
+            <div style="font-size:9px;color:var(--text2);line-height:1.6;">StoreContext checks /api/store-status. Closed
+              = full-screen overlay with hours. Orders completely blocked</div>
+          </div>
+          <div class="fc card a4" style="padding:14px 16px;" data-url="/">
+            <div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🔔 Notification Log</div>
+            <div style="font-size:9px;color:var(--text2);line-height:1.6;">Order 'ready': logs SMS + email notification
+              template for customer_name, phone, and email</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-// ── ANIMATED CANVAS BACKGROUND ──
-const canvas=document.getElementById('bg-canvas');
-const ctx=canvas.getContext('2d');
-let W,H,particles=[],gradTime=0,mouseX=0,mouseY=0;
+    <!-- ══ S9 SOPHIE ══ -->
+    <div class="slide" id="s9">
+      <div class="slide-glass"></div>
+      <div class="gtop"></div>
+      <div class="sh">
+        <div class="stag a1">07 · AI · Customer-Facing</div>
+        <h2 class="a2">Sophie — Customer AI Chatbot</h2>
+        <p class="a3">Bilingual, voice-enabled, connected to live menu and offers data</p>
+      </div>
+      <div class="sb">
+        <div class="g2" style="height:100%">
+          <div class="card a1" style="padding:20px;height:100%" data-url="/#ai-sophie">
+            <div
+              style="display:inline-block;font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:var(--caramel);color:#fff;padding:4px 12px;border-radius:20px;margin-bottom:13px;">
+              Customer-Facing AI</div>
+            <div
+              style="font-family:'Playfair Display',serif;font-size:42px;color:var(--text);line-height:.95;margin-bottom:5px;"
+              class="gold-text">Sophie</div>
+            <div
+              style="font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--text2);margin-bottom:18px;">
+              Faculty Coffee · Barista Bot</div>
+            <div class="li">
+              <div class="li-dot"></div>Reads live menu from DB via /api/ai-chat: name, price, add-ons, tags
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Shows active offers from offers table in real-time
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Hours: Mon–Fri 07:30–17:00, Sat 09:00–18:00, Sun 10:00–16:00
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>UK time-aware — knows if store is open right now
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Voice input EN/AR + SpeechSynthesis audio output
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>45s timeout with AbortController — graceful fallback
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>All conversations saved to chat_messages table
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Quick reply chips shown on first open
+            </div>
+            <div
+              style="margin-top:10px;font-size:8.5px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(196,135,74,.2);padding:6px;border-radius:8px;text-align:center;">
+              GPT-4o-mini · GitHub Models fallback (Azure)</div>
+          </div>
+          <div class="chat card a2" style="height:100%" data-url="/#ai-sophie">
+            <div>
+              <div class="bubble-label">Customer</div>
+              <div class="bubble user">Hi! What's your most popular drink?</div>
+            </div>
+            <div>
+              <div class="bubble-label">Sophie</div>
+              <div class="bubble bot">Our Flat White (£3.60) is a crowd favourite ☕ Silky microfoam with our house
+                espresso blend. Want to add it to your cart?</div>
+            </div>
+            <div>
+              <div class="bubble-label">Customer</div>
+              <div class="bubble user">Does it have dairy? I'm vegan 🌿</div>
+            </div>
+            <div>
+              <div class="bubble-label">Sophie</div>
+              <div class="bubble bot">Whole milk by default — but we offer oat, almond, and soy milk as add-ons! Want me
+                to help you customise it?</div>
+            </div>
+            <div>
+              <div class="bubble-label">Customer</div>
+              <div class="bubble user">Are you open Sunday?</div>
+            </div>
+            <div>
+              <div class="bubble-label">Sophie</div>
+              <div class="bubble bot">Yes! Sunday 10:00–16:00 ☀️ Come in and we'll have a fresh brew waiting!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
-window.addEventListener('resize',()=>{resize();initParticles();});
-resize();
-document.addEventListener('mousemove',e=>{mouseX=e.clientX;mouseY=e.clientY;});
+    <!-- ══ S10 CAFFAINE ══ -->
+    <div class="slide" id="s10">
+      <div class="slide-glass"></div>
+      <div class="gtop"></div>
+      <div class="sh">
+        <div class="stag a1">08 · AI · Admin-Facing</div>
+        <h2 class="a2">CaffAIne — Business Intelligence AI</h2>
+        <p class="a3">19 parallel DB queries — sales, stock, reviews, applications, messages, audit data fed to GPT</p>
+      </div>
+      <div class="sb">
+        <div class="g2" style="height:100%">
+          <div class="chat card a1" style="height:100%" data-url="/admin/ai-assistant">
+            <div>
+              <div class="bubble-label">Admin</div>
+              <div class="bubble user">What were our top sellers this week?</div>
+            </div>
+            <div>
+              <div class="bubble-label">CaffAIne</div>
+              <div class="bubble bot">Flat White led with 47 orders, Iced Americano (31), Vegan Pastry (28). Week
+                revenue: £342. Best day was Thursday.</div>
+            </div>
+            <div>
+              <div class="bubble-label">Admin</div>
+              <div class="bubble user">Any ingredients running low?</div>
+            </div>
+            <div>
+              <div class="bubble-label">CaffAIne</div>
+              <div class="bubble bot">Oat milk at 8% of threshold — reorder immediately. Vanilla syrup at 12%. All other
+                items healthy.</div>
+            </div>
+            <div>
+              <div class="bubble-label">Admin</div>
+              <div class="bubble user">Any new job applications?</div>
+            </div>
+            <div>
+              <div class="bubble-label">CaffAIne</div>
+              <div class="bubble bot">3 new applications for Barista this week. 1 still unreviewed (submitted 2 days
+                ago).</div>
+            </div>
+          </div>
+          <div class="card a2" style="padding:20px;height:100%" data-url="/admin/ai-assistant">
+            <div
+              style="display:inline-block;font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:var(--warm);color:#fff;padding:4px 12px;border-radius:20px;margin-bottom:13px;">
+              Admin-Facing AI</div>
+            <div
+              style="font-family:'Playfair Display',serif;font-size:42px;color:var(--text);line-height:.95;margin-bottom:5px;"
+              class="gold-text">CaffAIne</div>
+            <div
+              style="font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--text2);margin-bottom:18px;">
+              Real-time Business Intelligence</div>
+            <div class="li">
+              <div class="li-dot"></div>19 parallel Promise.allSettled() DB queries per request
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Reads: orders, revenue, top products, 15-day daily sales
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Reads: low stock, approaching threshold, full menu catalog
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Reads: applications, contact messages, active offers, careers
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>9 strict rules: no hallucinations, Arabic date format
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Logs saved to ai_assistant_messages table
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Returns 200 even on AI failure — local summary fallback
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-// ── BREATHING BLOBS ──
-const blobs=[
-  {x:.15,y:.2,r:.5,h:0,s:.004,c:'196,154,60'},
-  {x:.85,y:.25,r:.45,h:2.1,s:.003,c:'196,135,74'},
-  {x:.5,y:.85,r:.55,h:4.2,s:.002,c:'184,131,42'},
-  {x:.88,y:.8,r:.38,h:1.0,s:.005,c:'196,154,60'},
-  {x:.08,y:.75,r:.42,h:3.5,s:.003,c:'166,124,82'},
-];
+    <!-- ══ S11 ADMIN OVERVIEW ══ -->
+    <div class="slide" id="s11">
+      <div class="slide-glass"></div>
+      <div class="gtop"></div>
+      <div class="sh">
+        <div class="stag a1">09 · Admin Panel</div>
+        <h2 class="a2">Admin Dashboard — 12 Modules</h2>
+        <p class="a3">Complete business management — role-protected, audit-logged, real-time</p>
+      </div>
+      <div class="sb">
+        <div class="g4">
+          <div class="adm card a1" data-url="/admin/dashboard">
+            <div class="adm-icon">📊</div>
+            <div class="adm-title">Dashboard</div>
+            <div class="adm-desc">Live KPIs, 7-day chart, store toggle, 30s auto-refresh</div>
+          </div>
+          <div class="adm card a2" data-url="/admin/orders">
+            <div class="adm-icon">📋</div>
+            <div class="adm-title">Orders</div>
+            <div class="adm-desc">Live timer, status lifecycle, extend time, order items</div>
+          </div>
+          <div class="adm card a3" data-url="/admin/products">
+            <div class="adm-icon">🛍</div>
+            <div class="adm-title">Products</div>
+            <div class="adm-desc">CRUD, image upload, add-ons, tags, drag reorder</div>
+          </div>
+          <div class="adm card a4" data-url="/admin/inventory">
+            <div class="adm-icon">📦</div>
+            <div class="adm-title">Inventory</div>
+            <div class="adm-desc">Stock levels, threshold alerts, Arabic numeral input</div>
+          </div>
+          <div class="adm card a1" data-url="/admin/analytics">
+            <div class="adm-icon">📈</div>
+            <div class="adm-title">Analytics</div>
+            <div class="adm-desc">7-day SVG chart, category %, top products</div>
+          </div>
+          <div class="adm card a2" data-url="/admin/offers">
+            <div class="adm-icon">🎁</div>
+            <div class="adm-title">Offers</div>
+            <div class="adm-desc">Discount %, product, reason, end_date, toggle</div>
+          </div>
+          <div class="adm card a3" data-url="/admin/jobs">
+            <div class="adm-icon">💼</div>
+            <div class="adm-title">Jobs</div>
+            <div class="adm-desc">Title, type, location, description, active flag</div>
+          </div>
+          <div class="adm card a4" data-url="/admin/applications">
+            <div class="adm-icon">📄</div>
+            <div class="adm-title">Applications</div>
+            <div class="adm-desc">Review applicants, status update, cover letter</div>
+          </div>
+          <div class="adm card a1" data-url="/admin/messages">
+            <div class="adm-icon">✉️</div>
+            <div class="adm-title">Messages</div>
+            <div class="adm-desc">Contact inbox, mark read/unread, delete, search</div>
+          </div>
+          <div class="adm card a2" data-url="/admin/feedback">
+            <div class="adm-icon">⭐</div>
+            <div class="adm-title">Feedback</div>
+            <div class="adm-desc">Product + store + general reviews in one view</div>
+          </div>
+          <div class="adm card a3" data-url="/admin/ai-assistant">
+            <div class="adm-icon">🤖</div>
+            <div class="adm-title">CaffAIne AI</div>
+            <div class="adm-desc">Business intelligence with live DB data</div>
+          </div>
+          <div class="adm card a4" data-url="/admin/leader-dashboard">
+            <div class="adm-icon">👑</div>
+            <div class="adm-title">Leader Dashboard</div>
+            <div class="adm-desc">Super admin: audit logs, critical feedback, PDF</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-// ── PARTICLE CLASS ──
-class Particle{
-  constructor(i){
-    this.id=i;
-    this.reset(true);
-  }
-  reset(init){
-    this.x=Math.random()*W;
-    this.y=init?Math.random()*H:H+20;
-    this.baseSize=Math.random()*6+2;
-    this.size=this.baseSize;
-    this.speedX=(Math.random()-.5)*.8;
-    this.speedY=-(Math.random()*.6+.2);
-    this.opacity=Math.random()*.7+.2;
-    this.maxOpacity=this.opacity;
-    this.life=Math.random()*300+150;
-    this.maxLife=this.life;
-    const hues=[36,40,34,44,48,42];
-    this.hue=hues[Math.floor(Math.random()*hues.length)];
-    this.sat=Math.random()*25+55;
-    this.lit=Math.random()*15+48;
-    // shape: circle, ring, diamond, star
-    const shapes=['circle','circle','circle','ring','diamond','ring'];
-    this.shape=shapes[Math.floor(Math.random()*shapes.length)];
-    this.angle=Math.random()*Math.PI*2;
-    this.angleSpeed=(Math.random()-.5)*.03;
-    this.pulse=Math.random()*Math.PI*2;
-    this.pulseSpeed=Math.random()*.05+.02;
-    this.trail=[];
-    this.maxTrail=6;
-  }
-  update(){
-    // trail
-    this.trail.push({x:this.x,y:this.y,op:this.opacity});
-    if(this.trail.length>this.maxTrail)this.trail.shift();
+    <!-- ══ S12 DASHBOARD ══ -->
+    <div class="slide" id="s12">
+      <div class="slide-glass"></div>
+      <div class="gtop"></div>
+      <div class="sh">
+        <div class="stag a1">10 · Dashboard</div>
+        <h2 class="a2">Live Admin Dashboard</h2>
+        <p class="a3">Auto-refreshes every 30 seconds — real KPIs, revenue chart, live clock, store control</p>
+      </div>
+      <div class="sb">
+        <div class="g4" style="margin-bottom:14px;">
+          <div class="stat card a1" data-url="/admin/dashboard">
+            <div class="stat-val">£ Live</div>
+            <div class="stat-label">Gross Revenue</div>
+          </div>
+          <div class="stat card a2" data-url="/admin/dashboard">
+            <div class="stat-val">Live</div>
+            <div class="stat-label">Total Orders</div>
+          </div>
+          <div class="stat card a3" data-url="/admin/dashboard">
+            <div class="stat-val">Live</div>
+            <div class="stat-label">Today's Sales</div>
+          </div>
+          <div class="stat card a4" data-url="/admin/inventory">
+            <div class="stat-val">⚠️</div>
+            <div class="stat-label">Low Stock Items</div>
+          </div>
+        </div>
+        <div class="g3">
+          <div class="fc card a5" style="padding:14px 16px;" data-url="/admin/analytics">
+            <div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">📊 Revenue Bar Chart
+            </div>
+            <div style="font-size:9px;color:var(--text2);line-height:1.6;">Last 7 days, custom SVG bars. Real dailySales
+              data. Today highlighted. Full date on hover.</div>
+          </div>
+          <div class="fc card a6" style="padding:14px 16px;" data-url="/admin/dashboard">
+            <div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🏪 Store Toggle (3 Modes)
+            </div>
+            <div style="font-size:9px;color:var(--text2);line-height:1.6;">auto (schedule) / manual_open /
+              manual_closed. Updates site_settings table instantly.</div>
+          </div>
+          <div class="fc card a7" style="padding:14px 16px;" data-url="/admin/dashboard">
+            <div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">⏰ Live Clock + 30s Poll
+            </div>
+            <div style="font-size:9px;color:var(--text2);line-height:1.6;">setInterval(1000ms) for clock.
+              setInterval(30000ms) for data. Two separate intervals cleaned up on unmount.</div>
+          </div>
+          <div class="fc card a5" style="padding:14px 16px;" data-url="/admin/analytics">
+            <div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">📅 Today vs Yesterday
+            </div>
+            <div style="font-size:9px;color:var(--text2);line-height:1.6;">todayOrders, todaySales, yesterdayOrders,
+              yesterdaySales — all from /api/dashboard-stats</div>
+          </div>
+          <div class="fc card a6" style="padding:14px 16px;" data-url="/admin/inventory">
+            <div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🔔 Low Stock Alert Panel
+            </div>
+            <div style="font-size:9px;color:var(--text2);line-height:1.6;">lowStockItems array: item_name, quantity,
+              min_threshold. Clickable → navigates to Inventory module.</div>
+          </div>
+          <div class="fc card a7" style="padding:14px 16px;" data-url="/admin/dashboard">
+            <div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🎨 Theme Variables</div>
+            <div style="font-size:9px;color:var(--text2);line-height:1.6;">bg:#070504, accent:#c4a484, success:#38ef7d,
+              warning:#f59e0b, danger:#ff4d4d — admin dark theme.</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    this.x+=this.speedX;
-    this.y+=this.speedY;
-    this.angle+=this.angleSpeed;
-    this.pulse+=this.pulseSpeed;
-    this.size=this.baseSize+Math.sin(this.pulse)*.8;
-    this.life--;
+    <!-- ══ S13 ORDERS ══ -->
+    <div class="slide" id="s13">
+      <div class="slide-glass"></div>
+      <div class="gtop"></div>
+      <div class="sh">
+        <div class="stag a1">11 · Orders Module</div>
+        <h2 class="a2">Real-Time Order Management</h2>
+        <p class="a3">Live countdown, status lifecycle, atomic stock-checked transactions</p>
+      </div>
+      <div class="sb">
+        <div class="g2">
+          <div class="card a1" style="padding:20px;">
+            <div class="sec-title">📋 Order Lifecycle</div>
+            <div class="sec-sub">Statuses: preparing → ready → completed</div>
+            <div class="li">
+              <div class="li-num">1</div>POST /api/orders — BEGIN transaction, check stock per ingredient
+            </div>
+            <div class="li">
+              <div class="li-num">2</div>Insert order: status='preparing', estimated_ready_at = NOW() + 2 MIN
+            </div>
+            <div class="li">
+              <div class="li-num">3</div>Admin sees TIMESTAMPDIFF(SECOND, NOW(), estimated_ready_at) countdown
+            </div>
+            <div class="li">
+              <div class="li-num">4</div>Extend: PUT /api/extend-order/:id → adds N minutes to timer
+            </div>
+            <div class="li">
+              <div class="li-num">5</div>Mark ready: PUT /api/mark-ready/:id → notification log fired
+            </div>
+            <div class="li">
+              <div class="li-num">6</div>Items fetched: /api/order-items/:orderId with JOIN to menu_items
+            </div>
+            <div class="li">
+              <div class="li-num">7</div>Total recalculated server-side if client total is lower than expected
+            </div>
+          </div>
+          <div class="card a2" style="padding:20px;">
+            <div class="sec-title">💳 Data Captured per Order</div>
+            <div class="sec-sub">Everything stored and linked</div>
+            <div class="li">
+              <div class="li-dot"></div>customer_name, phone (required), email (optional)
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>order_type: takeaway / dine-in / delivery
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>delivery_address if delivery selected
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Each item: product_id, item_name, quantity, price per row
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Add-ons: separate order_items rows with addon price
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Auto-fix: 0-price addons looked up from addons table
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Inventory: GREATEST(quantity - deduct, 0) prevents negatives
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Recipe deduction: quantity_required × qty + addon inventory_id
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    // mouse repulsion
-    const dx=this.x-mouseX,dy=this.y-mouseY;
-    const dist=Math.sqrt(dx*dx+dy*dy);
-    if(dist<100){
-      const force=(100-dist)/100;
-      this.x+=dx/dist*force*1.5;
-      this.y+=dy/dist*force*1.5;
-    }
+    <!-- ══ S14 PRODUCTS ══ -->
+    <div class="slide" id="s14">
+      <div class="slide-glass"></div>
+      <div class="gtop"></div>
+      <div class="sh">
+        <div class="stag a1">12 · Products CRUD</div>
+        <h2 class="a2">Product Management</h2>
+        <p class="a3">Full CRUD — image upload, add-ons, tags, reorder, availability control</p>
+      </div>
+      <div class="sb">
+        <div class="g2">
+          <div class="card a1" style="padding:20px;" data-url="/admin/products">
+            <div class="sec-title">🛍 Product CRUD</div>
+            <div class="sec-sub">Every field editable, changes instant on public site</div>
+            <div class="li">
+              <div class="li-num">1</div>Fields: name, price_num, description, category_id, available, image_url, tags,
+              addons, sort_order
+            </div>
+            <div class="li">
+              <div class="li-num">2</div>Image: POST /api/upload-image — Multer saves to /public/images/ (10MB max)
+            </div>
+            <div class="li">
+              <div class="li-num">3</div>Add-ons: DELETE all from menu_item_addons → INSERT new on every save
+            </div>
+            <div class="li">
+              <div class="li-num">4</div>Tags: same pattern — DELETE all → INSERT from menu_item_tags bridge
+            </div>
+            <div class="li">
+              <div class="li-num">5</div>Delete: removes from recipes first, then menu_items — cascade-safe
+            </div>
+            <div class="li">
+              <div class="li-num">6</div>Reorder: PUT /api/products/reorder — batch sort_order update
+            </div>
+            <div class="li">
+              <div class="li-num">7</div>available=0 marks product unavailable on public menu instantly
+            </div>
+          </div>
+          <div class="card a2" style="padding:20px;" data-url="/admin/products">
+            <div class="sec-title">➕ Add-ons & Tags</div>
+            <div class="sec-sub">Fully normalised — no string hacks</div>
+            <div class="li">
+              <div class="li-dot"></div>addons table: id, name, price, inventory_id (links to stock)
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>tags table: id, name — 30+ visual types with gradient colours
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Bridge tables: menu_item_addons, menu_item_tags (M2M)
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Products API: GROUP_CONCAT with pipe → parsed to arrays client
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Out-of-stock: recipe ingredient check in products query
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Legacy fallback: comma-separated addons field still supported
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>On startup: addons with price=0 → SET price=0.50 (prevents free)
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    if(this.life<=0||this.y<-30||this.x<-30||this.x>W+30)this.reset(false);
-  }
-  draw(){
-    const fade=Math.min(1,this.life/40)*Math.min(1,(this.maxLife-this.life)/20);
-    const op=this.opacity*fade;
-    if(op<.01)return;
+    <!-- ══ S15 INVENTORY ══ -->
+    <div class="slide" id="s15">
+      <div class="slide-glass"></div>
+      <div class="gtop"></div>
+      <div class="sh">
+        <div class="stag a1">13 · Inventory</div>
+        <h2 class="a2">Inventory & Recipe System</h2>
+        <p class="a3">Recipe-linked auto-deduction on every order — zero manual counting</p>
+      </div>
+      <div class="sb">
+        <div class="g2">
+          <div class="card a1" style="padding:20px;" data-url="/admin/inventory">
+            <div class="sec-title">📦 Stock Control</div>
+            <div class="sec-sub">Real-time ingredient tracking</div>
+            <div class="li">
+              <div class="li-num">1</div>inventory table: item_name, quantity, unit, min_threshold
+            </div>
+            <div class="li">
+              <div class="li-num">2</div>Admin sets threshold — Dashboard + Inventory flag below it
+            </div>
+            <div class="li">
+              <div class="li-num">3</div>PUT /api/update-stock-item/:id — admin adjusts quantity + unit
+            </div>
+            <div class="li">
+              <div class="li-num">4</div>convertNumerals() — supports Arabic input (٠١٢٣٤٥٦٧٨٩)
+            </div>
+            <div class="li">
+              <div class="li-num">5</div>CaffAIne reads critical (below threshold) + approaching (within 150%)
+            </div>
+            <div class="li">
+              <div class="li-num">6</div>Out-of-stock flag in products query: marks isOutOfStock=true
+            </div>
+          </div>
+          <div class="card a2" style="padding:20px;" data-url="/admin/inventory">
+            <div class="sec-title">🧪 Recipe System</div>
+            <div class="sec-sub">Automated deduction on every sale</div>
+            <div class="li">
+              <div class="li-num">1</div>recipes table: menu_item_id, inventory_id, quantity_required
+            </div>
+            <div class="li">
+              <div class="li-num">2</div>GET /api/products/:id/recipe — view ingredient map per product
+            </div>
+            <div class="li">
+              <div class="li-num">3</div>POST /api/products/:id/recipe — clears old, inserts new array
+            </div>
+            <div class="li">
+              <div class="li-num">4</div>On order: deduct quantity_required × qty from each ingredient
+            </div>
+            <div class="li">
+              <div class="li-num">5</div>On order: deduct 1 × qty from each addon's inventory_id
+            </div>
+            <div class="li">
+              <div class="li-num">6</div>GREATEST(quantity - deduct, 0) — prevents negative stock values
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    // draw trail
-    this.trail.forEach((t,i)=>{
-      const tOp=op*(i/this.trail.length)*.3;
-      ctx.save();
-      ctx.globalAlpha=tOp;
-      ctx.fillStyle=`hsla(${this.hue},${this.sat}%,${this.lit}%,1)`;
-      ctx.beginPath();
-      ctx.arc(t.x,t.y,this.size*.4,0,Math.PI*2);
-      ctx.fill();
-      ctx.restore();
+    <!-- ══ S16 ANALYTICS ══ -->
+    <div class="slide" id="s16">
+      <div class="slide-glass"></div>
+      <div class="gtop"></div>
+      <div class="sh">
+        <div class="stag a1">14 · Analytics</div>
+        <h2 class="a2">Sales Analytics</h2>
+        <p class="a3">7-day revenue chart, category distribution, top products, period comparisons</p>
+      </div>
+      <div class="sb">
+        <div class="g2">
+          <div class="card a1" style="padding:20px;" data-url="/admin/analytics">
+            <div class="sec-title">📈 What's Tracked</div>
+            <div class="sec-sub">From /api/dashboard-stats — real SQL aggregations</div>
+            <div class="li">
+              <div class="li-dot"></div>Total revenue: SUM(total_amount) all-time
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Daily sales: last 15 days — GROUP BY DATE(created_at)
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>7-day chart: custom SVG bars rendered in Analytics.js
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Category stats: JOIN order_items → menu_items → categories
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Top category: sorted by count, percentage of total orders
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Today vs yesterday: separate COUNT + SUM queries
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>CaffAIne: top 50 products by sold count for AI context
+            </div>
+          </div>
+          <div class="card a2" style="padding:20px;" data-url="/admin/analytics">
+            <div class="sec-title">🏆 Top Products Sample</div>
+            <div class="sec-sub">Actual Faculty Coffee bestsellers</div>
+            <div class="bar-chart">
+              <div class="bar-row">
+                <div class="bar-label">Flat White</div>
+                <div class="bar-track">
+                  <div class="bar-fill" style="width:92%"></div>
+                </div>
+                <div class="bar-val">£3.60</div>
+              </div>
+              <div class="bar-row">
+                <div class="bar-label">Iced Americano</div>
+                <div class="bar-track">
+                  <div class="bar-fill" style="width:74%"></div>
+                </div>
+                <div class="bar-val">£3.80</div>
+              </div>
+              <div class="bar-row">
+                <div class="bar-label">Latte</div>
+                <div class="bar-track">
+                  <div class="bar-fill" style="width:65%"></div>
+                </div>
+                <div class="bar-val">£3.80</div>
+              </div>
+              <div class="bar-row">
+                <div class="bar-label">V60 Pour-Over</div>
+                <div class="bar-track">
+                  <div class="bar-fill" style="width:52%"></div>
+                </div>
+                <div class="bar-val">£4.50</div>
+              </div>
+              <div class="bar-row">
+                <div class="bar-label">Vegan Pastry</div>
+                <div class="bar-track">
+                  <div class="bar-fill" style="width:42%"></div>
+                </div>
+                <div class="bar-val">£3.50</div>
+              </div>
+              <div class="bar-row">
+                <div class="bar-label">Cake of the Day</div>
+                <div class="bar-track">
+                  <div class="bar-fill" style="width:32%"></div>
+                </div>
+                <div class="bar-val">£4.50</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ S17 OFFERS & FEEDBACK ══ -->
+    <div class="slide" id="s17">
+      <div class="slide-glass"></div>
+      <div class="gtop"></div>
+      <div class="sh">
+        <div class="stag a1">15 · Offers & Feedback</div>
+        <h2 class="a2">Promotions & Customer Reviews</h2>
+        <p class="a3">Discount engine + three-tier review system — product, store, and general</p>
+      </div>
+      <div class="sb">
+        <div class="g2">
+          <div class="card a1" style="padding:20px;" data-url="/admin/offers">
+            <div class="sec-title">🎁 Offers System</div>
+            <div class="sec-sub">Full CRUD — GET, POST, PUT, DELETE /api/offers</div>
+            <div class="li">
+              <div class="li-dot"></div>Fields: product_name, discount_percent, reason, end_date, active
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Active offers shown inline on public menu page
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Sophie reads active offers from DB in real-time
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>CaffAIne shows full offer JSON in admin context
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>All offer changes logged in audit trail automatically
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>end_date field — schedule automatic expiry per offer
+            </div>
+          </div>
+          <div class="card a2" style="padding:20px;" data-url="/admin/feedback">
+            <div class="sec-title">⭐ Three-Tier Review System</div>
+            <div class="sec-sub">GET /api/feedback returns all three types merged</div>
+            <div class="li">
+              <div class="li-num">1</div>Product Reviews: FK → menu_items CASCADE DELETE. Rating 1–5 + comment
+            </div>
+            <div class="li">
+              <div class="li-num">2</div>Store Reviews (store_reviews): Overall café experience rating
+            </div>
+            <div class="li">
+              <div class="li-num">3</div>General Feedback (general_feedback): Open-ended, no product link
+            </div>
+            <div class="li">
+              <div class="li-num">4</div>Submitted from product modal — POST /api/feedback/product
+            </div>
+            <div class="li">
+              <div class="li-num">5</div>Admin Feedback module: all three types in one filterable view
+            </div>
+            <div class="li">
+              <div class="li-num">6</div>Leader Dashboard: flags reviews ≤ 3 stars as critical
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ S18 CAREERS ══ -->
+    <div class="slide" id="s18">
+      <div class="slide-glass"></div>
+      <div class="gtop"></div>
+      <div class="sh">
+        <div class="stag a1">16 · Careers & Communication</div>
+        <h2 class="a2">Careers, Applications & Messages</h2>
+        <p class="a3">End-to-end hiring pipeline and customer communication — all in-platform</p>
+      </div>
+      <div class="sb">
+        <div class="g3">
+          <div class="fc card a1" data-url="/admin/jobs">
+            <div class="fc-icon">💼</div>
+            <div class="fc-line"></div>
+            <div class="fc-title">Jobs Module</div>
+            <div class="fc-text">careers table: title, type, location, description, active. Admin creates/closes
+              listings. Active jobs on public Careers page via GET /api/careers?active=1. DELETE removes permanently.
+            </div>
+          </div>
+          <div class="fc card a2" data-url="/admin/applications">
+            <div class="fc-icon">📄</div>
+            <div class="fc-line"></div>
+            <div class="fc-title">Applications</div>
+            <div class="fc-text">Apply via public form → POST /api/apply. Stored: name, email, phone, position,
+              cover_letter, resume_url, status. Admin updates status via PUT /api/applications/:id/status. CaffAIne
+              reads latest 20.</div>
+          </div>
+          <div class="fc card a3" data-url="/admin/messages">
+            <div class="fc-icon">✉️</div>
+            <div class="fc-line"></div>
+            <div class="fc-title">Messages</div>
+            <div class="fc-text">Contact form → POST /api/contact. contact_messages: name, email, message, is_read,
+              created_at. Mark read: PUT /api/contact/:id/read. DELETE removes. CaffAIne reads last 7 messages.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ S19 SECURITY ══ -->
+    <div class="slide" id="s19">
+      <div class="slide-glass"></div>
+      <div class="gtop"></div>
+      <div class="sh">
+        <div class="stag a1">17 · Security</div>
+        <h2 class="a2">Security & Access Control</h2>
+        <p class="a3">Role-based auth, server-side validation, audit trail on every action</p>
+      </div>
+      <div class="sb">
+        <div class="g2" style="height:100%">
+          <div style="display:grid;grid-template-columns:1fr;gap:13px;height:100%">
+            <div class="card a1" style="padding:18px;" data-url="/admin/login">
+              <div class="sec-title">🔐 Authentication</div>
+              <div class="sec-sub">POST /api/admin/login — 4 team accounts</div>
+              <div class="li">
+                <div class="li-dot"></div>omar@coffee.com (super_admin), sultan@coffee.com, mohammad@coffee.com,
+                bashar@coffee.com (admin)
+              </div>
+              <div class="li">
+                <div class="li-dot"></div>AdminContext stores: id, email, name, role throughout session
+              </div>
+              <div class="li">
+                <div class="li-dot"></div>AdminRoute wraps all /admin/* — redirects to login if no context
+              </div>
+              <div class="li">
+                <div class="li-dot"></div>Every login action inserted into admin_logs automatically
+              </div>
+            </div>
+            <div class="card a2" style="padding:18px;" data-url="/admin/leader-dashboard">
+              <div class="sec-title">📋 Audit Log Middleware</div>
+              <div class="sec-sub">req.logAdminAction on every route</div>
+              <div class="li">
+                <div class="li-dot"></div>Reads x-admin-email + x-admin-name headers on every request
+              </div>
+              <div class="li">
+                <div class="li-dot"></div>admin_logs: admin_email, admin_name, action, details, created_at
+              </div>
+              <div class="li">
+                <div class="li-dot"></div>GET /api/admin/logs → latest 200 entries to Leader Dashboard
+              </div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr;gap:13px;height:100%">
+            <div class="card a3" style="padding:18px;" data-url="/admin/leader-dashboard">
+              <div class="sec-title">👥 Role-Based Access</div>
+              <div class="sec-sub">super_admin vs admin</div>
+              <div class="li">
+                <div class="li-dot"></div>LeaderDashboard: if role !== 'super_admin' → navigate('/admin/dashboard')
+              </div>
+              <div class="li">
+                <div class="li-dot"></div>Leader auto-refreshes every 15s — always current data
+              </div>
+              <div class="li">
+                <div class="li-dot"></div>Regular admins: no audit logs, no critical feedback panel
+              </div>
+            </div>
+            <div class="card a4" style="padding:18px;" data-url="/admin/login">
+              <div class="sec-title">🛡 Data Integrity</div>
+              <div class="sec-sub">Server-side validation everywhere</div>
+              <div class="li">
+                <div class="li-dot"></div>Multer: fileFilter — jpeg/jpg/png/webp/gif only, rejects others
+              </div>
+              <div class="li">
+                <div class="li-dot"></div>Prepared statements across all MySQL queries — SQL injection proof
+              </div>
+              <div class="li">
+                <div class="li-dot"></div>CORS: only localhost origins allowed via regex pattern
+              </div>
+              <div class="li">
+                <div class="li-dot"></div>Order: customer_name + phone + cartItems required — 400 if missing
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ S20 LEADER DASHBOARD ══ -->
+    <div class="slide" id="s20">
+      <div class="slide-glass"></div>
+      <div class="gtop"></div>
+      <div class="sh">
+        <div class="stag a1">18 · Leader Dashboard</div>
+        <h2 class="a2">Leader Dashboard & PDF Export</h2>
+        <p class="a3">Super admin exclusive — audit logs, critical feedback, one-click PDF report</p>
+      </div>
+      <div class="sb">
+        <div class="g2">
+          <div class="card a1" style="padding:20px;" data-url="/admin/leader-dashboard">
+            <div class="sec-title">👑 Leader-Only Features</div>
+            <div class="sec-sub">Omar Al-Ajarma — super_admin only</div>
+            <div class="li">
+              <div class="li-num">1</div>3 parallel API calls: /api/admin/logs + /api/reviews + /api/contact-messages
+            </div>
+            <div class="li">
+              <div class="li-num">2</div>Auto-refresh every 15 seconds — always live activity
+            </div>
+            <div class="li">
+              <div class="li-num">3</div>Full audit table: admin_name, action, details, timestamp — searchable
+            </div>
+            <div class="li">
+              <div class="li-num">4</div>Search across name + action + details simultaneously
+            </div>
+            <div class="li">
+              <div class="li-num">5</div>Hoverable row highlight for fast scanning
+            </div>
+            <div class="li">
+              <div class="li-num">6</div>Non-super-admin visit → instant redirect to /admin/dashboard
+            </div>
+          </div>
+          <div class="card a2" style="padding:20px;" data-url="/admin/leader-dashboard">
+            <div class="sec-title">📊 Critical Detection + PDF</div>
+            <div class="sec-sub">Automated bad-experience surfacing</div>
+            <div class="li">
+              <div class="li-dot"></div>Combines product_reviews (rating ≤ 3) + contact messages with bad keywords
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Bad keywords: bad, terrible, worst, awful, angry, complaint, ruined, disgusting,
+              sick
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Sorted by created_at DESC — most recent critical issues first
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>PDF export: jsPDF + autoTable — one-click full audit report
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>PDF includes: all audit log columns, auto-sized, formatted
+            </div>
+            <div class="li">
+              <div class="li-dot"></div>Download button with Filter + Search icons from Lucide React
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ S21 UX & CHALLENGES ══ -->
+    <div class="slide" id="s21">
+      <div class="slide-glass"></div>
+      <div class="gtop"></div>
+      <div class="sh">
+        <div class="stag a1">19 · UX & Challenges</div>
+        <h2 class="a2">Premium UX & Real Challenges Solved</h2>
+        <p class="a3">The thoughtful details and real engineering problems we solved during development</p>
+      </div>
+      <div class="sb">
+        <div class="g2">
+          <div class="card a1" style="padding:20px;" data-url="/#ux">
+            <div class="sec-title">✨ UX Details Built</div>
+            <div class="sec-sub">Every detail from the actual codebase</div>
+            <div class="li">
+              <div class="li-dot"></div><strong>Lenis Smooth Scroll:</strong> @studio-freight/lenis, duration 1.25s,
+              custom easing
+            </div>
+            <div class="li">
+              <div class="li-dot"></div><strong>Custom Cursor:</strong> #cursor-dot + #cursor-ring — replaces browser
+              default
+            </div>
+            <div class="li">
+              <div class="li-dot"></div><strong>Loading Screen:</strong> LoadingScreen component with onComplete → fades
+              to hero
+            </div>
+            <div class="li">
+              <div class="li-dot"></div><strong>Mouse Parallax:</strong> Hero image ±10px/8px based on cursor position
+              in section
+            </div>
+            <div class="li">
+              <div class="li-dot"></div><strong>useReveal Hook:</strong> IntersectionObserver adds 'vis' class on
+              viewport entry
+            </div>
+            <div class="li">
+              <div class="li-dot"></div><strong>Voice Search:</strong> Web Speech API + bilingual Arabic dictionary in
+              Menu + Sophie
+            </div>
+            <div class="li">
+              <div class="li-dot"></div><strong>MobileNav:</strong> Separate mobile navigation component for responsive
+              layout
+            </div>
+            <div class="li">
+              <div class="li-dot"></div><strong>Scroll Progress:</strong> #scroll-progress bar shows reading position on
+              public site
+            </div>
+          </div>
+          <div class="card a2" style="padding:20px;" data-url="/#challenges">
+            <div class="sec-title">⚡ Real Engineering Challenges</div>
+            <div class="sec-sub">Actual problems we hit and solved</div>
+            <div class="li">
+              <div class="li-dot"></div><strong>0-Price Addons:</strong> Migration fixes historical order_items price=0
+              → lookup from addons table
+            </div>
+            <div class="li">
+              <div class="li-dot"></div><strong>Category Migration:</strong> Legacy string IDs → numeric IDs with
+              recovery keyword mapping
+            </div>
+            <div class="li">
+              <div class="li-dot"></div><strong>19 AI Queries:</strong> Promise.allSettled() — one failure never breaks
+              the full context
+            </div>
+            <div class="li">
+              <div class="li-dot"></div><strong>Dual AI Provider:</strong> Auto-detects ghp_/github_ prefix → switches
+              baseURL to GitHub/Azure
+            </div>
+            <div class="li">
+              <div class="li-dot"></div><strong>Arabic Numerals:</strong> convertNumerals() converts ١٢٣ → 123 for
+              inventory inputs
+            </div>
+            <div class="li">
+              <div class="li-dot"></div><strong>FK Delete Conflict:</strong> Product in orders → returns 400 "mark as
+              Unavailable instead"
+            </div>
+            <div class="li">
+              <div class="li-dot"></div><strong>Addon Price Fix:</strong> Startup UPDATE: addons SET price=0.50 WHERE
+              price=0
+            </div>
+            <div class="li">
+              <div class="li-dot"></div><strong>Store Auto-Mode:</strong> Server calculates open/closed from schedule —
+              no manual daily toggle
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ S22 CONCLUSION ══ -->
+    <div class="slide" id="s22">
+      <div class="slide-glass"></div>
+      <div class="gtop"></div>
+      <div class="orb-ring" style="width:600px;height:600px;top:-120px;right:-120px;animation-duration:30s;"></div>
+      <div class="orb-ring"
+        style="width:380px;height:380px;bottom:-80px;left:-80px;animation-duration:22s;animation-direction:reverse;">
+      </div>
+      <div class="conc-center">
+        <div class="a1"><span class="tag">Conclusion</span></div>
+        <div class="a2" style="margin-top:16px;">
+          <div class="conc-title gold-text">Thank You</div>
+        </div>
+        <div class="a3">
+          <div class="conc-italic">Coffaine — built with passion, precision, and purpose at Faculty Coffee, Birmingham
+          </div>
+        </div>
+        <div class="a3">
+          <div class="conc-div"></div>
+        </div>
+        <div class="fg-grid a4">
+          <div class="fg"><strong>📱 Native Mobile App</strong><span>iOS & Android with push notifications for live
+              order updates</span></div>
+          <div class="fg"><strong>💳 Payment Gateway</strong><span>Stripe integration for online card payments at
+              checkout</span></div>
+          <div class="fg"><strong>🌍 Multi-Branch</strong><span>Scale to multiple Faculty Coffee locations under one
+              system</span></div>
+          <div class="fg"><strong>🔔 Real-Time WebSockets</strong><span>Live order status without polling — instant
+              kitchen alerts</span></div>
+        </div>
+        <div class="a5">
+          <div class="thanks-names">Omar · Sultan · Mohammad · Bashar</div>
+          <div class="thanks-meta">Supervised by Dr. Mohammad Al-Riyalat &nbsp;·&nbsp; Software Engineering
+            &nbsp;·&nbsp; 2026</div>
+        </div>
+      </div>
+      <div class="gtop" style="top:auto;bottom:0;transform:rotate(180deg);"></div>
+    </div>
+
+  </div><!-- /deck -->
+
+  <script>
+    // ── CURSOR ──
+    const cur = document.getElementById('cur'), cur2 = document.getElementById('cur2');
+    document.addEventListener('mousemove', e => {
+      cur.style.left = e.clientX + 'px'; cur.style.top = e.clientY + 'px';
+      setTimeout(() => { cur2.style.left = e.clientX + 'px'; cur2.style.top = e.clientY + 'px'; }, 60);
     });
 
-    ctx.save();
-    ctx.globalAlpha=op;
-    ctx.translate(this.x,this.y);
-    ctx.rotate(this.angle);
+    // ── ANIMATED CANVAS BACKGROUND ──
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, particles = [], gradTime = 0, mouseX = 0, mouseY = 0;
 
-    const color=`hsla(${this.hue},${this.sat}%,${this.lit}%,1)`;
-    const glow=`hsla(${this.hue},${this.sat}%,${this.lit+15}%,0)`;
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+    window.addEventListener('resize', () => { resize(); initParticles(); });
+    resize();
+    document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
 
-    if(this.shape==='circle'){
-      // glowing circle
-      const rg=ctx.createRadialGradient(0,0,0,0,0,this.size*2);
-      rg.addColorStop(0,`hsla(${this.hue},${this.sat}%,${this.lit+10}%,1)`);
-      rg.addColorStop(.5,color);
-      rg.addColorStop(1,glow);
-      ctx.fillStyle=rg;
-      ctx.beginPath();
-      ctx.arc(0,0,this.size*1.5,0,Math.PI*2);
-      ctx.fill();
-      // inner bright core
-      ctx.fillStyle=`hsla(${this.hue},${this.sat}%,85%,.8)`;
-      ctx.beginPath();
-      ctx.arc(0,0,this.size*.35,0,Math.PI*2);
-      ctx.fill();
+    // ── BREATHING BLOBS ──
+    const blobs = [
+      { x: .15, y: .2, r: .5, h: 0, s: .004, c: '196,154,60' },
+      { x: .85, y: .25, r: .45, h: 2.1, s: .003, c: '196,135,74' },
+      { x: .5, y: .85, r: .55, h: 4.2, s: .002, c: '184,131,42' },
+      { x: .88, y: .8, r: .38, h: 1.0, s: .005, c: '196,154,60' },
+      { x: .08, y: .75, r: .42, h: 3.5, s: .003, c: '166,124,82' },
+    ];
 
-    } else if(this.shape==='ring'){
-      ctx.strokeStyle=color;
-      ctx.lineWidth=1.5;
-      ctx.globalAlpha=op*.9;
-      ctx.beginPath();
-      ctx.arc(0,0,this.size*1.5,0,Math.PI*2);
-      ctx.stroke();
-      // inner ring
-      ctx.lineWidth=.7;
-      ctx.globalAlpha=op*.5;
-      ctx.beginPath();
-      ctx.arc(0,0,this.size*.7,0,Math.PI*2);
-      ctx.stroke();
+    // ── PARTICLE CLASS ──
+    class Particle {
+      constructor(i) {
+        this.id = i;
+        this.reset(true);
+      }
+      reset(init) {
+        this.x = Math.random() * W;
+        this.y = init ? Math.random() * H : H + 20;
+        this.baseSize = Math.random() * 6 + 2;
+        this.size = this.baseSize;
+        this.speedX = (Math.random() - .5) * .8;
+        this.speedY = -(Math.random() * .6 + .2);
+        this.opacity = Math.random() * .7 + .2;
+        this.maxOpacity = this.opacity;
+        this.life = Math.random() * 300 + 150;
+        this.maxLife = this.life;
+        const hues = [36, 40, 34, 44, 48, 42];
+        this.hue = hues[Math.floor(Math.random() * hues.length)];
+        this.sat = Math.random() * 25 + 55;
+        this.lit = Math.random() * 15 + 48;
+        // shape: circle, ring, diamond, star
+        const shapes = ['circle', 'circle', 'circle', 'ring', 'diamond', 'ring'];
+        this.shape = shapes[Math.floor(Math.random() * shapes.length)];
+        this.angle = Math.random() * Math.PI * 2;
+        this.angleSpeed = (Math.random() - .5) * .03;
+        this.pulse = Math.random() * Math.PI * 2;
+        this.pulseSpeed = Math.random() * .05 + .02;
+        this.trail = [];
+        this.maxTrail = 6;
+      }
+      update() {
+        // trail
+        this.trail.push({ x: this.x, y: this.y, op: this.opacity });
+        if (this.trail.length > this.maxTrail) this.trail.shift();
 
-    } else if(this.shape==='diamond'){
-      const s=this.size*1.6;
-      const rg2=ctx.createRadialGradient(0,0,0,0,0,s);
-      rg2.addColorStop(0,`hsla(${this.hue},${this.sat}%,80%,1)`);
-      rg2.addColorStop(.4,color);
-      rg2.addColorStop(1,glow);
-      ctx.fillStyle=rg2;
-      ctx.beginPath();
-      ctx.moveTo(0,-s);ctx.lineTo(s*.6,0);
-      ctx.lineTo(0,s);ctx.lineTo(-s*.6,0);
-      ctx.closePath();ctx.fill();
-    }
-    ctx.restore();
-  }
-}
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.angle += this.angleSpeed;
+        this.pulse += this.pulseSpeed;
+        this.size = this.baseSize + Math.sin(this.pulse) * .8;
+        this.life--;
 
-// ── CONSTELLATION LINES ──
-function drawLines(pts){
-  const maxDist=120;
-  for(let i=0;i<pts.length;i++){
-    for(let j=i+1;j<pts.length;j++){
-      const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y;
-      const dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist<maxDist){
-        const op=(1-dist/maxDist)*.25;
+        // mouse repulsion
+        const dx = this.x - mouseX, dy = this.y - mouseY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 100) {
+          const force = (100 - dist) / 100;
+          this.x += dx / dist * force * 1.5;
+          this.y += dy / dist * force * 1.5;
+        }
+
+        if (this.life <= 0 || this.y < -30 || this.x < -30 || this.x > W + 30) this.reset(false);
+      }
+      draw() {
+        const fade = Math.min(1, this.life / 40) * Math.min(1, (this.maxLife - this.life) / 20);
+        const op = this.opacity * fade;
+        if (op < .01) return;
+
+        // draw trail
+        this.trail.forEach((t, i) => {
+          const tOp = op * (i / this.trail.length) * .3;
+          ctx.save();
+          ctx.globalAlpha = tOp;
+          ctx.fillStyle = `hsla(${this.hue},${this.sat}%,${this.lit}%,1)`;
+          ctx.beginPath();
+          ctx.arc(t.x, t.y, this.size * .4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        });
+
         ctx.save();
-        ctx.globalAlpha=op;
-        ctx.strokeStyle=`hsla(42,65%,55%,1)`;
-        ctx.lineWidth=.8;
-        ctx.beginPath();
-        ctx.moveTo(pts[i].x,pts[i].y);
-        ctx.lineTo(pts[j].x,pts[j].y);
-        ctx.stroke();
+        ctx.globalAlpha = op;
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+
+        const color = `hsla(${this.hue},${this.sat}%,${this.lit}%,1)`;
+        const glow = `hsla(${this.hue},${this.sat}%,${this.lit + 15}%,0)`;
+
+        if (this.shape === 'circle') {
+          // glowing circle
+          const rg = ctx.createRadialGradient(0, 0, 0, 0, 0, this.size * 2);
+          rg.addColorStop(0, `hsla(${this.hue},${this.sat}%,${this.lit + 10}%,1)`);
+          rg.addColorStop(.5, color);
+          rg.addColorStop(1, glow);
+          ctx.fillStyle = rg;
+          ctx.beginPath();
+          ctx.arc(0, 0, this.size * 1.5, 0, Math.PI * 2);
+          ctx.fill();
+          // inner bright core
+          ctx.fillStyle = `hsla(${this.hue},${this.sat}%,85%,.8)`;
+          ctx.beginPath();
+          ctx.arc(0, 0, this.size * .35, 0, Math.PI * 2);
+          ctx.fill();
+
+        } else if (this.shape === 'ring') {
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 1.5;
+          ctx.globalAlpha = op * .9;
+          ctx.beginPath();
+          ctx.arc(0, 0, this.size * 1.5, 0, Math.PI * 2);
+          ctx.stroke();
+          // inner ring
+          ctx.lineWidth = .7;
+          ctx.globalAlpha = op * .5;
+          ctx.beginPath();
+          ctx.arc(0, 0, this.size * .7, 0, Math.PI * 2);
+          ctx.stroke();
+
+        } else if (this.shape === 'diamond') {
+          const s = this.size * 1.6;
+          const rg2 = ctx.createRadialGradient(0, 0, 0, 0, 0, s);
+          rg2.addColorStop(0, `hsla(${this.hue},${this.sat}%,80%,1)`);
+          rg2.addColorStop(.4, color);
+          rg2.addColorStop(1, glow);
+          ctx.fillStyle = rg2;
+          ctx.beginPath();
+          ctx.moveTo(0, -s); ctx.lineTo(s * .6, 0);
+          ctx.lineTo(0, s); ctx.lineTo(-s * .6, 0);
+          ctx.closePath(); ctx.fill();
+        }
         ctx.restore();
       }
     }
-  }
-}
 
-function initParticles(){
-  particles=[];
-  const count=Math.min(90,Math.floor(W*H/9000)+40);
-  for(let i=0;i<count;i++){
-    particles.push(new Particle(i));
-  }
-}
-initParticles();
+    // ── CONSTELLATION LINES ──
+    function drawLines(pts) {
+      const maxDist = 120;
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) {
+          const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < maxDist) {
+            const op = (1 - dist / maxDist) * .25;
+            ctx.save();
+            ctx.globalAlpha = op;
+            ctx.strokeStyle = `hsla(42,65%,55%,1)`;
+            ctx.lineWidth = .8;
+            ctx.beginPath();
+            ctx.moveTo(pts[i].x, pts[i].y);
+            ctx.lineTo(pts[j].x, pts[j].y);
+            ctx.stroke();
+            ctx.restore();
+          }
+        }
+      }
+    }
 
-// ── COLOR LERP ──
-function lerp(a,b,t){return a+(b-a)*t;}
-function lerpColor(a,b,t){return [lerp(a[0],b[0],t),lerp(a[1],b[1],t),lerp(a[2],b[2],t)];}
+    function initParticles() {
+      particles = [];
+      const count = Math.min(90, Math.floor(W * H / 9000) + 40);
+      for (let i = 0; i < count; i++) {
+        particles.push(new Particle(i));
+      }
+    }
+    initParticles();
 
-const bgColors=[
-  [248,242,232],[242,233,215],[237,226,205],[251,241,224],[245,235,212]
-];
+    // ── COLOR LERP ──
+    function lerp(a, b, t) { return a + (b - a) * t; }
+    function lerpColor(a, b, t) { return [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)]; }
 
-function animate(){
-  requestAnimationFrame(animate);
-  gradTime+=.001;
+    const bgColors = [
+      [248, 242, 232], [242, 233, 215], [237, 226, 205], [251, 241, 224], [245, 235, 212]
+    ];
 
-  // ── BREATHING BACKGROUND ──
-  const t=Math.sin(gradTime)*.5+.5;
-  const t2=Math.sin(gradTime*1.4+1)*.5+.5;
-  const t3=Math.sin(gradTime*.8+3)*.5+.5;
-  const c1=lerpColor(bgColors[0],bgColors[2],t);
-  const c2=lerpColor(bgColors[1],bgColors[4],t2);
-  const c3=lerpColor(bgColors[3],bgColors[1],t3);
+    function animate() {
+      requestAnimationFrame(animate);
+      gradTime += .001;
 
-  // diagonal gradient that shifts
-  const angle=gradTime*.3;
-  const gx1=W*.5+Math.cos(angle)*W*.6;
-  const gy1=H*.5+Math.sin(angle)*H*.6;
-  const gx2=W*.5-Math.cos(angle)*W*.6;
-  const gy2=H*.5-Math.sin(angle)*H*.6;
+      // ── BREATHING BACKGROUND ──
+      const t = Math.sin(gradTime) * .5 + .5;
+      const t2 = Math.sin(gradTime * 1.4 + 1) * .5 + .5;
+      const t3 = Math.sin(gradTime * .8 + 3) * .5 + .5;
+      const c1 = lerpColor(bgColors[0], bgColors[2], t);
+      const c2 = lerpColor(bgColors[1], bgColors[4], t2);
+      const c3 = lerpColor(bgColors[3], bgColors[1], t3);
 
-  const bg=ctx.createLinearGradient(gx1,gy1,gx2,gy2);
-  bg.addColorStop(0,`rgb(${c1[0]|0},${c1[1]|0},${c1[2]|0})`);
-  bg.addColorStop(.45,`rgb(${c2[0]|0},${c2[1]|0},${c2[2]|0})`);
-  bg.addColorStop(1,`rgb(${c3[0]|0},${c3[1]|0},${c3[2]|0})`);
-  ctx.fillStyle=bg;
-  ctx.fillRect(0,0,W,H);
+      // diagonal gradient that shifts
+      const angle = gradTime * .3;
+      const gx1 = W * .5 + Math.cos(angle) * W * .6;
+      const gy1 = H * .5 + Math.sin(angle) * H * .6;
+      const gx2 = W * .5 - Math.cos(angle) * W * .6;
+      const gy2 = H * .5 - Math.sin(angle) * H * .6;
 
-  // ── RADIAL BLOBS ──
-  blobs.forEach(b=>{
-    b.h+=b.s;
-    const bx=(b.x+Math.sin(b.h)*.09)*W;
-    const by=(b.y+Math.cos(b.h*.6)*.08)*H;
-    const br=(b.r+Math.sin(b.h*.4)*.05)*Math.min(W,H)*.55;
-    const rg=ctx.createRadialGradient(bx,by,0,bx,by,br);
-    rg.addColorStop(0,`rgba(${b.c},.12)`);
-    rg.addColorStop(.4,`rgba(${b.c},.06)`);
-    rg.addColorStop(1,`rgba(${b.c},0)`);
-    ctx.fillStyle=rg;
-    ctx.beginPath();ctx.arc(bx,by,br,0,Math.PI*2);ctx.fill();
-  });
+      const bg = ctx.createLinearGradient(gx1, gy1, gx2, gy2);
+      bg.addColorStop(0, `rgb(${c1[0] | 0},${c1[1] | 0},${c1[2] | 0})`);
+      bg.addColorStop(.45, `rgb(${c2[0] | 0},${c2[1] | 0},${c2[2] | 0})`);
+      bg.addColorStop(1, `rgb(${c3[0] | 0},${c3[1] | 0},${c3[2] | 0})`);
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, W, H);
 
-  // ── MOUSE GLOW ──
-  if(mouseX&&mouseY){
-    const mg=ctx.createRadialGradient(mouseX,mouseY,0,mouseX,mouseY,180);
-    mg.addColorStop(0,'rgba(196,154,60,.08)');
-    mg.addColorStop(1,'rgba(196,154,60,0)');
-    ctx.fillStyle=mg;
-    ctx.beginPath();ctx.arc(mouseX,mouseY,180,0,Math.PI*2);ctx.fill();
-  }
+      // ── RADIAL BLOBS ──
+      blobs.forEach(b => {
+        b.h += b.s;
+        const bx = (b.x + Math.sin(b.h) * .09) * W;
+        const by = (b.y + Math.cos(b.h * .6) * .08) * H;
+        const br = (b.r + Math.sin(b.h * .4) * .05) * Math.min(W, H) * .55;
+        const rg = ctx.createRadialGradient(bx, by, 0, bx, by, br);
+        rg.addColorStop(0, `rgba(${b.c},.12)`);
+        rg.addColorStop(.4, `rgba(${b.c},.06)`);
+        rg.addColorStop(1, `rgba(${b.c},0)`);
+        ctx.fillStyle = rg;
+        ctx.beginPath(); ctx.arc(bx, by, br, 0, Math.PI * 2); ctx.fill();
+      });
 
-  // ── CONSTELLATION LINES ──
-  drawLines(particles);
+      // ── MOUSE GLOW ──
+      if (mouseX && mouseY) {
+        const mg = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, 180);
+        mg.addColorStop(0, 'rgba(196,154,60,.08)');
+        mg.addColorStop(1, 'rgba(196,154,60,0)');
+        ctx.fillStyle = mg;
+        ctx.beginPath(); ctx.arc(mouseX, mouseY, 180, 0, Math.PI * 2); ctx.fill();
+      }
 
-  // ── PARTICLES ──
-  particles.forEach(p=>{p.update();p.draw();});
+      // ── CONSTELLATION LINES ──
+      drawLines(particles);
 
-  // ── VIGNETTE ──
-  const vig=ctx.createRadialGradient(W/2,H/2,H*.3,W/2,H/2,H*.85);
-  vig.addColorStop(0,'rgba(240,228,210,0)');
-  vig.addColorStop(1,'rgba(220,202,170,.18)');
-  ctx.fillStyle=vig;
-  ctx.fillRect(0,0,W,H);
-}
-animate();
+      // ── PARTICLES ──
+      particles.forEach(p => { p.update(); p.draw(); });
 
-// ── SLIDES ──
-const slides=[...document.querySelectorAll('.slide')];
-const prog=document.getElementById('prog');
-const ctr=document.getElementById('ctr');
-const dotsEl=document.getElementById('dots');
-const hint=document.getElementById('hint');
-const N=slides.length;
-let cur_=0;
+      // ── VIGNETTE ──
+      const vig = ctx.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, H * .85);
+      vig.addColorStop(0, 'rgba(240,228,210,0)');
+      vig.addColorStop(1, 'rgba(220,202,170,.18)');
+      ctx.fillStyle = vig;
+      ctx.fillRect(0, 0, W, H);
+    }
+    animate();
 
-slides.forEach((_,i)=>{
-  const d=document.createElement('div');
-  d.className='dot'+(i===0?' on':'');
-  d.onclick=()=>go(i);
-  dotsEl.appendChild(d);
-});
+    // ── SLIDES ──
+    const slides = [...document.querySelectorAll('.slide')];
+    const prog = document.getElementById('prog');
+    const ctr = document.getElementById('ctr');
+    const dotsEl = document.getElementById('dots');
+    const hint = document.getElementById('hint');
+    const N = slides.length;
+    let cur_ = 0;
 
-function go(n){
-  if(n<0||n>=N)return;
-  slides[cur_].classList.remove('active');
-  slides[cur_].classList.add('prev');
-  setTimeout(()=>slides[cur_].classList.remove('prev'),750);
-  cur_=n;
-  slides[cur_].classList.add('active');
-  ctr.textContent=String(cur_+1).padStart(2,'0')+' / '+String(N).padStart(2,'0');
-  prog.style.width=((cur_+1)/N*100)+'%';
-  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('on',i===cur_));
-  if(cur_>0)hint.style.opacity='0';
-}
+    slides.forEach((_, i) => {
+      const d = document.createElement('div');
+      d.className = 'dot' + (i === 0 ? ' on' : '');
+      d.onclick = () => go(i);
+      dotsEl.appendChild(d);
+    });
 
-document.addEventListener('keydown',e=>{
-  if(['ArrowRight','ArrowDown',' '].includes(e.key)){e.preventDefault();go(cur_+1);}
-  if(['ArrowLeft','ArrowUp'].includes(e.key)){e.preventDefault();go(cur_-1);}
-});
+    function go(n) {
+      if (n < 0 || n >= N) return;
+      slides[cur_].classList.remove('active');
+      slides[cur_].classList.add('prev');
+      setTimeout(() => slides[cur_].classList.remove('prev'), 750);
+      cur_ = n;
+      slides[cur_].classList.add('active');
+      ctr.textContent = String(cur_ + 1).padStart(2, '0') + ' / ' + String(N).padStart(2, '0');
+      prog.style.width = ((cur_ + 1) / N * 100) + '%';
+      document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('on', i === cur_));
+      if (cur_ > 0) hint.style.opacity = '0';
+    }
 
-let tx=0;
-document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
-document.addEventListener('touchend',e=>{
-  const dx=tx-e.changedTouches[0].clientX;
-  if(Math.abs(dx)>50)go(cur_+(dx>0?1:-1));
-},{passive:true});
+    document.addEventListener('keydown', e => {
+      if (['ArrowRight', 'ArrowDown', ' '].includes(e.key)) { e.preventDefault(); go(cur_ + 1); }
+      if (['ArrowLeft', 'ArrowUp'].includes(e.key)) { e.preventDefault(); go(cur_ - 1); }
+    });
 
-// ── OPEN URL ──
-const BASE_URL = 'https://caffaine-dashboard-v1-eygrgfdsfdgrghft.swedencentral-01.azurewebsites.net';
-document.addEventListener('click', e => {
-  const card = e.target.closest('.card[data-url]');
-  if (card) {
-    const url = card.getAttribute('data-url');
-    window.open(BASE_URL + url, '_blank');
-  }
-});
+    let tx = 0;
+    document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+    document.addEventListener('touchend', e => {
+      const dx = tx - e.changedTouches[0].clientX;
+      if (Math.abs(dx) > 50) go(cur_ + (dx > 0 ? 1 : -1));
+    }, { passive: true });
 
-go(0);
-</script>
+    // ── OPEN URL ──
+    const BASE_URL = 'https://caffaine-dashboard-v1-eygrgfdsfdgrghft.swedencentral-01.azurewebsites.net';
+    document.addEventListener('click', e => {
+      const card = e.target.closest('.card[data-url]');
+      if (card) {
+        const url = card.getAttribute('data-url');
+        window.open(BASE_URL + url, '_blank');
+      }
+    });
+
+    go(0);
+  </script>
 </body>
+
 </html>
