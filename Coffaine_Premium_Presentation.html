@@ -85,8 +85,10 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
   backdrop-filter:blur(16px) saturate(1.2);
   box-shadow:0 4px 28px rgba(100,60,20,.08),inset 0 1px 0 rgba(255,255,255,.6);
   transition:transform .35s cubic-bezier(.4,0,.2,1),box-shadow .35s;
+  cursor:pointer;
 }
 .card:hover{transform:translateY(-4px);box-shadow:0 14px 40px rgba(100,60,20,.13),inset 0 1px 0 rgba(255,255,255,.7);}
+.card:active{transform:translateY(-2px) scale(0.98);}
 .card-glow{box-shadow:0 4px 28px rgba(196,135,74,.15),inset 0 1px 0 rgba(255,255,255,.6);}
 
 /* ── TAG ── */
@@ -296,26 +298,26 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
   </div>
   <div class="sb">
     <div class="ag-wrap">
-      <div class="ag card a1"><div class="ag-num">01</div><div class="ag-t">Problem & Vision</div><div class="ag-d">Why we built this</div></div>
-      <div class="ag card a2"><div class="ag-num">02</div><div class="ag-t">Tech Stack</div><div class="ag-d">React + Node + MySQL</div></div>
-      <div class="ag card a3"><div class="ag-num">03</div><div class="ag-t">Database Design</div><div class="ag-d">14 tables, auto-migrate</div></div>
-      <div class="ag card a4"><div class="ag-num">04</div><div class="ag-t">Public Website</div><div class="ag-d">6 sections, smooth scroll</div></div>
-      <div class="ag card a5"><div class="ag-num">05</div><div class="ag-t">Menu System</div><div class="ag-d">Voice search, EN+AR</div></div>
-      <div class="ag card a1"><div class="ag-num">06</div><div class="ag-t">Cart & Checkout</div><div class="ag-d">Atomic transactions</div></div>
-      <div class="ag card a2"><div class="ag-num">07</div><div class="ag-t">Sophie AI</div><div class="ag-d">Customer chatbot</div></div>
-      <div class="ag card a3"><div class="ag-num">08</div><div class="ag-t">CaffAIne AI</div><div class="ag-d">19 DB queries, live</div></div>
-      <div class="ag card a4"><div class="ag-num">09</div><div class="ag-t">Admin Panel</div><div class="ag-d">12 live modules</div></div>
-      <div class="ag card a5"><div class="ag-num">10</div><div class="ag-t">Dashboard</div><div class="ag-d">KPIs, 30s refresh</div></div>
-      <div class="ag card a1"><div class="ag-num">11</div><div class="ag-t">Orders Module</div><div class="ag-d">Timer, lifecycle</div></div>
-      <div class="ag card a2"><div class="ag-num">12</div><div class="ag-t">Products CRUD</div><div class="ag-d">Add-ons, tags, images</div></div>
-      <div class="ag card a3"><div class="ag-num">13</div><div class="ag-t">Inventory</div><div class="ag-d">Recipes, auto-deduct</div></div>
-      <div class="ag card a4"><div class="ag-num">14</div><div class="ag-t">Analytics</div><div class="ag-d">Weekly charts, KPIs</div></div>
-      <div class="ag card a5"><div class="ag-num">15</div><div class="ag-t">Offers & Feedback</div><div class="ag-d">Promos & reviews</div></div>
-      <div class="ag card a1"><div class="ag-num">16</div><div class="ag-t">Careers</div><div class="ag-d">Jobs & applications</div></div>
-      <div class="ag card a2"><div class="ag-num">17</div><div class="ag-t">Security</div><div class="ag-d">Auth, roles, audit</div></div>
-      <div class="ag card a3"><div class="ag-num">18</div><div class="ag-t">Leader Dashboard</div><div class="ag-d">Super admin + PDF</div></div>
-      <div class="ag card a4"><div class="ag-num">19</div><div class="ag-t">UX Details</div><div class="ag-d">Lenis, cursor, loader</div></div>
-      <div class="ag card a5"><div class="ag-num">20</div><div class="ag-t">Challenges Solved</div><div class="ag-d">Real engineering</div></div>
+      <div class="ag card a1" data-url="/#home"><div class="ag-num">01</div><div class="ag-t">Problem & Vision</div><div class="ag-d">Why we built this</div></div>
+      <div class="ag card a2" data-url="/#tech"><div class="ag-num">02</div><div class="ag-t">Tech Stack</div><div class="ag-d">React + Node + MySQL</div></div>
+      <div class="ag card a3" data-url="/admin/database"><div class="ag-num">03</div><div class="ag-t">Database Design</div><div class="ag-d">14 tables, auto-migrate</div></div>
+      <div class="ag card a4" data-url="/"><div class="ag-num">04</div><div class="ag-t">Public Website</div><div class="ag-d">6 sections, smooth scroll</div></div>
+      <div class="ag card a5" data-url="/menu"><div class="ag-num">05</div><div class="ag-t">Menu System</div><div class="ag-d">Voice search, EN+AR</div></div>
+      <div class="ag card a1" data-url="/cart"><div class="ag-num">06</div><div class="ag-t">Cart & Checkout</div><div class="ag-d">Atomic transactions</div></div>
+      <div class="ag card a2" data-url="/#ai-sophie"><div class="ag-num">07</div><div class="ag-t">Sophie AI</div><div class="ag-d">Customer chatbot</div></div>
+      <div class="ag card a3" data-url="/admin/ai-assistant"><div class="ag-num">08</div><div class="ag-t">CaffAIne AI</div><div class="ag-d">19 DB queries, live</div></div>
+      <div class="ag card a4" data-url="/admin/login"><div class="ag-num">09</div><div class="ag-t">Admin Panel</div><div class="ag-d">12 live modules</div></div>
+      <div class="ag card a5" data-url="/admin/dashboard"><div class="ag-num">10</div><div class="ag-t">Dashboard</div><div class="ag-d">KPIs, 30s refresh</div></div>
+      <div class="ag card a1" data-url="/admin/orders"><div class="ag-num">11</div><div class="ag-t">Orders Module</div><div class="ag-d">Timer, lifecycle</div></div>
+      <div class="ag card a2" data-url="/admin/products"><div class="ag-num">12</div><div class="ag-t">Products CRUD</div><div class="ag-d">Add-ons, tags, images</div></div>
+      <div class="ag card a3" data-url="/admin/inventory"><div class="ag-num">13</div><div class="ag-t">Inventory</div><div class="ag-d">Recipes, auto-deduct</div></div>
+      <div class="ag card a4" data-url="/admin/analytics"><div class="ag-num">14</div><div class="ag-t">Analytics</div><div class="ag-d">Weekly charts, KPIs</div></div>
+      <div class="ag card a5" data-url="/admin/offers"><div class="ag-num">15</div><div class="ag-t">Offers & Feedback</div><div class="ag-d">Promos & reviews</div></div>
+      <div class="ag card a1" data-url="/careers"><div class="ag-num">16</div><div class="ag-t">Careers</div><div class="ag-d">Jobs & applications</div></div>
+      <div class="ag card a2" data-url="/admin/login"><div class="ag-num">17</div><div class="ag-t">Security</div><div class="ag-d">Auth, roles, audit</div></div>
+      <div class="ag card a3" data-url="/admin/leader-dashboard"><div class="ag-num">18</div><div class="ag-t">Leader Dashboard</div><div class="ag-d">Super admin + PDF</div></div>
+      <div class="ag card a4" data-url="/#ux"><div class="ag-num">19</div><div class="ag-t">UX Details</div><div class="ag-d">Lenis, cursor, loader</div></div>
+      <div class="ag card a5" data-url="/#challenges"><div class="ag-num">20</div><div class="ag-t">Challenges Solved</div><div class="ag-d">Real engineering</div></div>
     </div>
   </div>
 </div>
@@ -330,7 +332,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
   </div>
   <div class="sb">
     <div class="g2" style="height:100%">
-      <div class="fc card a1" style="height:100%">
+      <div class="fc card a1" style="height:100%" data-url="/#home">
         <div class="fc-icon">⚡</div><div class="fc-line"></div>
         <div class="fc-title">The Problem</div>
         <div class="li"><div class="li-dot"></div>No online ordering — customers had to visit in person only</div>
@@ -340,7 +342,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
         <div class="li"><div class="li-dot"></div>Staff hiring done manually — no digital application system</div>
         <div class="li"><div class="li-dot"></div>Store open/closed communicated only physically — no automation</div>
       </div>
-      <div class="fc card a2" style="height:100%">
+      <div class="fc card a2" style="height:100%" data-url="/#home">
         <div class="fc-icon">☕</div><div class="fc-line"></div>
         <div class="fc-title">Our Vision</div>
         <div class="li"><div class="li-dot"></div>A cinematic public site where customers browse, order, and interact</div>
@@ -364,12 +366,12 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
   </div>
   <div class="sb">
     <div class="g3">
-      <div class="tc card a1"><div class="tc-layer">Frontend</div><div class="tc-name">React.js 18</div><div class="tc-bar"></div><div class="tc-detail">React Router v7, Context API (Cart + Store + Admin), custom Hooks (useReveal, useAdminAuth), Lenis smooth scroll, animated loader, custom cursor</div></div>
-      <div class="tc card a2"><div class="tc-layer">Backend</div><div class="tc-name">Node.js + Express 5</div><div class="tc-bar"></div><div class="tc-detail">40+ REST endpoints, Multer file uploads (10MB, images only), MySQL2 pool (10 connections), CORS, audit log middleware on every request</div></div>
-      <div class="tc card a3"><div class="tc-layer">Database</div><div class="tc-name">MySQL + Auto-Migration</div><div class="tc-bar"></div><div class="tc-detail">14 tables with FK constraints, schema migration on startup, prepared statements (SQL injection proof), atomic transactions with full ROLLBACK</div></div>
-      <div class="tc card a4"><div class="tc-layer">Artificial Intelligence</div><div class="tc-name">OpenAI GPT-4o-mini</div><div class="tc-bar"></div><div class="tc-detail">Dual mode: Sophie (customer) + CaffAIne (admin). GitHub Models/Azure fallback. 19 parallel DB queries for admin. 45s timeout + AbortController</div></div>
-      <div class="tc card a5"><div class="tc-layer">UI / Icons</div><div class="tc-name">Lucide + CSS Modules</div><div class="tc-bar"></div><div class="tc-detail">Lucide in admin, Font Awesome in public, CSS Modules for scoped styles, 30+ tag types with unique gradient colour systems</div></div>
-      <div class="tc card a6"><div class="tc-layer">Dev Tools</div><div class="tc-name">Concurrently + dotenv</div><div class="tc-bar"></div><div class="tc-detail">Parallel frontend + backend dev, .env config, jsPDF + autoTable for PDF export, axios for admin API, supabaseClient for storage</div></div>
+      <div class="tc card a1" data-url="/#tech"><div class="tc-layer">Frontend</div><div class="tc-name">React.js 18</div><div class="tc-bar"></div><div class="tc-detail">React Router v7, Context API (Cart + Store + Admin), custom Hooks (useReveal, useAdminAuth), Lenis smooth scroll, animated loader, custom cursor</div></div>
+      <div class="tc card a2" data-url="/#tech"><div class="tc-layer">Backend</div><div class="tc-name">Node.js + Express 5</div><div class="tc-bar"></div><div class="tc-detail">40+ REST endpoints, Multer file uploads (10MB, images only), MySQL2 pool (10 connections), CORS, audit log middleware on every request</div></div>
+      <div class="tc card a3" data-url="/admin/database"><div class="tc-layer">Database</div><div class="tc-name">MySQL + Auto-Migration</div><div class="tc-bar"></div><div class="tc-detail">14 tables with FK constraints, schema migration on startup, prepared statements (SQL injection proof), atomic transactions with full ROLLBACK</div></div>
+      <div class="tc card a4" data-url="/admin/ai-assistant"><div class="tc-layer">Artificial Intelligence</div><div class="tc-name">OpenAI GPT-4o-mini</div><div class="tc-bar"></div><div class="tc-detail">Dual mode: Sophie (customer) + CaffAIne (admin). GitHub Models/Azure fallback. 19 parallel DB queries for admin. 45s timeout + AbortController</div></div>
+      <div class="tc card a5" data-url="/#tech"><div class="tc-layer">UI / Icons</div><div class="tc-name">Lucide + CSS Modules</div><div class="tc-bar"></div><div class="tc-detail">Lucide in admin, Font Awesome in public, CSS Modules for scoped styles, 30+ tag types with unique gradient colour systems</div></div>
+      <div class="tc card a6" data-url="/#tech"><div class="tc-layer">Dev Tools</div><div class="tc-name">Concurrently + dotenv</div><div class="tc-bar"></div><div class="tc-detail">Parallel frontend + backend dev, .env config, jsPDF + autoTable for PDF export, axios for admin API, supabaseClient for storage</div></div>
     </div>
   </div>
 </div>
@@ -384,23 +386,23 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
   </div>
   <div class="sb">
     <div class="g4" style="margin-bottom:12px;">
-      <div class="stat card a1" style="padding:12px 8px;"><div style="font-size:16px;margin-bottom:5px;">👤</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">admin_logs</div><div style="font-size:7.5px;color:var(--text3);">Every action logged</div></div>
-      <div class="stat card a2" style="padding:12px 8px;"><div style="font-size:16px;margin-bottom:5px;">🛍</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">menu_items</div><div style="font-size:7.5px;color:var(--text3);">Products + sort_order</div></div>
-      <div class="stat card a3" style="padding:12px 8px;"><div style="font-size:16px;margin-bottom:5px;">📋</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">orders + items</div><div style="font-size:7.5px;color:var(--text3);">Full order lifecycle</div></div>
-      <div class="stat card a4" style="padding:12px 8px;"><div style="font-size:16px;margin-bottom:5px;">📦</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">inventory + recipes</div><div style="font-size:7.5px;color:var(--text3);">Ingredient → product</div></div>
-      <div class="stat card a1" style="padding:12px 8px;"><div style="font-size:16px;margin-bottom:5px;">➕</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">addons + tags</div><div style="font-size:7.5px;color:var(--text3);">Bridge tables M2M</div></div>
-      <div class="stat card a2" style="padding:12px 8px;"><div style="font-size:16px;margin-bottom:5px;">🎁</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">offers</div><div style="font-size:7.5px;color:var(--text3);">Discounts + end_date</div></div>
-      <div class="stat card a3" style="padding:12px 8px;"><div style="font-size:16px;margin-bottom:5px;">💼</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">careers + apps</div><div style="font-size:7.5px;color:var(--text3);">Jobs & applicants</div></div>
-      <div class="stat card a4" style="padding:12px 8px;"><div style="font-size:16px;margin-bottom:5px;">✉️</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">contact_messages</div><div style="font-size:7.5px;color:var(--text3);">is_read flag</div></div>
-      <div class="stat card a1" style="padding:12px 8px;"><div style="font-size:16px;margin-bottom:5px;">⭐</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">product_reviews</div><div style="font-size:7.5px;color:var(--text3);">FK CASCADE DELETE</div></div>
-      <div class="stat card a2" style="padding:12px 8px;"><div style="font-size:16px;margin-bottom:5px;">🏪</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">site_settings</div><div style="font-size:7.5px;color:var(--text3);">auto/manual mode</div></div>
-      <div class="stat card a3" style="padding:12px 8px;"><div style="font-size:16px;margin-bottom:5px;">💬</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">chat_messages</div><div style="font-size:7.5px;color:var(--text3);">Sophie conv. logs</div></div>
-      <div class="stat card a4" style="padding:12px 8px;"><div style="font-size:16px;margin-bottom:5px;">🤖</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">ai_assistant_msgs</div><div style="font-size:7.5px;color:var(--text3);">CaffAIne logs</div></div>
+      <div class="stat card a1" style="padding:12px 8px;" data-url="/admin/database"><div style="font-size:16px;margin-bottom:5px;">👤</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">admin_logs</div><div style="font-size:7.5px;color:var(--text3);">Every action logged</div></div>
+      <div class="stat card a2" style="padding:12px 8px;" data-url="/admin/products"><div style="font-size:16px;margin-bottom:5px;">🛍</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">menu_items</div><div style="font-size:7.5px;color:var(--text3);">Products + sort_order</div></div>
+      <div class="stat card a3" style="padding:12px 8px;" data-url="/admin/orders"><div style="font-size:16px;margin-bottom:5px;">📋</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">orders + items</div><div style="font-size:7.5px;color:var(--text3);">Full order lifecycle</div></div>
+      <div class="stat card a4" style="padding:12px 8px;" data-url="/admin/inventory"><div style="font-size:16px;margin-bottom:5px;">📦</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">inventory + recipes</div><div style="font-size:7.5px;color:var(--text3);">Ingredient → product</div></div>
+      <div class="stat card a1" style="padding:12px 8px;" data-url="/admin/products"><div style="font-size:16px;margin-bottom:5px;">➕</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">addons + tags</div><div style="font-size:7.5px;color:var(--text3);">Bridge tables M2M</div></div>
+      <div class="stat card a2" style="padding:12px 8px;" data-url="/admin/offers"><div style="font-size:16px;margin-bottom:5px;">🎁</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">offers</div><div style="font-size:7.5px;color:var(--text3);">Discounts + end_date</div></div>
+      <div class="stat card a3" style="padding:12px 8px;" data-url="/admin/applications"><div style="font-size:16px;margin-bottom:5px;">💼</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">careers + apps</div><div style="font-size:7.5px;color:var(--text3);">Jobs & applicants</div></div>
+      <div class="stat card a4" style="padding:12px 8px;" data-url="/admin/messages"><div style="font-size:16px;margin-bottom:5px;">✉️</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">contact_messages</div><div style="font-size:7.5px;color:var(--text3);">is_read flag</div></div>
+      <div class="stat card a1" style="padding:12px 8px;" data-url="/admin/feedback"><div style="font-size:16px;margin-bottom:5px;">⭐</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">product_reviews</div><div style="font-size:7.5px;color:var(--text3);">FK CASCADE DELETE</div></div>
+      <div class="stat card a2" style="padding:12px 8px;" data-url="/admin/dashboard"><div style="font-size:16px;margin-bottom:5px;">🏪</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">site_settings</div><div style="font-size:7.5px;color:var(--text3);">auto/manual mode</div></div>
+      <div class="stat card a3" style="padding:12px 8px;" data-url="/admin/ai-assistant"><div style="font-size:16px;margin-bottom:5px;">💬</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">chat_messages</div><div style="font-size:7.5px;color:var(--text3);">Sophie conv. logs</div></div>
+      <div class="stat card a4" style="padding:12px 8px;" data-url="/admin/ai-assistant"><div style="font-size:16px;margin-bottom:5px;">🤖</div><div style="font-size:9.5px;font-weight:700;color:var(--text);margin-bottom:1px;">ai_assistant_msgs</div><div style="font-size:7.5px;color:var(--text3);">CaffAIne logs</div></div>
     </div>
     <div class="g3">
-      <div class="fc card a5" style="padding:13px 16px;"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🔄 Auto-Migration on Startup</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">Checks and adds missing columns (phone, delivery_address, estimated_ready_at) on every server start. Zero manual SQL</div></div>
-      <div class="fc card a6" style="padding:13px 16px;"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🔗 M2M Bridge Tables</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">menu_item_addons + menu_item_tags bridge tables — fully normalised. GROUP_CONCAT in queries → parsed to arrays</div></div>
-      <div class="fc card a7" style="padding:13px 16px;"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">⚡ Atomic Order Transaction</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">BEGIN → check stock → insert order → insert items → deduct inventory → deduct addons → COMMIT. Full ROLLBACK on failure</div></div>
+      <div class="fc card a5" style="padding:13px 16px;" data-url="/admin/database"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🔄 Auto-Migration on Startup</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">Checks and adds missing columns (phone, delivery_address, estimated_ready_at) on every server start. Zero manual SQL</div></div>
+      <div class="fc card a6" style="padding:13px 16px;" data-url="/admin/database"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🔗 M2M Bridge Tables</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">menu_item_addons + menu_item_tags bridge tables — fully normalised. GROUP_CONCAT in queries → parsed to arrays</div></div>
+      <div class="fc card a7" style="padding:13px 16px;" data-url="/cart"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">⚡ Atomic Order Transaction</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">BEGIN → check stock → insert order → insert items → deduct inventory → deduct addons → COMMIT. Full ROLLBACK on failure</div></div>
     </div>
   </div>
 </div>
@@ -415,12 +417,12 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
   </div>
   <div class="sb">
     <div class="g3">
-      <div class="fc card a1"><div class="fc-icon">🏠</div><div class="fc-line"></div><div class="fc-title">Hero Section</div><div class="fc-text">Mouse-parallax image (±10px/8px). Live store open/closed from API. "Specialty Coffee · Birmingham" eyebrow. CTAs: View Menu + Find Us. Hours strip: Mon–Fri 07:30, Sat 09:00, Sun 10:00.</div></div>
-      <div class="fc card a2"><div class="fc-icon">☕</div><div class="fc-line"></div><div class="fc-title">Menu Section</div><div class="fc-text">DB-driven categories with icons + colours. Featured cards row. Full item list with modal, add-ons selector, real-time price, star rating, and review submission inline.</div></div>
-      <div class="fc card a3"><div class="fc-icon">🖼</div><div class="fc-line"></div><div class="fc-title">Gallery</div><div class="fc-text">Photo grid from /public/images/ managed via admin panel. Lazy-loaded with fallback to coffee-beans.png on error. Scroll-reveal via useReveal hook.</div></div>
-      <div class="fc card a4"><div class="fc-icon">📖</div><div class="fc-line"></div><div class="fc-title">About Us</div><div class="fc-text">"Precision-crafted drinks, warm welcome, unhurried pace." Brand story with scroll-reveal animations. useReveal IntersectionObserver adds 'vis' class on entry.</div></div>
-      <div class="fc card a5"><div class="fc-icon">💼</div><div class="fc-line"></div><div class="fc-title">Careers Page</div><div class="fc-text">Live listings from /api/careers?active=1. Customers apply: name, email, phone, position, cover letter → job_applications table. Status tracked in admin.</div></div>
-      <div class="fc card a6"><div class="fc-icon">✉️</div><div class="fc-line"></div><div class="fc-title">Contact Section</div><div class="fc-text">POST /api/contact → contact_messages with is_read flag. Location: 14 Piccadilly Arcade, Birmingham. Managed in admin Messages module.</div></div>
+      <div class="fc card a1" data-url="/"><div class="fc-icon">🏠</div><div class="fc-line"></div><div class="fc-title">Hero Section</div><div class="fc-text">Mouse-parallax image (±10px/8px). Live store open/closed from API. "Specialty Coffee · Birmingham" eyebrow. CTAs: View Menu + Find Us. Hours strip: Mon–Fri 07:30, Sat 09:00, Sun 10:00.</div></div>
+      <div class="fc card a2" data-url="/menu"><div class="fc-icon">☕</div><div class="fc-line"></div><div class="fc-title">Menu Section</div><div class="fc-text">DB-driven categories with icons + colours. Featured cards row. Full item list with modal, add-ons selector, real-time price, star rating, and review submission inline.</div></div>
+      <div class="fc card a3" data-url="/#gallery"><div class="fc-icon">🖼</div><div class="fc-line"></div><div class="fc-title">Gallery</div><div class="fc-text">Photo grid from /public/images/ managed via admin panel. Lazy-loaded with fallback to coffee-beans.png on error. Scroll-reveal via useReveal hook.</div></div>
+      <div class="fc card a4" data-url="/#about"><div class="fc-icon">📖</div><div class="fc-line"></div><div class="fc-title">About Us</div><div class="fc-text">"Precision-crafted drinks, warm welcome, unhurried pace." Brand story with scroll-reveal animations. useReveal IntersectionObserver adds 'vis' class on entry.</div></div>
+      <div class="fc card a5" data-url="/careers"><div class="fc-icon">💼</div><div class="fc-line"></div><div class="fc-title">Careers Page</div><div class="fc-text">Live listings from /api/careers?active=1. Customers apply: name, email, phone, position, cover letter → job_applications table. Status tracked in admin.</div></div>
+      <div class="fc card a6" data-url="/#contact"><div class="fc-icon">✉️</div><div class="fc-line"></div><div class="fc-title">Contact Section</div><div class="fc-text">POST /api/contact → contact_messages with is_read flag. Location: 14 Piccadilly Arcade, Birmingham. Managed in admin Messages module.</div></div>
     </div>
   </div>
 </div>
@@ -435,7 +437,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
   </div>
   <div class="sb">
     <div class="g2">
-      <div class="card a1" style="padding:20px;">
+      <div class="card a1" style="padding:20px;" data-url="/menu">
         <div class="sec-title">📋 Real Menu Items</div>
         <div class="sec-sub">Actual products at Faculty Coffee, Birmingham</div>
         <div class="li"><div class="li-dot"></div><strong>Coffee:</strong> Espresso £2.80, Flat White £3.60, Cappuccino £3.40, Latte £3.80, Long Black £3.00, V60 Pour-Over £4.50, Hot Chocolate £4.00</div>
@@ -444,7 +446,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
         <div class="li"><div class="li-dot"></div><strong>Cold Drinks:</strong> Palestine Cola, Gaza Cola SF, Fresh OJ, Apple Juice, Beetroot Juice, 330ml Still</div>
         <div class="li"><div class="li-dot"></div><strong>Sweets:</strong> Freshly Baked Pastry £3.50, Cake of the Day £4.50, Raspberry & Custard Pastry £3.45, Basque Cheesecake</div>
       </div>
-      <div class="card a2" style="padding:20px;">
+      <div class="card a2" style="padding:20px;" data-url="/menu">
         <div class="sec-title">🔍 Smart Features Built</div>
         <div class="sec-sub">All from Menu.js source code</div>
         <div class="li"><div class="li-num">1</div>Voice search — Web Speech API, EN (en-GB) & AR (ar-SA) toggle</div>
@@ -469,21 +471,21 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
   </div>
   <div class="sb">
     <div class="flow a1" style="margin-bottom:16px;">
-      <div class="fs card"><div class="fs-icon">🛒</div><div class="fs-t">Browse</div></div><div class="fa">›</div>
-      <div class="fs card"><div class="fs-icon">➕</div><div class="fs-t">Add + Add-ons</div></div><div class="fa">›</div>
-      <div class="fs card"><div class="fs-icon">💳</div><div class="fs-t">Checkout</div></div><div class="fa">›</div>
-      <div class="fs card"><div class="fs-icon">✅</div><div class="fs-t">Order POST</div></div><div class="fa">›</div>
-      <div class="fs card"><div class="fs-icon">📦</div><div class="fs-t">Stock Deducted</div></div><div class="fa">›</div>
-      <div class="fs card"><div class="fs-icon">⏱</div><div class="fs-t">Admin Timer</div></div><div class="fa">›</div>
-      <div class="fs card"><div class="fs-icon">✅</div><div class="fs-t">Complete</div></div>
+      <div class="fs card" data-url="/menu"><div class="fs-icon">🛒</div><div class="fs-t">Browse</div></div><div class="fa">›</div>
+      <div class="fs card" data-url="/menu"><div class="fs-icon">➕</div><div class="fs-t">Add + Add-ons</div></div><div class="fa">›</div>
+      <div class="fs card" data-url="/cart"><div class="fs-icon">💳</div><div class="fs-t">Checkout</div></div><div class="fa">›</div>
+      <div class="fs card" data-url="/cart"><div class="fs-icon">✅</div><div class="fs-t">Order POST</div></div><div class="fa">›</div>
+      <div class="fs card" data-url="/admin/inventory"><div class="fs-icon">📦</div><div class="fs-t">Stock Deducted</div></div><div class="fa">›</div>
+      <div class="fs card" data-url="/admin/orders"><div class="fs-icon">⏱</div><div class="fs-t">Admin Timer</div></div><div class="fa">›</div>
+      <div class="fs card" data-url="/admin/orders"><div class="fs-icon">✅</div><div class="fs-t">Complete</div></div>
     </div>
     <div class="g3">
-      <div class="fc card a2" style="padding:14px 16px;"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🛒 CartContext</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">React Context persists cart across navigation. addItem, setQty, removeItem. Live price with all add-ons included</div></div>
-      <div class="fc card a3" style="padding:14px 16px;"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">💳 Checkout Fields</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">customer_name (req), phone (req), email (opt), order_type: takeaway / dine-in / delivery, delivery_address</div></div>
-      <div class="fc card a4" style="padding:14px 16px;"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🔒 Atomic Transaction</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">BEGIN → check stock → insert order → insert items → deduct inventory → deduct addons → COMMIT. Full ROLLBACK on failure</div></div>
-      <div class="fc card a2" style="padding:14px 16px;"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">⏱ Prep Timer</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">estimated_ready_at = NOW() + 2 MIN. Live countdown in admin. Extend N minutes via /api/extend-order/:id</div></div>
-      <div class="fc card a3" style="padding:14px 16px;"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🏪 Store Gating</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">StoreContext checks /api/store-status. Closed = full-screen overlay with hours. Orders completely blocked</div></div>
-      <div class="fc card a4" style="padding:14px 16px;"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🔔 Notification Log</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">Order 'ready': logs SMS + email notification template for customer_name, phone, and email</div></div>
+      <div class="fc card a2" style="padding:14px 16px;" data-url="/cart"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🛒 CartContext</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">React Context persists cart across navigation. addItem, setQty, removeItem. Live price with all add-ons included</div></div>
+      <div class="fc card a3" style="padding:14px 16px;" data-url="/cart"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">💳 Checkout Fields</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">customer_name (req), phone (req), email (opt), order_type: takeaway / dine-in / delivery, delivery_address</div></div>
+      <div class="fc card a4" style="padding:14px 16px;" data-url="/cart"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🔒 Atomic Transaction</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">BEGIN → check stock → insert order → insert items → deduct inventory → deduct addons → COMMIT. Full ROLLBACK on failure</div></div>
+      <div class="fc card a2" style="padding:14px 16px;" data-url="/admin/orders"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">⏱ Prep Timer</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">estimated_ready_at = NOW() + 2 MIN. Live countdown in admin. Extend N minutes via /api/extend-order/:id</div></div>
+      <div class="fc card a3" style="padding:14px 16px;" data-url="/"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🏪 Store Gating</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">StoreContext checks /api/store-status. Closed = full-screen overlay with hours. Orders completely blocked</div></div>
+      <div class="fc card a4" style="padding:14px 16px;" data-url="/admin/orders"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🔔 Notification Log</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">Order 'ready': logs SMS + email notification template for customer_name, phone, and email</div></div>
     </div>
   </div>
 </div>
@@ -498,7 +500,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
   </div>
   <div class="sb">
     <div class="g2" style="height:100%">
-      <div class="card a1" style="padding:20px;height:100%">
+      <div class="card a1" style="padding:20px;height:100%" data-url="/#ai-sophie">
         <div style="display:inline-block;font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:var(--caramel);color:#fff;padding:4px 12px;border-radius:20px;margin-bottom:13px;">Customer-Facing AI</div>
         <div style="font-family:'Playfair Display',serif;font-size:42px;color:var(--text);line-height:.95;margin-bottom:5px;" class="gold-text">Sophie</div>
         <div style="font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--text2);margin-bottom:18px;">Faculty Coffee · Barista Bot</div>
@@ -512,7 +514,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
         <div class="li"><div class="li-dot"></div>Quick reply chips shown on first open</div>
         <div style="margin-top:10px;font-size:8.5px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(196,135,74,.2);padding:6px;border-radius:8px;text-align:center;">GPT-4o-mini · GitHub Models fallback (Azure)</div>
       </div>
-      <div class="chat card a2" style="height:100%">
+      <div class="chat card a2" style="height:100%" data-url="/#ai-sophie">
         <div><div class="bubble-label">Customer</div><div class="bubble user">Hi! What's your most popular drink?</div></div>
         <div><div class="bubble-label">Sophie</div><div class="bubble bot">Our Flat White (£3.60) is a crowd favourite ☕ Silky microfoam with our house espresso blend. Want to add it to your cart?</div></div>
         <div><div class="bubble-label">Customer</div><div class="bubble user">Does it have dairy? I'm vegan 🌿</div></div>
@@ -534,7 +536,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
   </div>
   <div class="sb">
     <div class="g2" style="height:100%">
-      <div class="chat card a1" style="height:100%">
+      <div class="chat card a1" style="height:100%" data-url="/admin/ai-assistant">
         <div><div class="bubble-label">Admin</div><div class="bubble user">What were our top sellers this week?</div></div>
         <div><div class="bubble-label">CaffAIne</div><div class="bubble bot">Flat White led with 47 orders, Iced Americano (31), Vegan Pastry (28). Week revenue: £342. Best day was Thursday.</div></div>
         <div><div class="bubble-label">Admin</div><div class="bubble user">Any ingredients running low?</div></div>
@@ -542,7 +544,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
         <div><div class="bubble-label">Admin</div><div class="bubble user">Any new job applications?</div></div>
         <div><div class="bubble-label">CaffAIne</div><div class="bubble bot">3 new applications for Barista this week. 1 still unreviewed (submitted 2 days ago).</div></div>
       </div>
-      <div class="card a2" style="padding:20px;height:100%">
+      <div class="card a2" style="padding:20px;height:100%" data-url="/admin/ai-assistant">
         <div style="display:inline-block;font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:var(--warm);color:#fff;padding:4px 12px;border-radius:20px;margin-bottom:13px;">Admin-Facing AI</div>
         <div style="font-family:'Playfair Display',serif;font-size:42px;color:var(--text);line-height:.95;margin-bottom:5px;" class="gold-text">CaffAIne</div>
         <div style="font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--text2);margin-bottom:18px;">Real-time Business Intelligence</div>
@@ -568,18 +570,18 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
   </div>
   <div class="sb">
     <div class="g4">
-      <div class="adm card a1"><div class="adm-icon">📊</div><div class="adm-title">Dashboard</div><div class="adm-desc">Live KPIs, 7-day chart, store toggle, 30s auto-refresh</div></div>
-      <div class="adm card a2"><div class="adm-icon">📋</div><div class="adm-title">Orders</div><div class="adm-desc">Live timer, status lifecycle, extend time, order items</div></div>
-      <div class="adm card a3"><div class="adm-icon">🛍</div><div class="adm-title">Products</div><div class="adm-desc">CRUD, image upload, add-ons, tags, drag reorder</div></div>
-      <div class="adm card a4"><div class="adm-icon">📦</div><div class="adm-title">Inventory</div><div class="adm-desc">Stock levels, threshold alerts, Arabic numeral input</div></div>
-      <div class="adm card a1"><div class="adm-icon">📈</div><div class="adm-title">Analytics</div><div class="adm-desc">7-day SVG chart, category %, top products</div></div>
-      <div class="adm card a2"><div class="adm-icon">🎁</div><div class="adm-title">Offers</div><div class="adm-desc">Discount %, product, reason, end_date, toggle</div></div>
-      <div class="adm card a3"><div class="adm-icon">💼</div><div class="adm-title">Jobs</div><div class="adm-desc">Title, type, location, description, active flag</div></div>
-      <div class="adm card a4"><div class="adm-icon">📄</div><div class="adm-title">Applications</div><div class="adm-desc">Review applicants, status update, cover letter</div></div>
-      <div class="adm card a1"><div class="adm-icon">✉️</div><div class="adm-title">Messages</div><div class="adm-desc">Contact inbox, mark read/unread, delete, search</div></div>
-      <div class="adm card a2"><div class="adm-icon">⭐</div><div class="adm-title">Feedback</div><div class="adm-desc">Product + store + general reviews in one view</div></div>
-      <div class="adm card a3"><div class="adm-icon">🤖</div><div class="adm-title">CaffAIne AI</div><div class="adm-desc">Business intelligence with live DB data</div></div>
-      <div class="adm card a4"><div class="adm-icon">👑</div><div class="adm-title">Leader Dashboard</div><div class="adm-desc">Super admin: audit logs, critical feedback, PDF</div></div>
+      <div class="adm card a1" data-url="/admin/dashboard"><div class="adm-icon">📊</div><div class="adm-title">Dashboard</div><div class="adm-desc">Live KPIs, 7-day chart, store toggle, 30s auto-refresh</div></div>
+      <div class="adm card a2" data-url="/admin/orders"><div class="adm-icon">📋</div><div class="adm-title">Orders</div><div class="adm-desc">Live timer, status lifecycle, extend time, order items</div></div>
+      <div class="adm card a3" data-url="/admin/products"><div class="adm-icon">🛍</div><div class="adm-title">Products</div><div class="adm-desc">CRUD, image upload, add-ons, tags, drag reorder</div></div>
+      <div class="adm card a4" data-url="/admin/inventory"><div class="adm-icon">📦</div><div class="adm-title">Inventory</div><div class="adm-desc">Stock levels, threshold alerts, Arabic numeral input</div></div>
+      <div class="adm card a1" data-url="/admin/analytics"><div class="adm-icon">📈</div><div class="adm-title">Analytics</div><div class="adm-desc">7-day SVG chart, category %, top products</div></div>
+      <div class="adm card a2" data-url="/admin/offers"><div class="adm-icon">🎁</div><div class="adm-title">Offers</div><div class="adm-desc">Discount %, product, reason, end_date, toggle</div></div>
+      <div class="adm card a3" data-url="/admin/jobs"><div class="adm-icon">💼</div><div class="adm-title">Jobs</div><div class="adm-desc">Title, type, location, description, active flag</div></div>
+      <div class="adm card a4" data-url="/admin/applications"><div class="adm-icon">📄</div><div class="adm-title">Applications</div><div class="adm-desc">Review applicants, status update, cover letter</div></div>
+      <div class="adm card a1" data-url="/admin/messages"><div class="adm-icon">✉️</div><div class="adm-title">Messages</div><div class="adm-desc">Contact inbox, mark read/unread, delete, search</div></div>
+      <div class="adm card a2" data-url="/admin/feedback"><div class="adm-icon">⭐</div><div class="adm-title">Feedback</div><div class="adm-desc">Product + store + general reviews in one view</div></div>
+      <div class="adm card a3" data-url="/admin/ai-assistant"><div class="adm-icon">🤖</div><div class="adm-title">CaffAIne AI</div><div class="adm-desc">Business intelligence with live DB data</div></div>
+      <div class="adm card a4" data-url="/admin/leader-dashboard"><div class="adm-icon">👑</div><div class="adm-title">Leader Dashboard</div><div class="adm-desc">Super admin: audit logs, critical feedback, PDF</div></div>
     </div>
   </div>
 </div>
@@ -594,18 +596,18 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
   </div>
   <div class="sb">
     <div class="g4" style="margin-bottom:14px;">
-      <div class="stat card a1"><div class="stat-val">£ Live</div><div class="stat-label">Gross Revenue</div></div>
-      <div class="stat card a2"><div class="stat-val">Live</div><div class="stat-label">Total Orders</div></div>
-      <div class="stat card a3"><div class="stat-val">Live</div><div class="stat-label">Today's Sales</div></div>
-      <div class="stat card a4"><div class="stat-val">⚠️</div><div class="stat-label">Low Stock Items</div></div>
+      <div class="stat card a1" data-url="/admin/dashboard"><div class="stat-val">£ Live</div><div class="stat-label">Gross Revenue</div></div>
+      <div class="stat card a2" data-url="/admin/dashboard"><div class="stat-val">Live</div><div class="stat-label">Total Orders</div></div>
+      <div class="stat card a3" data-url="/admin/dashboard"><div class="stat-val">Live</div><div class="stat-label">Today's Sales</div></div>
+      <div class="stat card a4" data-url="/admin/inventory"><div class="stat-val">⚠️</div><div class="stat-label">Low Stock Items</div></div>
     </div>
     <div class="g3">
-      <div class="fc card a5" style="padding:14px 16px;"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">📊 Revenue Bar Chart</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">Last 7 days, custom SVG bars. Real dailySales data. Today highlighted. Full date on hover.</div></div>
-      <div class="fc card a6" style="padding:14px 16px;"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🏪 Store Toggle (3 Modes)</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">auto (schedule) / manual_open / manual_closed. Updates site_settings table instantly.</div></div>
-      <div class="fc card a7" style="padding:14px 16px;"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">⏰ Live Clock + 30s Poll</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">setInterval(1000ms) for clock. setInterval(30000ms) for data. Two separate intervals cleaned up on unmount.</div></div>
-      <div class="fc card a5" style="padding:14px 16px;"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">📅 Today vs Yesterday</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">todayOrders, todaySales, yesterdayOrders, yesterdaySales — all from /api/dashboard-stats</div></div>
-      <div class="fc card a6" style="padding:14px 16px;"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🔔 Low Stock Alert Panel</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">lowStockItems array: item_name, quantity, min_threshold. Clickable → navigates to Inventory module.</div></div>
-      <div class="fc card a7" style="padding:14px 16px;"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🎨 Theme Variables</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">bg:#070504, accent:#c4a484, success:#38ef7d, warning:#f59e0b, danger:#ff4d4d — admin dark theme.</div></div>
+      <div class="fc card a5" style="padding:14px 16px;" data-url="/admin/analytics"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">📊 Revenue Bar Chart</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">Last 7 days, custom SVG bars. Real dailySales data. Today highlighted. Full date on hover.</div></div>
+      <div class="fc card a6" style="padding:14px 16px;" data-url="/admin/dashboard"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🏪 Store Toggle (3 Modes)</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">auto (schedule) / manual_open / manual_closed. Updates site_settings table instantly.</div></div>
+      <div class="fc card a7" style="padding:14px 16px;" data-url="/admin/dashboard"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">⏰ Live Clock + 30s Poll</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">setInterval(1000ms) for clock. setInterval(30000ms) for data. Two separate intervals cleaned up on unmount.</div></div>
+      <div class="fc card a5" style="padding:14px 16px;" data-url="/admin/analytics"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">📅 Today vs Yesterday</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">todayOrders, todaySales, yesterdayOrders, yesterdaySales — all from /api/dashboard-stats</div></div>
+      <div class="fc card a6" style="padding:14px 16px;" data-url="/admin/inventory"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🔔 Low Stock Alert Panel</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">lowStockItems array: item_name, quantity, min_threshold. Clickable → navigates to Inventory module.</div></div>
+      <div class="fc card a7" style="padding:14px 16px;" data-url="/admin/dashboard"><div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">🎨 Theme Variables</div><div style="font-size:9px;color:var(--text2);line-height:1.6;">bg:#070504, accent:#c4a484, success:#38ef7d, warning:#f59e0b, danger:#ff4d4d — admin dark theme.</div></div>
     </div>
   </div>
 </div>
@@ -657,7 +659,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
   </div>
   <div class="sb">
     <div class="g2">
-      <div class="card a1" style="padding:20px;">
+      <div class="card a1" style="padding:20px;" data-url="/admin/products">
         <div class="sec-title">🛍 Product CRUD</div>
         <div class="sec-sub">Every field editable, changes instant on public site</div>
         <div class="li"><div class="li-num">1</div>Fields: name, price_num, description, category_id, available, image_url, tags, addons, sort_order</div>
@@ -668,7 +670,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
         <div class="li"><div class="li-num">6</div>Reorder: PUT /api/products/reorder — batch sort_order update</div>
         <div class="li"><div class="li-num">7</div>available=0 marks product unavailable on public menu instantly</div>
       </div>
-      <div class="card a2" style="padding:20px;">
+      <div class="card a2" style="padding:20px;" data-url="/admin/products">
         <div class="sec-title">➕ Add-ons & Tags</div>
         <div class="sec-sub">Fully normalised — no string hacks</div>
         <div class="li"><div class="li-dot"></div>addons table: id, name, price, inventory_id (links to stock)</div>
@@ -693,7 +695,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
   </div>
   <div class="sb">
     <div class="g2">
-      <div class="card a1" style="padding:20px;">
+      <div class="card a1" style="padding:20px;" data-url="/admin/inventory">
         <div class="sec-title">📦 Stock Control</div>
         <div class="sec-sub">Real-time ingredient tracking</div>
         <div class="li"><div class="li-num">1</div>inventory table: item_name, quantity, unit, min_threshold</div>
@@ -703,7 +705,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
         <div class="li"><div class="li-num">5</div>CaffAIne reads critical (below threshold) + approaching (within 150%)</div>
         <div class="li"><div class="li-num">6</div>Out-of-stock flag in products query: marks isOutOfStock=true</div>
       </div>
-      <div class="card a2" style="padding:20px;">
+      <div class="card a2" style="padding:20px;" data-url="/admin/inventory">
         <div class="sec-title">🧪 Recipe System</div>
         <div class="sec-sub">Automated deduction on every sale</div>
         <div class="li"><div class="li-num">1</div>recipes table: menu_item_id, inventory_id, quantity_required</div>
@@ -727,7 +729,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
   </div>
   <div class="sb">
     <div class="g2">
-      <div class="card a1" style="padding:20px;">
+      <div class="card a1" style="padding:20px;" data-url="/admin/analytics">
         <div class="sec-title">📈 What's Tracked</div>
         <div class="sec-sub">From /api/dashboard-stats — real SQL aggregations</div>
         <div class="li"><div class="li-dot"></div>Total revenue: SUM(total_amount) all-time</div>
@@ -738,7 +740,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
         <div class="li"><div class="li-dot"></div>Today vs yesterday: separate COUNT + SUM queries</div>
         <div class="li"><div class="li-dot"></div>CaffAIne: top 50 products by sold count for AI context</div>
       </div>
-      <div class="card a2" style="padding:20px;">
+      <div class="card a2" style="padding:20px;" data-url="/admin/analytics">
         <div class="sec-title">🏆 Top Products Sample</div>
         <div class="sec-sub">Actual Faculty Coffee bestsellers</div>
         <div class="bar-chart">
@@ -764,7 +766,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
   </div>
   <div class="sb">
     <div class="g2">
-      <div class="card a1" style="padding:20px;">
+      <div class="card a1" style="padding:20px;" data-url="/admin/offers">
         <div class="sec-title">🎁 Offers System</div>
         <div class="sec-sub">Full CRUD — GET, POST, PUT, DELETE /api/offers</div>
         <div class="li"><div class="li-dot"></div>Fields: product_name, discount_percent, reason, end_date, active</div>
@@ -774,7 +776,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
         <div class="li"><div class="li-dot"></div>All offer changes logged in audit trail automatically</div>
         <div class="li"><div class="li-dot"></div>end_date field — schedule automatic expiry per offer</div>
       </div>
-      <div class="card a2" style="padding:20px;">
+      <div class="card a2" style="padding:20px;" data-url="/admin/feedback">
         <div class="sec-title">⭐ Three-Tier Review System</div>
         <div class="sec-sub">GET /api/feedback returns all three types merged</div>
         <div class="li"><div class="li-num">1</div>Product Reviews: FK → menu_items CASCADE DELETE. Rating 1–5 + comment</div>
@@ -798,17 +800,17 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
   </div>
   <div class="sb">
     <div class="g3">
-      <div class="fc card a1">
+      <div class="fc card a1" data-url="/admin/jobs">
         <div class="fc-icon">💼</div><div class="fc-line"></div>
         <div class="fc-title">Jobs Module</div>
         <div class="fc-text">careers table: title, type, location, description, active. Admin creates/closes listings. Active jobs on public Careers page via GET /api/careers?active=1. DELETE removes permanently.</div>
       </div>
-      <div class="fc card a2">
+      <div class="fc card a2" data-url="/admin/applications">
         <div class="fc-icon">📄</div><div class="fc-line"></div>
         <div class="fc-title">Applications</div>
         <div class="fc-text">Apply via public form → POST /api/apply. Stored: name, email, phone, position, cover_letter, resume_url, status. Admin updates status via PUT /api/applications/:id/status. CaffAIne reads latest 20.</div>
       </div>
-      <div class="fc card a3">
+      <div class="fc card a3" data-url="/admin/messages">
         <div class="fc-icon">✉️</div><div class="fc-line"></div>
         <div class="fc-title">Messages</div>
         <div class="fc-text">Contact form → POST /api/contact. contact_messages: name, email, message, is_read, created_at. Mark read: PUT /api/contact/:id/read. DELETE removes. CaffAIne reads last 7 messages.</div>
@@ -828,7 +830,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
   <div class="sb">
     <div class="g2" style="height:100%">
       <div style="display:grid;grid-template-columns:1fr;gap:13px;height:100%">
-        <div class="card a1" style="padding:18px;">
+        <div class="card a1" style="padding:18px;" data-url="/admin/login">
           <div class="sec-title">🔐 Authentication</div>
           <div class="sec-sub">POST /api/admin/login — 4 team accounts</div>
           <div class="li"><div class="li-dot"></div>omar@coffee.com (super_admin), sultan@coffee.com, mohammad@coffee.com, bashar@coffee.com (admin)</div>
@@ -836,7 +838,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
           <div class="li"><div class="li-dot"></div>AdminRoute wraps all /admin/* — redirects to login if no context</div>
           <div class="li"><div class="li-dot"></div>Every login action inserted into admin_logs automatically</div>
         </div>
-        <div class="card a2" style="padding:18px;">
+        <div class="card a2" style="padding:18px;" data-url="/admin/leader-dashboard">
           <div class="sec-title">📋 Audit Log Middleware</div>
           <div class="sec-sub">req.logAdminAction on every route</div>
           <div class="li"><div class="li-dot"></div>Reads x-admin-email + x-admin-name headers on every request</div>
@@ -845,14 +847,14 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr;gap:13px;height:100%">
-        <div class="card a3" style="padding:18px;">
+        <div class="card a3" style="padding:18px;" data-url="/admin/leader-dashboard">
           <div class="sec-title">👥 Role-Based Access</div>
           <div class="sec-sub">super_admin vs admin</div>
           <div class="li"><div class="li-dot"></div>LeaderDashboard: if role !== 'super_admin' → navigate('/admin/dashboard')</div>
           <div class="li"><div class="li-dot"></div>Leader auto-refreshes every 15s — always current data</div>
           <div class="li"><div class="li-dot"></div>Regular admins: no audit logs, no critical feedback panel</div>
         </div>
-        <div class="card a4" style="padding:18px;">
+        <div class="card a4" style="padding:18px;" data-url="/admin/login">
           <div class="sec-title">🛡 Data Integrity</div>
           <div class="sec-sub">Server-side validation everywhere</div>
           <div class="li"><div class="li-dot"></div>Multer: fileFilter — jpeg/jpg/png/webp/gif only, rejects others</div>
@@ -875,7 +877,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
   </div>
   <div class="sb">
     <div class="g2">
-      <div class="card a1" style="padding:20px;">
+      <div class="card a1" style="padding:20px;" data-url="/admin/leader-dashboard">
         <div class="sec-title">👑 Leader-Only Features</div>
         <div class="sec-sub">Omar Al-Ajarma — super_admin only</div>
         <div class="li"><div class="li-num">1</div>3 parallel API calls: /api/admin/logs + /api/reviews + /api/contact-messages</div>
@@ -885,7 +887,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
         <div class="li"><div class="li-num">5</div>Hoverable row highlight for fast scanning</div>
         <div class="li"><div class="li-num">6</div>Non-super-admin visit → instant redirect to /admin/dashboard</div>
       </div>
-      <div class="card a2" style="padding:20px;">
+      <div class="card a2" style="padding:20px;" data-url="/admin/leader-dashboard">
         <div class="sec-title">📊 Critical Detection + PDF</div>
         <div class="sec-sub">Automated bad-experience surfacing</div>
         <div class="li"><div class="li-dot"></div>Combines product_reviews (rating ≤ 3) + contact messages with bad keywords</div>
@@ -909,7 +911,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
   </div>
   <div class="sb">
     <div class="g2">
-      <div class="card a1" style="padding:20px;">
+      <div class="card a1" style="padding:20px;" data-url="/#ux">
         <div class="sec-title">✨ UX Details Built</div>
         <div class="sec-sub">Every detail from the actual codebase</div>
         <div class="li"><div class="li-dot"></div><strong>Lenis Smooth Scroll:</strong> @studio-freight/lenis, duration 1.25s, custom easing</div>
@@ -921,7 +923,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;c
         <div class="li"><div class="li-dot"></div><strong>MobileNav:</strong> Separate mobile navigation component for responsive layout</div>
         <div class="li"><div class="li-dot"></div><strong>Scroll Progress:</strong> #scroll-progress bar shows reading position on public site</div>
       </div>
-      <div class="card a2" style="padding:20px;">
+      <div class="card a2" style="padding:20px;" data-url="/#challenges">
         <div class="sec-title">⚡ Real Engineering Challenges</div>
         <div class="sec-sub">Actual problems we hit and solved</div>
         <div class="li"><div class="li-dot"></div><strong>0-Price Addons:</strong> Migration fixes historical order_items price=0 → lookup from addons table</div>
@@ -1260,6 +1262,16 @@ document.addEventListener('touchend',e=>{
   const dx=tx-e.changedTouches[0].clientX;
   if(Math.abs(dx)>50)go(cur_+(dx>0?1:-1));
 },{passive:true});
+
+// ── OPEN URL ──
+const BASE_URL = 'https://caffaine-dashboard-v1-eygrgfdsfdgrghft.swedencentral-01.azurewebsites.net';
+document.addEventListener('click', e => {
+  const card = e.target.closest('.card[data-url]');
+  if (card) {
+    const url = card.getAttribute('data-url');
+    window.open(BASE_URL + url, '_blank');
+  }
+});
 
 go(0);
 </script>
