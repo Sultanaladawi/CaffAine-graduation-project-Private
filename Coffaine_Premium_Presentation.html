@@ -335,11 +335,7 @@
       backdrop-filter: blur(16px) saturate(1.2);
       box-shadow: 0 4px 28px rgba(100, 60, 20, .08), inset 0 1px 0 rgba(255, 255, 255, .6);
       transition: transform .35s cubic-bezier(.4, 0, .2, 1), box-shadow .35s;
-      cursor: default; /* Changed default cursor to normal arrow */
-    }
-
-    .card[data-url] {
-      cursor: pointer; /* Only cards with links show the pointer hand */
+      cursor: none; /* Always hide the browser arrow */
     }
 
     .card[data-url]:hover {
@@ -350,6 +346,10 @@
     .card[data-url]:active {
       transform: translateY(-2px) scale(0.98);
     }
+
+    /* Scaling effect for custom cursor over links */
+    body.is-hovering #cur { transform: translate(-50%, -50%) scale(1.5); background: var(--caramel); }
+    body.is-hovering #cur2 { transform: translate(-50%, -50%) scale(1.2); border-color: var(--gold); opacity: 1; }
 
     .card-glow {
       box-shadow: 0 4px 28px rgba(196, 135, 74, .15), inset 0 1px 0 rgba(255, 255, 255, .6);
@@ -2621,8 +2621,14 @@
     document.addEventListener('mousemove', e => {
       cur.style.left = e.clientX + 'px'; cur.style.top = e.clientY + 'px';
       setTimeout(() => { cur2.style.left = e.clientX + 'px'; cur2.style.top = e.clientY + 'px'; }, 60);
+
+      // Custom cursor hover detection
+      const hovered = e.target.closest('[data-url], .dot, .kbd');
+      if(hovered) document.body.classList.add('is-hovering');
+      else document.body.classList.remove('is-hovering');
     });
 
+    // ── OPEN URL ──
     // ── ANIMATED CANVAS BACKGROUND ──
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
