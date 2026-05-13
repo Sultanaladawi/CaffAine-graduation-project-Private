@@ -197,12 +197,20 @@
       padding: 18px 56px 4px;
     }
 
-    /* Slides 19 & 21 — move content up more */
-    #s19 .sb, #s21 .sb {
+    /* Slide 19 — move content up more */
+    #s19 .sb {
       padding-top: 0px;
     }
-    #s19 .sh, #s21 .sh {
+    #s19 .sh {
       padding: 10px 56px 4px;
+    }
+
+    /* Slide 21 — lowered slightly as requested */
+    #s21 .sb {
+      padding-top: 10px;
+    }
+    #s21 .sh {
+      padding: 18px 56px 8px;
     }
 
     /* ── ANIMATIONS ── */
@@ -1027,7 +1035,7 @@
       height: 100%;
       flex-direction: column;
       text-align: center;
-      padding: 0 40px 60px;
+      padding: 0 40px 110px; /* Lifted to be in the vertical center */
     }
 
     /* Added 60px bottom padding to lift content visually */
