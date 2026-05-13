@@ -506,6 +506,29 @@ const Products = () => {
           position: relative;
           z-index: 10;
         }
+
+        /* Mobile View: Hide Table, Show Cards */
+        @media screen and (max-width: 1024px) {
+          .desktop-table { display: none !important; }
+          .mobile-cards { display: grid !important; }
+        }
+        
+        .mobile-cards {
+          display: none;
+          grid-template-columns: 1fr;
+          gap: 20px;
+          padding: 10px;
+        }
+        
+        .product-mobile-card {
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid ${colors.border};
+          border-radius: 20px;
+          padding: 20px;
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+        }
       `}</style>
       {/* Elegant Notification Toast */}
       {notification && (
@@ -1051,30 +1074,33 @@ const Products = () => {
           <div style={{ padding: '100px', textAlign: 'center', color: colors.latte, letterSpacing: '3px', fontWeight: 'bold', opacity: 0.6 }}>
             PREPARING PREMIUM MENU...
           </div>
-        ) :          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 10px', color: colors.latte, textAlign: 'left', tableLayout: 'fixed' }}>
-              <colgroup>
-                <col style={{ width: '140px' }} />
-                <col style={{ width: '22%' }} />
-                <col style={{ width: '12%' }} />
-                <col style={{ width: '9%' }} />
-                <col style={{ width: '16%' }} />
-                <col style={{ width: '15%' }} />
-                <col style={{ width: '10%' }} />
-                <col style={{ width: '8%' }} />
-              </colgroup>
-              <thead style={{ backgroundColor: 'rgba(45, 41, 38, 0.7)' }}>
-                <tr>
-                  <th style={{ padding: '20px 12px', color: colors.crema, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: '700' }}>ID</th>
-                  <th style={{ padding: '20px 12px', color: colors.crema, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: '700' }}>Product</th>
-                  <th style={{ padding: '20px 12px', color: colors.crema, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: '700' }}>Category</th>
-                  <th style={{ padding: '20px 12px', color: colors.crema, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: '700' }}>Price</th>
-                  <th style={{ padding: '20px 12px', color: colors.crema, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: '700' }}>Tags</th>
-                  <th style={{ padding: '20px 12px', color: colors.crema, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: '700' }}>Add-ons</th>
-                  <th style={{ padding: '20px 12px', color: colors.crema, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: '700' }}>Status</th>
-                  <th style={{ padding: '20px 12px', color: colors.crema, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: '700', textAlign: 'center' }}>Actions</th>
-                </tr>
-              </thead>
+        ) : (
+          <>
+            {/* Desktop View Table */}
+            <div className="desktop-table" style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 10px', color: colors.latte, textAlign: 'left', tableLayout: 'fixed' }}>
+                <colgroup>
+                  <col style={{ width: '140px' }} />
+                  <col style={{ width: '22%' }} />
+                  <col style={{ width: '12%' }} />
+                  <col style={{ width: '9%' }} />
+                  <col style={{ width: '16%' }} />
+                  <col style={{ width: '15%' }} />
+                  <col style={{ width: '10%' }} />
+                  <col style={{ width: '8%' }} />
+                </colgroup>
+                <thead style={{ backgroundColor: 'rgba(45, 41, 38, 0.7)' }}>
+                  <tr>
+                    <th style={{ padding: '20px 12px', color: colors.crema, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: '700' }}>ID</th>
+                    <th style={{ padding: '20px 12px', color: colors.crema, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: '700' }}>Product</th>
+                    <th style={{ padding: '20px 12px', color: colors.crema, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: '700' }}>Category</th>
+                    <th style={{ padding: '20px 12px', color: colors.crema, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: '700' }}>Price</th>
+                    <th style={{ padding: '20px 12px', color: colors.crema, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: '700' }}>Tags</th>
+                    <th style={{ padding: '20px 12px', color: colors.crema, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: '700' }}>Add-ons</th>
+                    <th style={{ padding: '20px 12px', color: colors.crema, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: '700' }}>Status</th>
+                    <th style={{ padding: '20px 12px', color: colors.crema, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: '700', textAlign: 'center' }}>Actions</th>
+                  </tr>
+                </thead>
               <tbody>
                 {products.map((item, index) => (
                   <tr key={item.id} className="product-row premium-row"
@@ -1211,9 +1237,66 @@ const Products = () => {
                   </tr>
                 ))}
               </tbody>
-            </table>
-          </div>
-        }
+            </div>
+
+            {/* Mobile View Cards */}
+            <div className="mobile-cards">
+              {products.map((item, index) => (
+                <div key={item.id} className="product-mobile-card">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ padding: '4px 12px', borderRadius: '8px', background: 'linear-gradient(135deg, #c7a57a 0%, #a47c4f 100%)', color: colors.espresso, fontWeight: 900, fontSize: '0.7rem' }}>
+                      PRD-{String(index + 1).padStart(3, '0')}
+                    </span>
+                    <div style={{ display: 'flex', gap: '15px' }}>
+                      <Edit onClick={() => openEditModal(item)} size={18} style={{ cursor: 'pointer', color: colors.crema }} />
+                      <Trash2 onClick={() => handleDelete(item.id)} size={18} style={{ cursor: 'pointer', color: '#e74a3b' }} />
+                    </div>
+                  </div>
+                  
+                  <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                    <div style={{ width: '80px', height: '80px', borderRadius: '15px', overflow: 'hidden', border: `1px solid ${colors.border}` }}>
+                      <img 
+                        src={item.image_url ? `/images/${item.image_url}` : '/images/coffee-beans.png'}
+                        alt={item.name} 
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        onError={e => { e.target.onerror = null; e.target.src = '/images/coffee-beans.png'; }}
+                      />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <h4 style={{ color: '#fff', margin: '0 0 5px 0', fontSize: '1.1rem' }}>{item.name}</h4>
+                      <div style={{ color: colors.crema, fontSize: '0.85rem', fontWeight: '700' }}>
+                        {item.discounted_price ? (
+                          <>
+                            <span style={{ textDecoration: 'line-through', opacity: 0.5, marginRight: '8px' }}>£{parseFloat(item.price_num).toFixed(2)}</span>
+                            <span style={{ color: '#38ef7d' }}>£{parseFloat(item.discounted_price).toFixed(2)}</span>
+                          </>
+                        ) : `£${parseFloat(item.price_num || 0).toFixed(2)}`}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#888', marginTop: '5px' }}>
+                        {dbCategories.find(c => String(c.id) === String(item.category_id))?.name || 'Uncategorized'}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '10px', borderTop: `1px solid rgba(255,255,255,0.05)` }}>
+                    <span style={{ 
+                      backgroundColor: item.available === 0 ? 'rgba(231, 74, 59, 0.1)' : 'rgba(40, 167, 69, 0.1)', 
+                      color: item.available === 0 ? '#e74a3b' : '#28a745',
+                      padding: '4px 10px', borderRadius: '20px', fontSize: '0.65rem', fontWeight: '700'
+                    }}>
+                      {item.available === 0 ? 'OUT OF STOCK' : 'AVAILABLE'}
+                    </span>
+                    <div style={{ display: 'flex', gap: '5px' }}>
+                       {item.linkedTags?.slice(0,2).map((t, i) => (
+                         <span key={i} style={{ fontSize: '0.6rem', color: '#c7a57a', border: '1px solid #c7a57a', padding: '2px 6px', borderRadius: '5px' }}>{t.name}</span>
+                       ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
