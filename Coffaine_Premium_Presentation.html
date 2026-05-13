@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Coffaine — Graduation Project 2026</title>
-  <link rel="icon" href="public/favicon.jpg" />
+  <link rel="icon" href="/favicon.jpg" />
   <link
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600;700&display=swap"
     rel="stylesheet" />
@@ -1117,32 +1117,59 @@
     }
     /* ── RESPONSIVE ADAPTATIONS ── */
     @media (max-width: 1024px) {
-      .sh h2 { font-size: 32px; }
-      #s1 .brand-name { font-size: 80px; }
+      .sh h2 { font-size: 2.5rem; }
+      #s1 .brand-name { font-size: 5rem; }
       .g3, .g4, .g5 { grid-template-columns: 1fr 1fr; }
-      .sh { padding: 20px 30px 10px; }
-      .sb { padding: 10px 30px 40px; }
+      .sh { padding: 30px 40px 10px; }
+      .sb { padding: 10px 40px 40px; }
     }
 
     @media (max-width: 768px) {
-      #cur, #cur2 { display: none; } /* Hide custom cursor on touch */
+      #cur, #cur2 { display: none; }
       body { cursor: auto !important; } 
-      .sh h2 { font-size: 26px; }
-      #s1 .brand-name { font-size: 60px; }
-      .g2, .g3, .g4, .g5 { grid-template-columns: 1fr; }
-      .sh { padding: 15px 20px 5px; }
-      .sb { padding: 5px 20px 30px; }
-      .tc-name, .fc-title { font-size: 18px; }
-      .stat-val { font-size: 28px; }
-      #s1 .team-grid { grid-template-columns: 1fr; gap: 15px; }
+      
+      .slide-glass {
+        padding: 15px;
+        border-radius: 20px;
+        width: 92%;
+        margin: 0 auto;
+      }
+
+      .sh h2 { font-size: 1.8rem; margin-bottom: 10px; }
+      .sh .label { font-size: 0.6rem; }
+      
+      #s1 .brand-name { font-size: 3.5rem; }
+      #s1 .team-grid { grid-template-columns: 1fr; gap: 10px; }
+      #s1 .team-card { padding: 12px; }
+      
+      .g2, .g3, .g4, .g5 { grid-template-columns: 1fr; gap: 15px; }
+      .stat-val { font-size: 2rem; }
+      .tc-name, .fc-title { font-size: 1rem; }
+      
+      .sb { 
+        padding: 10px 20px 60px; 
+        overflow-y: auto;
+      }
+      
+      .nav-controls {
+        bottom: 15px;
+        gap: 15px;
+      }
+      
       #s22 .fg-grid { grid-template-columns: 1fr; }
-      .bubble { max-width: 95%; }
+      #s22 .thanks-names { font-size: 1.2rem; }
+      
+      .bubble { 
+        max-width: 100%; 
+        font-size: 0.85rem; 
+        padding: 12px 18px;
+      }
     }
 
     @media (max-height: 700px) {
-      .sh h2 { font-size: 24px; }
-      .fc-icon, .tc-icon { font-size: 20px; }
-      .sb { padding-bottom: 20px; }
+      .sh { padding-top: 10px; }
+      .sh h2 { font-size: 1.5rem; }
+      .sb { padding-bottom: 50px; }
     }
   </style>
 </head>
