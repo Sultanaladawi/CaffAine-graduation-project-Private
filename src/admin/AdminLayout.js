@@ -213,10 +213,11 @@ const AdminLayout = () => {
       fontFamily: "'Inter', sans-serif",
       margin: 0, padding: 0
     }}>
-      <div style={{
+      <div className="admin-sidebar" style={{
         width: '260px', backgroundColor: 'var(--admin-card)', position: 'fixed',
         height: '100vh', borderRight: '1px solid var(--admin-border)', zIndex: 1000,
-        display: 'flex', flexDirection: 'column', boxShadow: '4px 0 15px rgba(0,0,0,0.4)'
+        display: 'flex', flexDirection: 'column', boxShadow: '4px 0 15px rgba(0,0,0,0.4)',
+        transition: 'all 0.3s ease'
       }}>
         <div style={{ padding: '30px 20px', textAlign: 'center' }}>
           <div style={{ color: 'var(--admin-accent)', marginBottom: '12px', display: 'flex', justifyContent: 'center' }}>
@@ -251,7 +252,7 @@ const AdminLayout = () => {
                   position: 'relative'
                 }}
               >
-                {item.icon} {item.name}
+                {item.icon} <span className="mobile-hide">{item.name}</span>
                 {item.badge > 0 && (
                   <span style={{
                     position: 'absolute', right: '18px',
@@ -280,9 +281,10 @@ const AdminLayout = () => {
         </div>
       </div>
 
-      <div style={{
+      <div className="admin-main" style={{
         marginLeft: '260px', flex: 1, display: 'flex', flexDirection: 'column',
-        minHeight: '100vh', backgroundColor: 'var(--admin-bg)'
+        minHeight: '100vh', backgroundColor: 'var(--admin-bg)',
+        transition: 'all 0.3s ease'
       }}>
         <header style={{
           height: '80px', backgroundColor: 'var(--admin-card)', borderBottom: '1px solid var(--admin-border)',

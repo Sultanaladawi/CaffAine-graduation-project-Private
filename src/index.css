@@ -34,3 +34,31 @@
 @media screen and (max-width: 1600px) { body { zoom: 90%; } }
 @media screen and (max-width: 1400px) { body { zoom: 85%; } }
 
+/* Global Responsiveness for Customer & Admin Sites */
+@media screen and (max-width: 1024px) {
+  .grid-container, .admin-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .grid-container, .admin-grid, .menu-grid {
+    grid-template-columns: 1fr !important;
+  }
+  h1 { font-size: 1.8rem !important; }
+  h2 { font-size: 1.5rem !important; }
+  .mobile-hide { display: none !important; }
+  
+  /* Admin Sidebar Handling */
+  .admin-sidebar {
+    width: 70px !important;
+  }
+  .admin-sidebar span { display: none; }
+  .admin-main { margin-left: 70px !important; }
+}
+
+@media screen and (max-width: 480px) {
+  .card, .panel { padding: 15px !important; }
+  button { padding: 10px 15px !important; }
+}
+

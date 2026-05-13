@@ -1115,6 +1115,35 @@
       animation: rotate-slow linear infinite;
       pointer-events: none;
     }
+    /* ── RESPONSIVE ADAPTATIONS ── */
+    @media (max-width: 1024px) {
+      .sh h2 { font-size: 32px; }
+      #s1 .brand-name { font-size: 80px; }
+      .g3, .g4, .g5 { grid-template-columns: 1fr 1fr; }
+      .sh { padding: 20px 30px 10px; }
+      .sb { padding: 10px 30px 40px; }
+    }
+
+    @media (max-width: 768px) {
+      #cur, #cur2 { display: none; } /* Hide custom cursor on touch */
+      body { cursor: auto !important; } 
+      .sh h2 { font-size: 26px; }
+      #s1 .brand-name { font-size: 60px; }
+      .g2, .g3, .g4, .g5 { grid-template-columns: 1fr; }
+      .sh { padding: 15px 20px 5px; }
+      .sb { padding: 5px 20px 30px; }
+      .tc-name, .fc-title { font-size: 18px; }
+      .stat-val { font-size: 28px; }
+      #s1 .team-grid { grid-template-columns: 1fr; gap: 15px; }
+      #s22 .fg-grid { grid-template-columns: 1fr; }
+      .bubble { max-width: 95%; }
+    }
+
+    @media (max-height: 700px) {
+      .sh h2 { font-size: 24px; }
+      .fc-icon, .tc-icon { font-size: 20px; }
+      .sb { padding-bottom: 20px; }
+    }
   </style>
 </head>
 

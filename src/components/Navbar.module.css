@@ -221,4 +221,12 @@
 @media (max-width: 768px) {
   .navLinks { display: none; }
   .burger   { display: flex; }
+  .inner { padding: 0.4rem 1.2rem; }
+  .logo div { font-size: 1.6rem !important; }
+}
+
+@media (max-width: 480px) {
+  .logo div { font-size: 1.4rem !important; }
+  .cartBtn { width: 36px; height: 36px; }
+  .mobileLink, .mobileCartLink { font-size: 2rem; }
 }

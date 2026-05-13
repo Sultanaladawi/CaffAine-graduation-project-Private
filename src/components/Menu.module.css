@@ -254,16 +254,21 @@
 }
 
 @media (max-width: 768px) {
+  .menu { padding: 4rem 0; }
   .item {
     padding: 1rem;
+    gap: 1rem;
   }
-
   .itemName {
     font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-
   .featuredGrid {
-    gap: 1rem;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 0 1.5rem;
   }
 }
 
