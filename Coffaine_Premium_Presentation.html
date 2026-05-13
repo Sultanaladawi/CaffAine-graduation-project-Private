@@ -50,27 +50,27 @@
     /* ── CUSTOM CURSOR ── */
     #cur {
       position: fixed;
-      width: 10px;
-      height: 10px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       background: var(--gold);
       pointer-events: none;
       z-index: 9999;
       transform: translate(-50%, -50%);
-      mix-blend-mode: multiply;
+      box-shadow: 0 0 10px rgba(196, 154, 60, 0.4);
     }
 
     #cur2 {
       position: fixed;
-      width: 36px;
-      height: 36px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
-      border: 1.5px solid var(--caramel);
+      border: 1px solid rgba(196, 135, 74, 0.4);
       pointer-events: none;
       z-index: 9998;
       transform: translate(-50%, -50%);
-      opacity: .5;
-      transition: left .09s, top .09s;
+      transition: left .12s cubic-bezier(0.23, 1, 0.32, 1), top .12s cubic-bezier(0.23, 1, 0.32, 1), width .3s, height .3s, border-color .3s;
+      background: rgba(196, 135, 74, 0.03);
     }
 
     /* ── DECK ── */
@@ -199,10 +199,10 @@
 
     /* Slides 19 & 21 — move content up */
     #s19 .sb, #s21 .sb {
-      padding-top: 6px;
+      padding-top: 0px;
     }
     #s19 .sh, #s21 .sh {
-      padding-bottom: 8px;
+      padding: 18px 56px 4px;
     }
 
     /* ── ANIMATIONS ── */
