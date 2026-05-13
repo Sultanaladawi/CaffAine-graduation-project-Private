@@ -1236,7 +1236,8 @@ const Products = () => {
                     </td>
                   </tr>
                 ))}
-              </tbody>
+                </tbody>
+              </table>
             </div>
 
             {/* Mobile View Cards */}
