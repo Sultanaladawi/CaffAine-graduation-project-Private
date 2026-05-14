@@ -81,10 +81,10 @@ app.use(express.static(path.join(__dirname, 'build')));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
 
-// Explicitly serve manifest.json to ensure PWA stability
-app.get('/manifest.json', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'manifest.json'));
-});
+// Explicitly serve favicon and manifest to ensure stability across all platforms
+app.get('/favicon.jpg', (req, res) => res.sendFile(path.join(__dirname, 'public', 'favicon.jpg')));
+app.get('/favicon.ico', (req, res) => res.sendFile(path.join(__dirname, 'public', 'favicon.jpg')));
+app.get('/manifest.json', (req, res) => res.sendFile(path.join(__dirname, 'build', 'manifest.json')));
 
 // Serving the presentation file with a short, professional URL
 app.get('/presentation', (req, res) => {
