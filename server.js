@@ -78,7 +78,13 @@ app.use((req, res, next) => {
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'build')));
 app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
+
+// Explicitly serve manifest.json to avoid catch-all route conflicts
+app.get('/manifest.json', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'manifest.json'));
+});
 
 // Serving the presentation file with a short, professional URL
 app.get('/presentation', (req, res) => {
@@ -1308,7 +1314,7 @@ app.post('/api/ai-assistant-logs', (req, res) => {
 });
 
 // ✅ Serve React build files
-app.use(express.static(path.join(__dirname, 'build')));
+// Static build already moved to top for better priority
 
 // ✅ SERVE GRADUATION PRESENTATION
 app.get('/presentation', (req, res) => {
