@@ -121,8 +121,8 @@ const Dashboard = () => {
         .orb-2 { width: 500px; height: 500px; background: #2a1b10; bottom: -100px; left: -100px; }
         @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 50px) scale(1.1); } }
         
-        .stat-card { background: rgba(255,255,255,0.025); border: 1px solid ${theme.border}; border-radius: 28px; padding: 30px; transition: 0.4s; position: relative; z-index: 1; backdrop-filter: blur(10px); cursor: pointer; }
-        .stat-card:hover { transform: translateY(-10px); border-color: ${theme.accent}66; background: rgba(196, 164, 132, 0.05); box-shadow: 0 30px 60px rgba(0,0,0,0.6); }
+        .stat-card { background: rgba(255,255,255,0.025); border: 1px solid ${theme.border}; border-radius: 20px; padding: 25px; transition: 0.4s; position: relative; z-index: 1; backdrop-filter: blur(10px); cursor: pointer; display: flex; flexDirection: column; gap: 15px; }
+        .stat-card:hover { transform: translateY(-5px); border-color: ${theme.accent}66; background: rgba(196, 164, 132, 0.05); box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
         
         .chart-container { background: rgba(255,255,255,0.015); border: 1px solid ${theme.border}; border-radius: 35px; padding: 40px; position: relative; z-index: 1; }
         .bar-wrapper { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 10px; position: relative; }
@@ -215,14 +215,14 @@ const Dashboard = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '25px', marginBottom: '40px', position: 'relative', zIndex: 1 }}>
+      <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '40px', position: 'relative', zIndex: 1 }}>
         {cards.map((c, i) => (
           <div key={i} className="stat-card" onClick={() => navigate(c.path)}>
             <div style={{ background: `${c.color}22`, color: c.color, padding: '12px', borderRadius: '15px', width: 'fit-content', marginBottom: '20px', border: `1px solid ${c.color}33` }}>
               <c.icon size={22} />
             </div>
-            <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.75rem', fontWeight: 900, letterSpacing: '2.5px', marginBottom: '8px' }}>{c.title}</div>
-            <div style={{ color: '#fff', fontSize: '2.2rem', fontWeight: 900, fontFamily: 'monospace' }}>{c.value}</div>
+            <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.8rem', fontWeight: 900, letterSpacing: '1px', marginBottom: '5px', textTransform: 'uppercase' }}>{c.title}</div>
+            <div style={{ color: '#fff', fontSize: '1.8rem', fontWeight: 800 }}>{c.value}</div>
             <div style={{ color: c.color, fontSize: '0.65rem', marginTop: '15px', fontWeight: 700, opacity: 0.8, display: 'flex', alignItems: 'center', gap: '5px' }}>
               {c.desc} <ChevronRight size={12} />
             </div>

@@ -77,6 +77,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
 
 // Serving the presentation file with a short, professional URL
