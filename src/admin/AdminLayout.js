@@ -7,7 +7,7 @@ import {
   LayoutGrid, ShoppingBag, ShoppingCart, Box,
   BarChart3, MessageSquare, BotMessageSquare, LogOut, User, Coffee,
   FileText, MessagesSquare, Volume2, VolumeX, Briefcase, BellRing,
-  Power, Store, Mail, Activity
+  Power, Store, Mail, Activity, Menu, X
 } from 'lucide-react';
 
 // Setup global axios interceptor to attach admin identity for Audit Logs
@@ -33,6 +33,7 @@ const AdminLayout = () => {
   const lastLowStockCount = useRef(0);
   const lastOrderCount = useRef(null); // null = first load, don't ring
   const [newOrderCount, setNewOrderCount] = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Play a pleasant 3-beep chime using Web Audio API (no external files needed)
   const playOrderChime = () => {
@@ -167,6 +168,8 @@ const AdminLayout = () => {
     if (!loading && !admin && location.pathname.startsWith('/admin')) {
       navigate('/admin/login', { replace: true });
     }
+    // Close sidebar on navigation (mobile)
+    setSidebarOpen(false);
   }, [admin, loading, location.pathname, navigate]);
 
   const handleLogout = async () => {
@@ -211,9 +214,21 @@ const AdminLayout = () => {
       width: '100%',
       backgroundColor: 'var(--admin-bg)',
       fontFamily: "'Inter', sans-serif",
-      margin: 0, padding: 0
+      margin: 0, padding: 0,
+      position: 'relative'
     }}>
-      <div className="admin-sidebar" style={{
+      {/* Mobile Backdrop */}
+      {sidebarOpen && (
+        <div 
+          onClick={() => setSidebarOpen(false)}
+          style={{
+            position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', 
+            zIndex: 999, backdropFilter: 'blur(3px)', display: 'none'
+          }}
+          className="mobile-backdrop"
+        />
+      )}
+      <div className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`} style={{
         width: '260px', backgroundColor: 'var(--admin-card)', position: 'fixed',
         height: '100vh', borderRight: '1px solid var(--admin-border)', zIndex: 1000,
         display: 'flex', flexDirection: 'column', boxShadow: '4px 0 15px rgba(0,0,0,0.4)',
@@ -252,7 +267,7 @@ const AdminLayout = () => {
                   position: 'relative'
                 }}
               >
-                {item.icon} <span className="mobile-hide">{item.name}</span>
+                {item.icon} <span>{item.name}</span>
                 {item.badge > 0 && (
                   <span style={{
                     position: 'absolute', right: '18px',
@@ -282,15 +297,25 @@ const AdminLayout = () => {
       </div>
 
       <div className="admin-main" style={{
-        marginLeft: '260px', flex: 1, display: 'flex', flexDirection: 'column',
+        marginLeft: sidebarOpen ? '0' : '260px', flex: 1, display: 'flex', flexDirection: 'column',
         minHeight: '100vh', backgroundColor: 'var(--admin-bg)',
         transition: 'all 0.3s ease'
       }}>
         <header style={{
           height: '80px', backgroundColor: 'var(--admin-card)', borderBottom: '1px solid var(--admin-border)',
-          display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
-          padding: '0 40px', position: 'sticky', top: 0, zIndex: 999, gap: '20px'
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '0 20px', position: 'sticky', top: 0, zIndex: 999, gap: '20px'
         }}>
+          <button 
+            className="mobile-menu-btn"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            style={{
+              background: 'none', border: 'none', color: 'var(--admin-accent)',
+              cursor: 'pointer', display: 'none', alignItems: 'center', justifyContent: 'center'
+            }}
+          >
+            {sidebarOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
           <audio ref={undefined} style={{display:'none'}} />
@@ -379,7 +404,7 @@ const AdminLayout = () => {
             </button>
 
             {/* Admin Profile Details */}
-            <div style={{
+            <div className="admin-profile-box" style={{
               display: 'flex', alignItems: 'center', gap: '15px',
               backgroundColor: 'var(--admin-bg)', padding: '6px 18px', borderRadius: '12px',
               border: '1px solid var(--admin-border)',
@@ -417,6 +442,35 @@ const AdminLayout = () => {
         @keyframes bellRing {
           0% { transform: rotate(-15deg); }
           100% { transform: rotate(15deg); }
+        }
+        @media (max-width: 1024px) {
+          .admin-sidebar {
+            left: -260px;
+          }
+          .admin-sidebar.open {
+            left: 0;
+          }
+          .admin-main {
+            margin-left: 0 !important;
+          }
+          .mobile-menu-btn {
+            display: flex !important;
+          }
+          .mobile-hide {
+            display: none;
+          }
+          .admin-main header {
+            padding: 0 15px !important;
+          }
+          .admin-main main {
+            padding: 20px !important;
+          }
+          .admin-profile-box {
+            display: none !important;
+          }
+          .mobile-backdrop {
+            display: block !important;
+          }
         }
       `}</style>
     </div>

@@ -527,7 +527,24 @@ app.get('/api/dashboard-stats', async (req, res) => {
     else if (mode === 'manual_open') currentState = 'open';
     else if (mode === 'manual_closed') currentState = 'closed';
 
-    res.json({ totalProducts: products.count, totalOrders: orders.count, totalSales: sales.total || 0, todayOrders: todayStats.count || 0, todaySales: todayStats.revenue || 0, yesterdayOrders: yesterdayStats.count || 0, yesterdaySales: yesterdayStats.revenue || 0, storeStatus: currentState, storeMode: mode, lowStock: lowStockItems.length, lowStockItems, dailySales, categoryStats });
+    const [topProducts] = await promiseDb.query(`SELECT item_name, SUM(quantity) as total_sold FROM order_items GROUP BY item_name ORDER BY total_sold DESC LIMIT 6`);
+
+    res.json({ 
+      totalProducts: products.count, 
+      totalOrders: orders.count, 
+      totalSales: sales.total || 0, 
+      todayOrders: todayStats.count || 0, 
+      todaySales: todayStats.revenue || 0, 
+      yesterdayOrders: yesterdayStats.count || 0, 
+      yesterdaySales: yesterdayStats.revenue || 0, 
+      storeStatus: currentState, 
+      storeMode: mode, 
+      lowStock: lowStockItems.length, 
+      lowStockItems, 
+      dailySales, 
+      categoryStats,
+      topProducts: topProducts || []
+    });
   } catch (err) {
     console.error('Dashboard Stats Error:', err);
     res.status(500).json({ error: 'Internal Server Error' });

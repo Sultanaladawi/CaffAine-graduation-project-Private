@@ -21,7 +21,8 @@ const Dashboard = () => {
     storeMode: 'auto',
     lowStock: 0,
     lowStockItems: [],
-    dailySales: []
+    dailySales: [],
+    topProducts: []
   });
   const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -77,7 +78,8 @@ const Dashboard = () => {
         storeMode: incomingData.storeMode || 'auto',
         lowStock: incomingData.lowStock || 0,
         lowStockItems: incomingData.lowStockItems || [],
-        dailySales: last7Days
+        dailySales: last7Days,
+        topProducts: incomingData.topProducts || []
       });
       setLoading(false);
     } catch (err) {
@@ -101,12 +103,13 @@ const Dashboard = () => {
     { title: 'Active Orders', value: stats.totalOrders, icon: ShoppingBag, color: theme.info, desc: 'System processing', path: '/admin/orders' },
     { title: 'Catalog Density', value: stats.totalProducts, icon: LayoutGrid, color: theme.success, desc: 'Menu items verified', path: '/admin/products' },
     { title: 'Logistics Risk', value: stats.lowStock, icon: AlertTriangle, color: theme.danger, desc: stats.lowStock > 0 ? 'CRITICAL ALERT' : 'SUPPLY STABLE', path: '/admin/inventory' },
+    { title: 'Best Seller', value: stats.topProducts[0]?.item_name || 'None', icon: Zap, color: '#ff9a9e', desc: `${stats.topProducts[0]?.total_sold || 0} Items Sold`, path: '/admin/analytics' },
   ];
 
   const maxSales = Math.max(...stats.dailySales.map(d => d.total), 1);
 
   return (
-    <div style={{ backgroundColor: theme.bg, minHeight: '100vh', padding: '40px', fontFamily: "'Inter', sans-serif", color: theme.text, position: 'relative', overflow: 'hidden' }}>
+    <div className="dashboard-container" style={{ backgroundColor: theme.bg, minHeight: '100vh', padding: '40px', fontFamily: "'Inter', sans-serif", color: theme.text, position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: `radial-gradient(circle at 50% -20%, #2a1b10 0%, #070504 70%)`, zIndex: 0 }} />
       <div className="orb orb-1" />
       <div className="orb orb-2" />
@@ -149,14 +152,28 @@ const Dashboard = () => {
         .pulse-open { background: #c4a484; box-shadow: 0 0 10px #c4a484; animation: pulse-beige 2s infinite; }
         .pulse-closed { background: #ff4d4d; box-shadow: 0 0 10px #ff4d4d; animation: pulse-red 2s infinite; }
         .pulse-auto { background: #38ef7d; box-shadow: 0 0 10px #38ef7d; animation: pulse-green 2s infinite; }
-        @keyframes pulse-beige { 0% { box-shadow: 0 0 0 0 rgba(196, 164, 132, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(196, 164, 132, 0); } 100% { box-shadow: 0 0 0 0 rgba(196, 164, 132, 0); } }
-        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 77, 77, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); } }
         @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(56, 239, 125, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(56, 239, 125, 0); } 100% { box-shadow: 0 0 0 0 rgba(56, 239, 125, 0); } }
+
+        @media (max-width: 1024px) {
+          .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .charts-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 768px) {
+          .dashboard-container { padding: 20px !important; }
+          .header-title { font-size: 2rem !important; }
+          .stats-grid { grid-template-columns: 1fr !important; }
+          .page-badge span { font-size: 1.4rem !important; }
+          .stat-card { padding: 20px !important; }
+          .chart-container { padding: 25px !important; }
+          .bar-wrapper { gap: 5px !important; }
+          .bar-wrapper span { font-size: 0.6rem !important; }
+          .minimal-clock { position: static !important; text-align: left !important; margin-top: 15px; }
+        }
       `}</style>
 
       {/* Clean & Elegant Header */}
       <div style={{ position: 'relative', zIndex: 1, marginBottom: '50px' }}>
-        <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: theme.accent, lineHeight: 1 }}>
+        <div className="header-title" style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: theme.accent, lineHeight: 1 }}>
           Faculty <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
         </div>
 
@@ -189,7 +206,7 @@ const Dashboard = () => {
         </div>
 
         {/* Minimal Clock */}
-        <div style={{ position: 'absolute', top: 0, right: 0, textAlign: 'right' }}>
+        <div className="minimal-clock" style={{ position: 'absolute', top: 0, right: 0, textAlign: 'right' }}>
             <div style={{ color: theme.accent, fontSize: '1rem', fontWeight: 900, letterSpacing: '1px' }}>
               <Clock size={16} style={{ marginRight: '8px', verticalAlign: 'middle' }} /> 
               {currentTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Europe/London' }).toUpperCase()}
@@ -198,7 +215,7 @@ const Dashboard = () => {
       </div>
 
       {/* Stats Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '25px', marginBottom: '40px', position: 'relative', zIndex: 1 }}>
+      <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '25px', marginBottom: '40px', position: 'relative', zIndex: 1 }}>
         {cards.map((c, i) => (
           <div key={i} className="stat-card" onClick={() => navigate(c.path)}>
             <div style={{ background: `${c.color}22`, color: c.color, padding: '12px', borderRadius: '15px', width: 'fit-content', marginBottom: '20px', border: `1px solid ${c.color}33` }}>
@@ -213,7 +230,7 @@ const Dashboard = () => {
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '30px', position: 'relative', zIndex: 1 }}>
+      <div className="charts-grid" style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '30px', position: 'relative', zIndex: 1 }}>
         <div className="chart-container">
           <div style={{ marginBottom: '35px' }}>
             <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: '1.8rem', color: '#fff', margin: 0 }}>Verified Performance</h3>

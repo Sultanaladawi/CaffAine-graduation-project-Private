@@ -169,7 +169,7 @@ const Orders = () => {
   };
 
   return (
-    <div style={{ backgroundColor: theme.bg, minHeight: '100vh', padding: '30px', position: 'relative', overflow: 'hidden' }}>
+    <div className="orders-container" style={{ backgroundColor: theme.bg, minHeight: '100vh', padding: '30px', position: 'relative', overflow: 'hidden' }}>
       
       {/* Premium Background Elements */}
       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: `radial-gradient(circle at 50% -20%, #2a1b10 0%, #070504 70%)`, zIndex: 0 }} />
@@ -182,6 +182,18 @@ const Orders = () => {
         @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 50px) scale(1.1); } }
         .page-badge { background: #1b130e; border: 1px solid ${theme.border}; padding: 12px 25px; border-radius: 18px; display: inline-flex; align-items: center; gap: 12px; margin: 20px 0; }
         .page-badge span { font-family: 'Inter', sans-serif; font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: -0.5px; }
+        
+        @media (max-width: 768px) {
+          .orders-container { padding: 15px !important; }
+          .header-section { flex-direction: column !important; gap: 20px !important; }
+          .page-badge span { font-size: 1.5rem !important; }
+          .table-wrapper { overflow-x: auto !important; }
+          .premium-row td { padding: 12px 10px !important; font-size: 0.85rem !important; }
+          .mobile-hide-col { display: none !important; }
+          .modal-content { width: 95% !important; border-radius: 20px !important; }
+          .header-btns { width: 100% !important; flex-direction: column !important; }
+          .header-btns button { width: 100% !important; }
+        }
       `}</style>
 
       {/* Elegant Notification Toast */}
@@ -194,7 +206,7 @@ const Orders = () => {
 
       {selectedOrder && (
       <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', backdropFilter: 'blur(8px)' }}>
-          <div style={{ backgroundColor: '#0d0806', width: '100%', maxWidth: '520px', maxHeight: '90vh', borderRadius: '30px', border: `1px solid ${theme.border}`, position: 'relative', boxShadow: '0 25px 50px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <div className="modal-content" style={{ backgroundColor: '#0d0806', width: '100%', maxWidth: '520px', maxHeight: '90vh', borderRadius: '30px', border: `1px solid ${theme.border}`, position: 'relative', boxShadow: '0 25px 50px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             
             {/* Fixed Header */}
             <div style={{ padding: '30px 40px 20px', borderBottom: `1px solid ${theme.border}`, flexShrink: 0 }}>
@@ -290,7 +302,7 @@ const Orders = () => {
       )}
 
       {/* Unified Header applied over the original layout */}
-      <div style={{ position: 'relative', zIndex: 1, marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div className="header-section" style={{ position: 'relative', zIndex: 1, marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: theme.primary, lineHeight: 1 }}>
             Faculty <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
@@ -305,7 +317,7 @@ const Orders = () => {
             Real-time fulfillment tracking and logistics management.
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '15px' }}>
+        <div className="header-btns" style={{ display: 'flex', gap: '15px' }}>
           <button 
             onClick={fetchOrders}
             style={{ 
@@ -334,7 +346,7 @@ const Orders = () => {
         </div>
       </div>
 
-      <div style={{ 
+      <div className="table-wrapper" style={{ 
         position: 'relative',
         zIndex: 1,
         backgroundColor: theme.card, 
@@ -352,7 +364,7 @@ const Orders = () => {
             <thead>
               <tr style={{ backgroundColor: 'rgba(45, 41, 38, 0.7)' }}>
                 <th style={{ padding: '20px', textAlign: 'left', fontSize: '0.8rem', letterSpacing: '1px', color: cellTextStyle.color }}>ORDER NO.</th>
-                <th style={{ padding: '20px', textAlign: 'left', fontSize: '0.8rem', letterSpacing: '1px', color: cellTextStyle.color }}>DATE & TIME</th>
+                <th className="mobile-hide-col" style={{ padding: '20px', textAlign: 'left', fontSize: '0.8rem', letterSpacing: '1px', color: cellTextStyle.color }}>DATE & TIME</th>
                 <th style={{ padding: '20px', textAlign: 'left', fontSize: '0.8rem', letterSpacing: '1px', color: cellTextStyle.color }}>TOTAL AMOUNT</th>
                 <th style={{ padding: '20px', textAlign: 'left', fontSize: '0.8rem', letterSpacing: '1px', color: cellTextStyle.color }}>STATUS</th>
                 <th style={{ padding: '20px', textAlign: 'center', fontSize: '0.8rem', letterSpacing: '1px', color: cellTextStyle.color }}>ACTIONS</th>
@@ -366,7 +378,7 @@ const Orders = () => {
                   <td style={{ padding: '20px', color: theme.text, fontWeight: 'bold' }}>
                     <span style={{ display: 'inline-block', padding: '6px 14px', borderRadius: '8px', background: 'linear-gradient(135deg, #c7a57a 0%, #a47c4f 100%)', color: theme.bg, fontWeight: 900, letterSpacing: '1px', boxShadow: '0 4px 10px rgba(196, 164, 132, 0.3)' }}>{orderNo}</span>
                   </td>
-                  <td style={{ padding: '20px', color: cellTextStyle.color, fontSize: cellTextStyle.fontSize }}>
+                  <td className="mobile-hide-col" style={{ padding: '20px', color: cellTextStyle.color, fontSize: cellTextStyle.fontSize }}>
                     {order.created_at ? new Date(order.created_at).toLocaleString('en-GB') : 'N/A'}
                   </td>
                   <td style={{ padding: '20px', color: theme.primary, fontWeight: '700', fontSize: cellTextStyle.fontSize }}>

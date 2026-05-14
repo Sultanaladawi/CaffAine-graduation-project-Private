@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { TrendingUp, ShoppingBag, DollarSign, ArrowUpRight, BarChart3 } from 'lucide-react';
+import { TrendingUp, ShoppingBag, DollarSign, ArrowUpRight, BarChart3, Zap } from 'lucide-react';
 
 
 const Analytics = () => {
@@ -10,7 +10,8 @@ const Analytics = () => {
     totalProducts: 0,
     todaySales: 0,
     todayOrders: 0,
-    lowStock: 0
+    lowStock: 0,
+    topProducts: []
   });
   const [loading, setLoading] = useState(true);
 
@@ -84,6 +85,7 @@ const Analytics = () => {
     { title: 'Total Orders', value: stats.totalOrders, icon: ShoppingBag, color: theme.crema, desc: 'Cumulative' },
     { title: 'Avg Order Value', value: `£${(stats.totalSales / (stats.totalOrders || 1)).toFixed(2)}`, icon: TrendingUp, color: '#4facfe', desc: 'Per Customer' },
     { title: 'Active Products', value: stats.totalProducts, icon: BarChart3, color: '#f093fb', desc: 'In Menu' },
+    { title: 'Best Selling', value: stats.topProducts[0]?.item_name || 'None', icon: Zap, color: '#ff9a9e', desc: `${stats.topProducts[0]?.total_sold || 0} Sold` },
   ];
 
   if (loading) return <div style={{ color: theme.crema, padding: '40px', backgroundColor: theme.espresso, minHeight: '100vh' }}>Loading Real-time Analytics...</div>;
@@ -244,6 +246,42 @@ const Analytics = () => {
           <div style={{ textAlign: 'center' }}>
             <p style={{ color: '#fff', fontSize: '1.2rem', fontWeight: 'bold', margin: 0, fontFamily: 'serif' }}>{topCategory.name}</p>
             <p style={{ color: theme.text, fontSize: '0.85rem', opacity: 0.6, marginTop: '5px' }}>Highest Selling Category</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Top Selling Products List */}
+      <div style={{ position: 'relative', zIndex: 1, marginTop: '30px' }}>
+        <div style={{ backgroundColor: theme.card, padding: '35px', borderRadius: '24px', border: `1px solid ${theme.border}`, boxShadow: '0 15px 45px rgba(0,0,0,0.3)' }}>
+          <h3 style={{ color: '#fff', marginBottom: '25px', fontFamily: 'serif', fontSize: '1.5rem' }}>Top Selling Products</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+            {stats.topProducts.map((p, i) => (
+              <div key={i} className="premium-row" style={{ 
+                background: 'rgba(255,255,255,0.02)', 
+                padding: '20px', 
+                borderRadius: '16px', 
+                border: `1px solid ${theme.border}`,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '15px'
+              }}>
+                <div style={{ 
+                  width: '40px', height: '40px', borderRadius: '50%', 
+                  background: i === 0 ? 'linear-gradient(135deg, #FFD700, #B8860B)' : 'rgba(196,164,132,0.1)', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '1.2rem', fontWeight: 'bold', color: i === 0 ? '#000' : theme.crema
+                }}>
+                  {i + 1}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ color: '#fff', fontWeight: 'bold', fontSize: '1rem' }}>{p.item_name}</div>
+                  <div style={{ color: theme.text, opacity: 0.6, fontSize: '0.8rem' }}>{parseFloat(p.total_sold).toFixed(0)} Units Sold</div>
+                </div>
+                <div style={{ color: theme.crema, fontWeight: '900', fontSize: '0.9rem' }}>
+                  #{i + 1}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

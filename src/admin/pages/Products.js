@@ -513,13 +513,6 @@ const Products = () => {
           .mobile-cards { display: grid !important; }
         }
         
-        .mobile-cards {
-          display: none;
-          grid-template-columns: 1fr;
-          gap: 20px;
-          padding: 10px;
-        }
-        
         .product-mobile-card {
           background: rgba(255, 255, 255, 0.03);
           border: 1px solid ${colors.border};
@@ -528,6 +521,17 @@ const Products = () => {
           display: flex;
           flex-direction: column;
           gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+          .products-header { flex-direction: column !important; gap: 20px !important; }
+          .header-title { font-size: 2rem !important; }
+          .page-badge span { font-size: 1.5rem !important; }
+          .header-btns { width: 100% !important; flex-direction: column !important; }
+          .header-btns > div { width: 100% !important; flex-direction: column !important; }
+          .header-btns button { width: 100% !important; justify-content: center !important; }
+          .product-modal { padding: 25px !important; width: 95% !important; border-radius: 20px !important; }
+          .modal-grid-2 { flex-direction: column !important; gap: 15px !important; }
         }
       `}</style>
       {/* Elegant Notification Toast */}
@@ -540,7 +544,7 @@ const Products = () => {
 
       {showModal && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', backdropFilter: 'blur(5px)' }}>
-          <div style={{ backgroundColor: colors.bean, width: '100%', maxWidth: '700px', borderRadius: '30px', border: `1px solid ${colors.border}`, padding: '40px', position: 'relative', boxShadow: '0 20px 50px rgba(0,0,0,0.5)', overflowY: 'auto', maxHeight: '90vh' }}>
+          <div className="product-modal" style={{ backgroundColor: colors.bean, width: '100%', maxWidth: '700px', borderRadius: '30px', border: `1px solid ${colors.border}`, padding: '40px', position: 'relative', boxShadow: '0 20px 50px rgba(0,0,0,0.5)', overflowY: 'auto', maxHeight: '90vh' }}>
             <button onClick={() => setShowModal(false)} style={{ position: 'absolute', top: '25px', right: '25px', backgroundColor: 'transparent', border: 'none', color: colors.latte, cursor: 'pointer', opacity: 0.6 }}>
               <X size={24} />
             </button>
@@ -574,7 +578,7 @@ const Products = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '20px' }}>
+              <div className="modal-grid-2" style={{ display: 'flex', gap: '20px' }}>
                 <div style={{ flex: 1 }}>
                   <label style={labelStyle}>Product Name</label>
                   <input 
@@ -605,7 +609,7 @@ const Products = () => {
                 />
               </div>
 
-              <div style={{ display: 'flex', gap: '20px' }}>
+              <div className="modal-grid-2" style={{ display: 'flex', gap: '20px' }}>
                 <div style={{ flex: 1 }}>
                   <label style={labelStyle}>Product Category</label>
                   
@@ -656,7 +660,7 @@ const Products = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '25px' }}>
+              <div className="modal-grid-2" style={{ display: 'flex', gap: '25px' }}>
                 <div style={{ flex: 1 }}>
                   <label style={labelStyle}>Category Tags</label>
 
@@ -993,7 +997,7 @@ const Products = () => {
           </div>
         )}
 
-      <div style={{ 
+      <div className="products-header" style={{ 
         position: 'relative',
         zIndex: 1,
         width: '100%', 
@@ -1003,7 +1007,7 @@ const Products = () => {
         marginBottom: '40px'
       }}>
         <div>
-          <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: colors.crema, lineHeight: 1 }}>
+          <div className="header-title" style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: colors.crema, lineHeight: 1 }}>
             Faculty <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
           </div>
 
@@ -1016,7 +1020,7 @@ const Products = () => {
             Faculty Coffee | Menu Items & Product Configuration
           </p>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+        <div className="header-btns" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
           <div style={{ display: 'flex', gap: '15px' }}>
           <button 
             onClick={exportPDF}

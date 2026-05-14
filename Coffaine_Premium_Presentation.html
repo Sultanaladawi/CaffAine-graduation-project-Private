@@ -792,6 +792,61 @@
       flex-shrink: 0;
     }
 
+    /* ══ RESPONSIVE ══ */
+    @media (max-width: 1024px) {
+      * { cursor: auto !important; }
+      #cur, #cur2 { display: none !important; }
+      .sh h2 { font-size: 32px; }
+      .sb { padding: 12px 32px 24px; }
+    }
+
+    @media (max-width: 768px) {
+      .deck { overflow-y: auto; height: auto; min-height: 100vh; }
+      .slide { 
+        position: relative; 
+        height: auto; 
+        min-height: 100vh; 
+        inset: auto; 
+        opacity: 1 !important; 
+        pointer-events: all !important; 
+        transform: none !important; 
+        display: none;
+      }
+      .slide.active { display: flex; }
+      
+      .sh { padding: 20px 24px 12px; }
+      .sh h2 { font-size: 28px; }
+      .sh .stag { font-size: 11px; letter-spacing: 2px; }
+      .sb { padding: 12px 24px 80px; overflow: visible; }
+
+      .g2, .g3, .g4, .g5 { grid-template-columns: 1fr; gap: 15px; }
+      
+      .fc-title { font-size: 19px; }
+      .tc-name { font-size: 19px; }
+      .stat-val { font-size: 28px; }
+      
+      #dots { display: none; }
+      #ctr { right: 20px; bottom: 20px; font-size: 12px; }
+      #hint { display: none; }
+      
+      .chat { padding: 12px; }
+      .bubble { font-size: 13px; max-width: 95%; }
+
+      /* Fix cover slide */
+      .cover-content h1 { font-size: 42px !important; }
+      .cover-content p { font-size: 16px !important; }
+      
+      /* Fix conclusion slide */
+      .conc-title { font-size: 48px !important; }
+      .fg-grid { grid-template-columns: 1fr !important; }
+    }
+
+    @media (max-height: 700px) and (min-width: 769px) {
+      .sh { padding: 15px 56px 8px; }
+      .sh h2 { font-size: 32px; }
+      .sb { padding: 8px 56px 12px; }
+    }
+
     /* ═══════════════════════════════════════
    SLIDE 1 — COVER
 ═══════════════════════════════════════ */
