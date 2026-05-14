@@ -77,13 +77,13 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'build')));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
 
-// Explicitly serve manifest.json to avoid catch-all route conflicts
+// Explicitly serve manifest.json to ensure PWA stability
 app.get('/manifest.json', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'manifest.json'));
+  res.sendFile(path.join(__dirname, 'build', 'manifest.json'));
 });
 
 // Serving the presentation file with a short, professional URL
@@ -1313,13 +1313,7 @@ app.post('/api/ai-assistant-logs', (req, res) => {
   });
 });
 
-// ✅ Serve React build files
-// Static build already moved to top for better priority
-
-// ✅ SERVE GRADUATION PRESENTATION
-app.get('/presentation', (req, res) => {
-  res.sendFile(path.join(__dirname, 'Coffaine_Premium_Presentation_2.html'));
-});
+// Production static files already served at top
 
 // ✅ Catch-all for React Router
 app.get(/.*/, (req, res) => {
