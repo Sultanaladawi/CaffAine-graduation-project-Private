@@ -103,7 +103,7 @@ const Dashboard = () => {
     { title: 'Active Orders', value: stats.totalOrders, icon: ShoppingBag, color: theme.info, desc: 'System processing', path: '/admin/orders' },
     { title: 'Catalog Density', value: stats.totalProducts, icon: LayoutGrid, color: theme.success, desc: 'Menu items verified', path: '/admin/products' },
     { title: 'Logistics Risk', value: stats.lowStock, icon: AlertTriangle, color: theme.danger, desc: stats.lowStock > 0 ? 'CRITICAL ALERT' : 'SUPPLY STABLE', path: '/admin/inventory' },
-    { title: 'Best Seller', value: stats.topProducts[0]?.item_name || 'None', icon: Zap, color: '#ff9a9e', desc: `${stats.topProducts[0]?.total_sold || 0} Items Sold`, path: '/admin/analytics' },
+    { title: 'Best Seller', value: stats.topProducts[0]?.item_name || 'None', icon: Zap, color: '#ff9a9e', desc: `${stats.topProducts[0]?.total_sold || 0} Sold (£${parseFloat(stats.topProducts[0]?.revenue || 0).toFixed(2)})`, path: '/admin/analytics' },
   ];
 
   const maxSales = Math.max(...stats.dailySales.map(d => d.total), 1);

@@ -528,7 +528,7 @@ app.get('/api/dashboard-stats', async (req, res) => {
     else if (mode === 'manual_open') currentState = 'open';
     else if (mode === 'manual_closed') currentState = 'closed';
 
-    const [topProducts] = await promiseDb.query(`SELECT item_name, SUM(quantity) as total_sold FROM order_items GROUP BY item_name ORDER BY total_sold DESC LIMIT 6`);
+    const [topProducts] = await promiseDb.query(`SELECT item_name, SUM(quantity) as total_sold, SUM(quantity * price) as revenue FROM order_items GROUP BY item_name ORDER BY total_sold DESC LIMIT 6`);
 
     res.json({ 
       totalProducts: products.count, 

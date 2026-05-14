@@ -85,7 +85,7 @@ const Analytics = () => {
     { title: 'Total Orders', value: stats.totalOrders, icon: ShoppingBag, color: theme.crema, desc: 'Cumulative' },
     { title: 'Avg Order Value', value: `£${(stats.totalSales / (stats.totalOrders || 1)).toFixed(2)}`, icon: TrendingUp, color: '#4facfe', desc: 'Per Customer' },
     { title: 'Active Products', value: stats.totalProducts, icon: BarChart3, color: '#f093fb', desc: 'In Menu' },
-    { title: 'Best Selling', value: stats.topProducts[0]?.item_name || 'None', icon: Zap, color: '#ff9a9e', desc: `${stats.topProducts[0]?.total_sold || 0} Sold` },
+    { title: 'Best Selling', value: stats.topProducts[0]?.item_name || 'None', icon: Zap, color: '#ff9a9e', desc: `${stats.topProducts[0]?.total_sold || 0} Sold (£${parseFloat(stats.topProducts[0]?.revenue || 0).toFixed(2)})` },
   ];
 
   if (loading) return <div style={{ color: theme.crema, padding: '40px', backgroundColor: theme.espresso, minHeight: '100vh' }}>Loading Real-time Analytics...</div>;
@@ -275,9 +275,11 @@ const Analytics = () => {
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ color: '#fff', fontWeight: 'bold', fontSize: '1rem' }}>{p.item_name}</div>
-                  <div style={{ color: theme.text, opacity: 0.6, fontSize: '0.8rem' }}>{parseFloat(p.total_sold).toFixed(0)} Units Sold</div>
+                  <div style={{ color: theme.text, opacity: 0.7, fontSize: '0.85rem' }}>
+                    {parseFloat(p.total_sold).toFixed(0)} Sold · <span style={{ color: theme.accent }}>£{parseFloat(p.revenue || 0).toFixed(2)} Revenue</span>
+                  </div>
                 </div>
-                <div style={{ color: theme.crema, fontWeight: '900', fontSize: '0.9rem' }}>
+                <div style={{ color: theme.crema, opacity: 0.3, fontWeight: '900', fontSize: '1.1rem' }}>
                   #{i + 1}
                 </div>
               </div>
