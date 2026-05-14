@@ -148,6 +148,17 @@ ssl: {
   }
 });
 
+// Force all MySQL connections to use UK Time (Europe/London)
+// This handles Summer Time (+1) and Winter Time (+0) automatically.
+pool.on('connection', (connection) => {
+  connection.query("SET time_zone = 'Europe/London'", (err) => {
+    if (err) {
+      // Fallback in case Azure/MySQL lacks the timezone dictionary
+      connection.query("SET time_zone = '+01:00'");
+    }
+  });
+});
+
 const db = pool;
 
 const convertNumerals = str => {
@@ -653,7 +664,7 @@ app.delete('/api/tags/:id', async (req, res) => {
 });
 
 app.get('/api/orders', (req, res) => {
-  db.query("SELECT * FROM orders", (err, results) => {
+  db.query("SELECT * FROM orders ORDER BY created_at DESC", (err, results) => {
     if (err) return res.status(500).json({ error: 'Internal Server Error' });
     res.status(200).json(results);
   });
