@@ -293,10 +293,25 @@ app.post('/api/orders', async (req, res) => {
 
       if (Array.isArray(item.addons)) {
         for (const addon of item.addons) {
-          const [addonRows] = await conn.query("SELECT inventory_id FROM addons WHERE name = ? OR id = ?", [addon.name, addon.id]);
-          if (addonRows && addonRows.length > 0 && addonRows[0].inventory_id) {
-            await conn.query("UPDATE inventory SET quantity = GREATEST(quantity - ?, 0) WHERE id = ?", [1 * quantity, addonRows[0].inventory_id]);
+          // Get addon price and inventory link
+          const [addonRows] = await conn.query("SELECT price, inventory_id FROM addons WHERE name = ? OR id = ?", [addon.name, addon.id]);
+          let addonPrice = 0;
+          if (addonRows && addonRows.length > 0) {
+            addonPrice = parseFloat(addonRows[0].price) || 0;
+            
+            // Deduct addon from inventory if linked
+            if (addonRows[0].inventory_id) {
+              await conn.query("UPDATE inventory SET quantity = GREATEST(quantity - ?, 0) WHERE id = ?", [1 * quantity, addonRows[0].inventory_id]);
+            }
           }
+
+          calculatedTotal += addonPrice * quantity;
+
+          // Record addon as an order item for accurate revenue/sales tracking
+          await conn.query(
+            "INSERT INTO order_items (order_id, product_id, item_name, quantity, price) VALUES (?, ?, ?, ?, ?)",
+            [orderId, null, `+ ${addon.name}`, quantity, addonPrice]
+          );
         }
       }
     }
