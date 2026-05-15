@@ -240,7 +240,7 @@ const Products = () => {
         // Log the creation
         await axios.post('/api/log-action', {
           action: 'Product Created',
-          details: `Added new product: ${cleanFormData.name} (ÂJOD${cleanFormData.price_num})`
+          details: `Added new product: ${cleanFormData.name} (ï¿½JOD${cleanFormData.price_num})`
         });
         showToast("Product created with precision");
       } else {
@@ -248,7 +248,7 @@ const Products = () => {
         // Log the update
         await axios.post('/api/log-action', {
           action: 'Product Updated',
-          details: `Modified product: ${cleanFormData.name} (ÂJOD${cleanFormData.price_num})`
+          details: `Modified product: ${cleanFormData.name} (ï¿½JOD${cleanFormData.price_num})`
         });
         showToast("Product details refined");
       }
@@ -405,8 +405,8 @@ const Products = () => {
         item.name || 'Unnamed',
         dbCategories.find(c => String(c.id) === String(item.category_id))?.name || dbCategories.find(c => String(c.id) === String(item.category_id))?.label || item.category_id || 'N/A',
         item.discounted_price 
-          ? `ÂJOD${parseFloat(item.discounted_price).toFixed(2)} (Off: ÂJOD${parseFloat(item.price_num).toFixed(2)})`
-          : `ÂJOD${parseFloat(item.price_num || 0).toFixed(2)}`,
+          ? `ï¿½JOD${parseFloat(item.discounted_price).toFixed(2)} (Off: ï¿½JOD${parseFloat(item.price_num).toFixed(2)})`
+          : `ï¿½JOD${parseFloat(item.price_num || 0).toFixed(2)}`,
         item.available === 0 ? 'OUT OF STOCK' : 'AVAILABLE'
       ]);
 
@@ -508,6 +508,7 @@ const Products = () => {
         }
 
         /* Mobile View: Hide Table, Show Cards */
+        .mobile-cards { display: none; grid-template-columns: 1fr; gap: 20px; }
         @media screen and (max-width: 1024px) {
           .desktop-table { display: none !important; }
           .mobile-cards { display: grid !important; }
@@ -589,7 +590,7 @@ const Products = () => {
                   />
                 </div>
                 <div style={{ width: '150px' }}>
-                  <label style={labelStyle}>Price (ÂJOD)</label>
+                  <label style={labelStyle}>Price (ï¿½JOD)</label>
                   <input 
                     type="text" value={formData.price_num} 
                     onChange={(e) => setFormData({...formData, price_num: e.target.value})}
@@ -735,7 +736,7 @@ const Products = () => {
                         if (!addon) return null;
                         return (
                           <span key={`addon-${aid}-${idx}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', borderRadius: '20px', background: 'rgba(196,164,132,0.1)', border: '1px solid rgba(196,164,132,0.3)', color: colors.crema, fontSize: '0.72rem', fontWeight: '700' }}>
-                            {addon.name} (ÂJOD{addon.price})
+                            {addon.name} (ï¿½JOD{addon.price})
                             <button type="button" onClick={() => setFormData(prev => ({...prev, addon_ids: prev.addon_ids.filter((_, i) => i !== idx)}))} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: colors.crema, fontSize: '1rem', lineHeight: 1, marginLeft: '2px' }}>Ã—</button>
                           </span>
                         );
@@ -764,14 +765,14 @@ const Products = () => {
                                 style={{ flex: 2, background: 'rgba(255,255,255,0.05)', border: `1px solid ${colors.crema}`, borderRadius: '6px', color: colors.latte, padding: '2px 6px', fontSize: '0.75rem', outline: 'none' }}
                               />
                               <input value={addonEditPrice} onChange={e => setAddonEditPrice(e.target.value)}
-                                placeholder="ÂJOD"
+                                placeholder="ï¿½JOD"
                                 style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: `1px solid ${colors.crema}`, borderRadius: '6px', color: colors.latte, padding: '2px 6px', fontSize: '0.75rem', outline: 'none' }}
                               />
                             </div>
                           ) : (
                             <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: isSelected ? colors.crema : colors.latte }}>
                               <span>{addon.name}</span>
-                              <span style={{ opacity: 0.6, fontSize: '0.75rem' }}>ÂJOD{addon.price}</span>
+                              <span style={{ opacity: 0.6, fontSize: '0.75rem' }}>ï¿½JOD{addon.price}</span>
                             </div>
                           )}
                           {isEditing ? (
@@ -797,7 +798,7 @@ const Products = () => {
                         placeholder="Name" style={{...inputStyle, width: '100px', flex: '2', padding: '10px', fontSize: '0.82rem'}} />
                       <input type="text" value={newAddonPrice} onChange={e => setNewAddonPrice(e.target.value)}
                         onKeyDown={e => { if(e.key === 'Enter') { e.preventDefault(); handleQuickAddAddon(); }}}
-                        placeholder="ÂJOD" style={{...inputStyle, width: '50px', flex: '1', padding: '10px', fontSize: '0.82rem'}} />
+                        placeholder="ï¿½JOD" style={{...inputStyle, width: '50px', flex: '1', padding: '10px', fontSize: '0.82rem'}} />
                       <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleQuickAddAddon(); }} style={{backgroundColor: colors.crema, color: colors.espresso, border: 'none', borderRadius: '10px', width: '42px', height: '42px', cursor: 'pointer', fontWeight: 'bold', flexShrink: 0, fontSize: '1.2rem'}}>+</button>
                     </div>
                   </div>
@@ -1160,11 +1161,11 @@ const Products = () => {
                           fontSize: item.discounted_price ? '0.8rem' : '0.95rem',
                           color: item.discounted_price ? colors.latte : colors.crema
                         }}>
-                          ÂJOD{parseFloat(item.price_num || 0).toFixed(2)}
+                          ï¿½JOD{parseFloat(item.price_num || 0).toFixed(2)}
                         </span>
                         {item.discounted_price && (
                           <span style={{ color: '#38ef7d', fontSize: '1rem', textShadow: '0 0 10px rgba(56, 239, 125, 0.2)' }}>
-                            ÂJOD{parseFloat(item.discounted_price).toFixed(2)}
+                            ï¿½JOD{parseFloat(item.discounted_price).toFixed(2)}
                           </span>
                         )}
                       </div>
@@ -1272,10 +1273,10 @@ const Products = () => {
                       <div style={{ color: colors.crema, fontSize: '0.85rem', fontWeight: '700' }}>
                         {item.discounted_price ? (
                           <>
-                            <span style={{ textDecoration: 'line-through', opacity: 0.5, marginRight: '8px' }}>ÂJOD{parseFloat(item.price_num).toFixed(2)}</span>
-                            <span style={{ color: '#38ef7d' }}>ÂJOD{parseFloat(item.discounted_price).toFixed(2)}</span>
+                            <span style={{ textDecoration: 'line-through', opacity: 0.5, marginRight: '8px' }}>ï¿½JOD{parseFloat(item.price_num).toFixed(2)}</span>
+                            <span style={{ color: '#38ef7d' }}>ï¿½JOD{parseFloat(item.discounted_price).toFixed(2)}</span>
                           </>
-                        ) : `ÂJOD${parseFloat(item.price_num || 0).toFixed(2)}`}
+                        ) : `ï¿½JOD${parseFloat(item.price_num || 0).toFixed(2)}`}
                       </div>
                       <div style={{ fontSize: '0.75rem', color: '#888', marginTop: '5px' }}>
                         {dbCategories.find(c => String(c.id) === String(item.category_id))?.name || 'Uncategorized'}
