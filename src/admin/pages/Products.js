@@ -79,8 +79,10 @@ const Products = () => {
   
   const getImageUrl = (url) => {
     if (!url) return '/images/coffee-beans.png';
-    const cleanUrl = url.trim();
-    if (cleanUrl.startsWith('/images/') || cleanUrl.startsWith('http')) return cleanUrl;
+    const cleanUrl = String(url).trim();
+    if (cleanUrl.startsWith('http')) return cleanUrl;
+    if (cleanUrl.startsWith('/images/')) return cleanUrl;
+    if (cleanUrl.startsWith('images/')) return '/' + cleanUrl;
     return `/images/${cleanUrl}`;
   };
 const [formData, setFormData] = useState({ 
@@ -515,7 +517,8 @@ const [formData, setFormData] = useState({
         }
 
         /* Mobile View: Hide Table, Show Cards */
-        .mobile-cards { display: none; grid-template-columns: 1fr; gap: 20px; }
+        .mobile-cards { display: none !important; grid-template-columns: 1fr; gap: 20px; }
+        .desktop-table { display: block !important; }
         @media screen and (max-width: 1024px) {
           .desktop-table { display: none !important; }
           .mobile-cards { display: grid !important; }

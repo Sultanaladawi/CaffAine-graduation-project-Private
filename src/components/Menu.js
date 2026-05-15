@@ -334,8 +334,10 @@ export default function Menu() {
 
   const getImageUrl = (item) => {
     if (!item || !item.image_url) return '/images/coffee-beans.png';
-    const url = (item.image_url || '').trim();
-    if (url.startsWith('/images/') || url.startsWith('http')) return url;
+    const url = String(item.image_url).trim();
+    if (url.startsWith('http')) return url;
+    if (url.startsWith('/images/')) return url;
+    if (url.startsWith('images/')) return '/' + url;
     return `/images/${url}`;
   };
 

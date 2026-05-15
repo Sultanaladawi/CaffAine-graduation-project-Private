@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 require('dotenv').config();
@@ -77,14 +77,24 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.static(path.join(__dirname, 'build')));
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
+// --- STATIC FILES SERVING (HARDENED) ---
+// 1. Explicitly serve images first to avoid any overlap
+app.use('/images', express.static(path.resolve(__dirname, 'public/images'), {
+  maxAge: '1d',
+  etag: true,
+  setHeaders: (res) => {
+    res.set('Access-Control-Allow-Origin', '*');
+  }
+}));
 
-// Explicitly serve favicon and manifest to ensure stability across all platforms
-app.get('/favicon.jpg', (req, res) => res.sendFile(path.join(__dirname, 'public', 'favicon.jpg')));
-app.get('/favicon.ico', (req, res) => res.sendFile(path.join(__dirname, 'public', 'favicon.jpg')));
-app.get('/manifest.json', (req, res) => res.sendFile(path.join(__dirname, 'build', 'manifest.json')));
+// 2. Serve static assets from build and public
+app.use(express.static(path.resolve(__dirname, 'build')));
+app.use(express.static(path.resolve(__dirname, 'public')));
+
+// 3. Specific favicon and manifest routes for stability
+app.get('/favicon.ico', (req, res) => res.sendFile(path.resolve(__dirname, 'public/favicon.ico')));
+app.get('/favicon.jpg', (req, res) => res.sendFile(path.resolve(__dirname, 'public/favicon.jpg')));
+app.get('/manifest.json', (req, res) => res.sendFile(path.resolve(__dirname, 'public/manifest.json')));
 
 
 
