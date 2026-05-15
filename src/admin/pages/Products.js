@@ -76,7 +76,14 @@ const Products = () => {
     }
   };
 
-  const [formData, setFormData] = useState({ 
+  
+  const getImageUrl = (url) => {
+    if (!url) return '/images/coffee-beans.png';
+    const cleanUrl = url.trim();
+    if (cleanUrl.startsWith('/images/') || cleanUrl.startsWith('http')) return cleanUrl;
+    return `/images/${cleanUrl}`;
+  };
+const [formData, setFormData] = useState({ 
     id: null,
     name: '', 
     price_num: '', 
@@ -565,7 +572,7 @@ const Products = () => {
                     display: 'flex', alignItems: 'center', justifyContent: 'center'
                   }}>
                     {formData.image_url ? 
-                      <img src={`/images/${formData.image_url}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.onerror = null; e.target.src = '/images/coffee-beans.png'; }} /> 
+                      <img src={getImageUrl(formData.image_url)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.onerror = null; e.target.src = '/images/coffee-beans.png'; }} /> 
                       : <Image size={24} color="#888" />}
                   </div>
                   <button type="button" onClick={() => setShowImagePicker(true)} style={{
@@ -1135,7 +1142,7 @@ const Products = () => {
                           alignItems: 'center', justifyContent: 'center', border: `1px solid ${colors.border}` 
                         }}>
                           <img 
-                            src={item.image_url ? `/images/${item.image_url}` : '/images/coffee-beans.png'}
+                            src={getImageUrl(item.image_url)}
                             alt={item.name} 
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             onError={(e) => {
@@ -1262,7 +1269,7 @@ const Products = () => {
                   <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
                     <div style={{ width: '80px', height: '80px', borderRadius: '15px', overflow: 'hidden', border: `1px solid ${colors.border}` }}>
                       <img 
-                        src={item.image_url ? `/images/${item.image_url}` : '/images/coffee-beans.png'}
+                        src={getImageUrl(item.image_url)}
                         alt={item.name} 
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         onError={e => { e.target.onerror = null; e.target.src = '/images/coffee-beans.png'; }}
