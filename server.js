@@ -958,14 +958,25 @@ app.get('/api/order-items/:orderId', async (req, res) => {
 app.get('/api/products', async (req, res) => {
   try {
     const promiseDb = db.promise();
-    const [offers] = await promiseDb.query("SELECT * FROM offers WHERE active = 1 AND (end_date IS NULL OR end_date >= CURDATE())");
-    const [allAddons] = await promiseDb.query('SELECT name, price FROM addons');
+    const [offers] = await promiseDb.query("SELECT * FROM offers WHERE active = 1 AND (end_date IS NULL OR end_date >= CURDATE())").catch(() => [[]]);
+    const [allAddons] = await promiseDb.query('SELECT name, price FROM addons').catch(() => [[]]);
     const addonPriceMap = {};
     allAddons.forEach(a => { addonPriceMap[a.name.toLowerCase().trim()] = parseFloat(a.price); });
 
+    // Check if recipes table exists before using it in query
+    let recipesTableExists = false;
+    try {
+      await promiseDb.query('SELECT 1 FROM recipes LIMIT 1');
+      recipesTableExists = true;
+    } catch (e) { recipesTableExists = false; }
+
+    const outOfStockSubquery = recipesTableExists
+      ? `CASE WHEN m.available = 0 THEN 1 WHEN EXISTS (SELECT 1 FROM recipes r JOIN inventory i ON r.inventory_id = i.id WHERE r.menu_item_id = m.id AND i.quantity < r.quantity_required) THEN 1 ELSE 0 END`
+      : `CASE WHEN m.available = 0 THEN 1 ELSE 0 END`;
+
     const [results] = await promiseDb.query(`
       SELECT m.*, 
-        CASE WHEN m.available = 0 THEN 1 WHEN EXISTS (SELECT 1 FROM recipes r JOIN inventory i ON r.inventory_id = i.id WHERE r.menu_item_id = m.id AND i.quantity < r.quantity_required) THEN 1 ELSE 0 END as isOutOfStock,
+        ${outOfStockSubquery} as isOutOfStock,
         (SELECT GROUP_CONCAT(DISTINCT CONCAT(a.id, '|', a.name, '|', a.price)) FROM menu_item_addons mia JOIN addons a ON mia.addon_id = a.id WHERE mia.menu_item_id = m.id) as linked_addons,
         (SELECT GROUP_CONCAT(DISTINCT CONCAT(t.id, '|', t.name)) FROM menu_item_tags mit JOIN tags t ON mit.tag_id = t.id WHERE mit.menu_item_id = m.id) as linked_tags
       FROM menu_items m
@@ -991,9 +1002,14 @@ app.get('/api/products', async (req, res) => {
     res.status(200).json(products);
   } catch (err) {
     console.error('Products Fetch Error:', err);
-    res.status(500).json({ error: 'Internal Server Error' });
+    // Last resort fallback - return basic products without joins
+    db.query('SELECT * FROM menu_items', (fallbackErr, fallbackResults) => {
+      if (fallbackErr) return res.status(500).json({ error: 'Internal Server Error', details: err.message });
+      res.status(200).json(fallbackResults.map(p => ({ ...p, linkedAddons: [], linkedTags: [], isOutOfStock: p.available === 0 })));
+    });
   }
 });
+
 
 app.get('/api/inventory', (req, res) => {
   db.query("SELECT * FROM inventory", (err, results) => {
