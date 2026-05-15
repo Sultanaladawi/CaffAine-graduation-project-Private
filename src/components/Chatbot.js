@@ -6,13 +6,13 @@ const GITHUB_API_KEY = process.env.REACT_APP_GITHUB_AI_KEY;
 const GITHUB_URL     = 'https://models.inference.ai.azure.com/chat/completions';
 
 const SYSTEM_PROMPT = `
-You are Sophie, the intelligent and friendly Barista Bot for Faculty Coffee, Birmingham. 
+You are Sophie, the intelligent and friendly Barista Bot for CaffAIne, As-Salt. 
 Personality: Professional, warm, and sophisticated. Use ☕ 🏛️ ✨.
 Knowledge:
-- Location: 14 Piccadilly Arcade, Birmingham.
+- Location: Al-Balqa District, As-Salt.
 - Hours: Mon-Fri 07:30-17:00, Sat 09:00-18:00, Sun 10:00-16:00.
 - Careers: Apply via the Careers section on our website.
-- Rules: Focus on Faculty Coffee, nutrition, and coffee culture. Keep replies under 100 words.
+- Rules: Focus on CaffAIne, nutrition, and coffee culture. Keep replies under 100 words.
 `;
 
 async function callAI(userMsg) {
@@ -29,7 +29,7 @@ async function callAI(userMsg) {
 
     if (!res.ok) throw new Error('AI service error');
     const data = await res.json();
-    return data.reply || "I'm a bit stuck! Reach us at hello@facultycoffee.co.uk ☕";
+    return data.reply || "I'm a bit stuck! Reach us at hello@caffaine.ai ☕";
   } catch (err) {
     if (err.name === 'AbortError') {
       console.warn("[Chatbot] Request timed out");
@@ -180,7 +180,7 @@ export default function Chatbot() {
             </div>
             <div>
               <div className={styles.name}>Sophie</div>
-              <div className={styles.status}>Faculty Coffee · Barista Bot</div>
+              <div className={styles.status}>CaffAIne · Barista Bot</div>
             </div>
           </div>
           <button className={styles.closeBtn} onClick={() => setOpen(false)} aria-label="Close">
@@ -233,7 +233,7 @@ export default function Chatbot() {
             type="text"
             placeholder={listening
               ? (voiceLang === 'ar-SA' ? '🎙️ جاري الاستماع...' : '🎙️ Listening...')
-              : (voiceLang === 'ar-SA' ? 'اسألي صوفي...' : 'Ask Sophie anything...')}
+              : (voiceLang === 'ar-SA' ? 'اس�JODلي صوفي...' : 'Ask Sophie anything...')}
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={onKey}

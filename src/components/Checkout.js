@@ -28,7 +28,7 @@ export default function Checkout({ onClose, onBack }) {
 
   const formatPrice = (n) => {
     const val = parseFloat(n) || 0;
-    return `Â£${val.toFixed(2)}`;
+    return `ÂJOD${val.toFixed(2)}`;
   };
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -64,7 +64,7 @@ export default function Checkout({ onClose, onBack }) {
     });
 
     const isStudentOffer = offer.reason.toLowerCase().includes('student');
-    const isEmployeeOffer = offer.reason.toLowerCase().includes('corporate') || offer.reason.toLowerCase().includes('employee') || offer.reason.toLowerCase().includes('faculty');
+    const isEmployeeOffer = offer.reason.toLowerCase().includes('corporate') || offer.reason.toLowerCase().includes('employee') || offer.reason.toLowerCase().includes('CaffAIne');
 
     if (!hasItem) {
       setOfferModal({ show: true, message: `The product "${offer.product_name}" is not in your cart.\nThis exclusive offer applies only to that specific item.` });
@@ -77,7 +77,7 @@ export default function Checkout({ onClose, onBack }) {
     }
 
     if (isEmployeeOffer && customerType !== 'Employee') {
-      setOfferModal({ show: true, message: 'This exclusive offer is reserved for Faculty & Employees only.\nPlease select the correct customer category to apply this deal.' });
+      setOfferModal({ show: true, message: 'This exclusive offer is reserved for CaffAIne & Employees only.\nPlease select the correct customer category to apply this deal.' });
       return;
     }
 
@@ -764,7 +764,7 @@ export default function Checkout({ onClose, onBack }) {
               >
                 <option value="General">General Customer</option>
                 <option value="Student">Student</option>
-                <option value="Employee">Faculty / Employee</option>
+                <option value="Employee">CaffAIne / Employee</option>
               </select>
 
               {offers.length > 0 && (

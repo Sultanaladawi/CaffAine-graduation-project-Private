@@ -4,7 +4,7 @@ import styles from './About.module.css';
 const PILLARS = [
   { icon: 'fa-mug-hot',       title: 'Specialty Only',  desc: 'We serve exclusively specialty-grade coffee, sourced from farms we know and trust.' },
   { icon: 'fa-leaf',          title: 'Plant-Friendly',  desc: 'Extensive vegan and vegetarian menu options — no compromise on flavour.' },
-  { icon: 'fa-map-marker-alt',title: 'Heart of Brum',   desc: 'Tucked inside Piccadilly Arcade — a calm refuge from the city’s bustle.' },
+  { icon: 'fa-map-marker-alt',title: 'Heart of As-Salt',desc: 'Tucked inside the vibrant Al-Balqa District — a calm refuge from the city’s bustle.' },
 ];
 
 export default function About() {
@@ -20,19 +20,19 @@ export default function About() {
             <div className={styles.imgMain}>
               <img
                 src="/images/interior-wide.png"
-                alt="Faculty Coffee interior"
+                alt="CaffAIne interior"
                 loading="lazy"
               />
             </div>
             <div className={styles.imgAccent}>
               <img
                 src="/images/barista.png"
-                alt="Faculty Coffee barista at work"
+                alt="CaffAIne barista at work"
                 loading="lazy"
               />
             </div>
             <div className={styles.badge}>
-              <span className={styles.badgeText}>One of Birmingham's</span>
+              <span className={styles.badgeText}>One of As-Salt's</span>
               <span className={styles.badgeMain}>Top Specialty</span>
               <span className={styles.badgeText}>Coffee Spots</span>
             </div>
@@ -41,22 +41,22 @@ export default function About() {
           <div ref={textRef} className={`${styles.text} reveal ${textVis ? 'vis' : ''}`}>
             <div className="label">Our Story</div>
             <div className="divider" />
-            <h2 className="h2">A Warm Corner of Birmingham</h2>
+            <h2 className="h2">A Warm Corner of As-Salt</h2>
             
             <p className={styles.body}>
-              Faculty Coffee is an independent specialty café settled inside the beautiful Victorian surroundings
-              of Piccadilly Arcade. We opened with one purpose: to serve extraordinary coffee in a space
+              CaffAIne is an independent specialty café settled inside the vibrant
+              Al-Balqa District. We opened with one purpose: to serve extraordinary coffee in a space
               that feels genuinely welcoming.
             </p>
             
             <p className={styles.body}>
               Our team knows their beans. Every barista is trained to care — about extraction time, milk
               temperature, and the way a flat white should feel in your hands. Whether you want a
-              five-minute espresso or an hour with a pour-over and a pastry, Faculty is your place.
+              five-minute espresso or an hour with a pour-over and a pastry, CaffAIne is your place.
             </p>
             
             <p className={styles.body}>
-              Widely regarded as one of Birmingham's finest specialty coffee destinations, we're proud
+              Widely regarded as one of As-Salt's finest specialty coffee destinations, we're proud
               to be part of the city's growing independent food and drink scene.
             </p>
 

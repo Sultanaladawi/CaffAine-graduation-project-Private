@@ -13,7 +13,7 @@ const Jobs = () => {
   const [formData, setFormData] = useState({
     title: '',
     type: 'Full-time',
-    location: 'Birmingham',
+    location: 'As-Salt',
     description: '',
     active: 1
   });
@@ -54,7 +54,7 @@ const Jobs = () => {
       const doc = new jsPDF();
       doc.setFontSize(22);
       doc.setTextColor(45, 41, 38);
-      doc.text('Faculty Coffee - Career Openings', 14, 22);
+      doc.text('CaffAIne - Career Openings', 14, 22);
       doc.setFontSize(10);
       doc.setTextColor(100);
       doc.text(`Generated on: ${new Date().toLocaleString('en-GB')}`, 14, 32);
@@ -75,7 +75,7 @@ const Jobs = () => {
         theme: 'grid',
         headStyles: { fillColor: [196, 164, 132], textColor: [255, 255, 255] }
       });
-      doc.save(`Faculty_Coffee_Jobs_${Date.now()}.pdf`);
+      doc.save(`CaffAIne_Coffee_Jobs_${Date.now()}.pdf`);
     } catch (error) {
       console.error("PDF Export Error:", error);
       alert("Error generating PDF: " + error.message);
@@ -98,7 +98,7 @@ const Jobs = () => {
         active: job.active
       });
     } else {
-      setFormData({ title: '', type: 'Full-time', location: 'Birmingham', description: '', active: 1 });
+      setFormData({ title: '', type: 'Full-time', location: 'As-Salt', description: '', active: 1 });
     }
     setShowModal(true);
   };
@@ -234,7 +234,7 @@ const Jobs = () => {
       }}>
         <div>
           <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: colors.crema, lineHeight: 1 }}>
-            Faculty <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
+            CaffAIne <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
           </div>
 
           <div className="page-badge">
@@ -243,7 +243,7 @@ const Jobs = () => {
           </div>
 
           <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '1rem', fontWeight: 500, marginTop: '5px' }}>
-            Faculty Coffee | Recruitment & Vacancy Management
+            CaffAIne | Recruitment & Vacancy Management
           </p>
         </div>
         <div style={{ display: 'flex', gap: '15px' }}>
@@ -306,7 +306,7 @@ const Jobs = () => {
             <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '100px', backgroundColor: colors.bean, borderRadius: '30px', border: `1px dashed ${colors.border}` }}>
               <Briefcase size={48} color={colors.border} style={{ marginBottom: '20px' }} />
               <h3 style={{ color: colors.crema }}>No active job openings</h3>
-              <p style={{ color: '#777' }}>Click "Add Job" to start recruiting for Faculty Coffee.</p>
+              <p style={{ color: '#777' }}>Click "Add Job" to start recruiting for CaffAIne.</p>
             </div>
           )}
         </div>

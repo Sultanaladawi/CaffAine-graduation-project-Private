@@ -96,7 +96,7 @@ const LeaderDashboard = () => {
       
       doc.setFontSize(22);
       doc.setTextColor(45, 41, 38);
-      doc.text('Faculty Coffee - Team Activity Audit', 14, 22);
+      doc.text('CaffAIne - Team Activity Audit', 14, 22);
       
       doc.setFontSize(10);
       doc.setTextColor(100);
@@ -133,7 +133,7 @@ const LeaderDashboard = () => {
       });
 
       const today = new Date().toISOString().split('T')[0];
-      doc.save(`FacultyCoffee_AuditLog_${today}.pdf`);
+      doc.save(`CaffAIne_AuditLog_${today}.pdf`);
     } catch (error) {
       alert("Error generating PDF: " + error.message);
     }
@@ -152,7 +152,7 @@ const LeaderDashboard = () => {
       <div style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: colors.crema, lineHeight: 1, marginBottom: '20px' }}>
-            Faculty <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
+            CaffAIne <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
           </div>
 
           <div style={{ 
@@ -178,7 +178,7 @@ const LeaderDashboard = () => {
           </div>
 
           <p style={{ margin: '5px 0 0 5px', color: 'rgba(255,255,255,0.4)', fontSize: '0.95rem', fontWeight: '500' }}>
-            Faculty Coffee | <span style={{ color: 'rgba(255,255,255,0.3)' }}>Audit Logs & Critical Performance Oversight</span>
+            CaffAIne | <span style={{ color: 'rgba(255,255,255,0.3)' }}>Audit Logs & Critical Performance Oversight</span>
           </p>
         </div>
 

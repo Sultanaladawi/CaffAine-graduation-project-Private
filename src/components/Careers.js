@@ -143,7 +143,7 @@ export default function Careers() {
             ) : (
               <div className={styles.introContainer}>
                 <p className={styles.intro}>
-                  Faculty Coffee is always on the lookout for passionate individuals who share our love for specialty coffee and hospitality.
+                  CaffAIne is always on the lookout for passionate individuals who share our love for specialty coffee and hospitality.
                 </p>
                 <div className={styles.applyBox}>
                   <span className={styles.applyText}>DIRECT INQUIRIES:</span>

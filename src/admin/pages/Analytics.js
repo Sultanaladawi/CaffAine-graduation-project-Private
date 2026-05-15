@@ -31,6 +31,17 @@ const Analytics = () => {
     return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
   };
 
+  const processCategoryStats = (rawCats) => {
+    if (!Array.isArray(rawCats) || rawCats.length === 0) {
+      setTopCategory({ name: 'None', percentage: 0 });
+      return;
+    }
+    const total = rawCats.reduce((acc, c) => acc + (parseInt(c.count)||0), 0);
+    const sorted = [...rawCats].sort((a,b) => b.count - a.count);
+    const top = sorted[0];
+    setTopCategory({ name: top.name, percentage: total > 0 ? Math.round((top.count/total)*100) : 0 });
+  };
+
   const buildWeeklyBars = (rawDaily, daysCount = 7) => {
     const result = [];
     for (let i = daysCount - 1; i >= 0; i--) {
@@ -47,52 +58,53 @@ const Analytics = () => {
     return result;
   };
 
-  /* ── all-time fetch (for category dominance) ─────── */
+  /* ── all-time fetch ─────── */
   const fetchAllTime = useCallback(async () => {
     try {
       const res = await axios.get('/api/dashboard-stats');
       const d = res.data.data || res.data;
       setAllTime(d);
-      const rawCats = Array.isArray(d.categoryStats) ? d.categoryStats : [];
-      if (rawCats.length > 0) {
-        const total = rawCats.reduce((acc, c) => acc + (parseInt(c.count)||0), 0);
-        const top   = [...rawCats].sort((a,b) => b.count - a.count)[0];
-        setTopCategory({ name: top.name, percentage: total > 0 ? Math.round((top.count/total)*100) : 0 });
-      }
+      if (viewMode === 'alltime') processCategoryStats(d.categoryStats);
     } catch(e) { console.error(e); }
-  }, []);
+  }, [viewMode]);
 
   /* ── main stats fetch ────────────────────────────── */
   const fetchStats = useCallback(async () => {
     setLoading(true);
     try {
+      let data = null;
       if (viewMode === 'monthly') {
         const res = await axios.get(`/api/analytics-monthly?year=${selectedYear}&month=${selectedMonth}`);
-        setStats(res.data);
-        setWeeklyData(res.data.dailySales.map(s => ({
-          day: new Date(s.date).toLocaleDateString('en-GB',{day:'2-digit',month:'short'}),
-          total: parseFloat(s.total),
-          fullDate: new Date(s.date).toLocaleDateString('en-GB',{day:'2-digit',month:'short'})
-        })));
+        data = res.data;
       } else if (viewMode === 'range' && rangeFrom && rangeTo) {
         const res = await axios.get(`/api/analytics-range?from=${rangeFrom}&to=${rangeTo}`);
-        setStats(res.data);
-        setWeeklyData(res.data.dailySales.map(s => ({
-          day: new Date(s.date).toLocaleDateString('en-GB',{day:'2-digit',month:'short'}),
-          total: parseFloat(s.total),
-          fullDate: new Date(s.date).toLocaleDateString('en-GB',{day:'2-digit',month:'short'})
-        })));
+        data = res.data;
       } else if (viewMode === 'alltime') {
         const res = await axios.get('/api/dashboard-stats');
         const d = res.data.data || res.data;
-        setStats({
+        data = {
           totalOrders: d.totalOrders,
           totalSales:  d.totalSales,
           totalProducts: d.totalProducts,
           avgOrderValue: d.totalOrders > 0 ? d.totalSales / d.totalOrders : 0,
-          topProducts: d.topProducts || []
-        });
-        setWeeklyData(buildWeeklyBars(d.dailySales || []));
+          topProducts: d.topProducts || [],
+          dailySales: d.dailySales || [],
+          categoryStats: d.categoryStats || []
+        };
+      }
+
+      if (data) {
+        setStats(data);
+        processCategoryStats(data.categoryStats);
+        if (viewMode === 'alltime') {
+            setWeeklyData(buildWeeklyBars(data.dailySales || []));
+        } else {
+            setWeeklyData(data.dailySales.map(s => ({
+                day: new Date(s.date).toLocaleDateString('en-GB',{day:'2-digit',month:'short'}),
+                total: parseFloat(s.total),
+                fullDate: new Date(s.date).toLocaleDateString('en-GB',{day:'2-digit',month:'short'})
+              })));
+        }
       }
     } catch(e) {
       console.error('Analytics fetch error:', e);
@@ -107,11 +119,11 @@ const Analytics = () => {
   const topProducts = stats?.topProducts || [];
 
   const cards = stats ? [
-    { title: 'Total Revenue',    value: `£${parseFloat(stats.totalSales||0).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})}`, icon: DollarSign, color: '#38ef7d', desc: viewMode==='monthly'?`${MONTH_NAMES[selectedMonth-1]} ${selectedYear}`: viewMode==='range'?`${rangeFrom} → ${rangeTo}`:'All Time' },
+    { title: 'Total Revenue',    value: `${parseFloat(stats.totalSales||0).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})} JOD`, icon: DollarSign, color: '#38ef7d', desc: viewMode==='monthly'?`${MONTH_NAMES[selectedMonth-1]} ${selectedYear}`: viewMode==='range'?`${rangeFrom} → ${rangeTo}`:'All Time' },
     { title: 'Total Orders',     value: stats.totalOrders||0, icon: ShoppingBag, color: '#c4a484', desc: 'Orders Count' },
-    { title: 'Avg Order Value',  value: `£${parseFloat(stats.avgOrderValue||0).toFixed(2)}`, icon: TrendingUp, color: '#4facfe', desc: 'Per Transaction' },
+    { title: 'Avg Order Value',  value: `${parseFloat(stats.avgOrderValue||0).toFixed(2)} JOD`, icon: TrendingUp, color: '#4facfe', desc: 'Per Transaction' },
     { title: 'Active Products',  value: stats.totalProducts || (allTime?.totalProducts||0), icon: BarChart3, color: '#f093fb', desc: 'In Menu' },
-    { title: 'Best Selling',     value: topProducts[0]?.item_name || 'N/A', icon: Zap, color: '#ff9a9e', desc: topProducts[0] ? `${topProducts[0].total_sold} sold · £${parseFloat(topProducts[0].revenue||0).toFixed(2)}` : 'No data' },
+    { title: 'Best Selling',     value: topProducts[0]?.item_name || 'N/A', icon: Zap, color: '#ff9a9e', desc: topProducts[0] ? `${topProducts[0].total_sold} sold · ${parseFloat(topProducts[0].revenue||0).toFixed(2)} JOD` : 'No data' },
   ] : [];
 
   const years = [];
@@ -136,7 +148,7 @@ const Analytics = () => {
         .bar-wrapper { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; gap:10px; position:relative; cursor:pointer; }
         .bar-tooltip { position:absolute; top:-30px; background:#c4a484; color:#070504; padding:5px 12px; border-radius:10px; font-size:0.75rem; font-weight:900; opacity:0; transition:0.3s; pointer-events:none; z-index:10; white-space:nowrap; }
         .bar-wrapper:hover .bar-tooltip { opacity:1; transform:translateY(-10px); }
-        .bar-wrapper:hover .bar-fill { filter:brightness(1.2); }
+        .bar-wrapper:hover .bar-fill { filter:brightness(1.5); background:#fff !important; box-shadow: 0 0 15px rgba(255,255,255,0.5); }
         .bar-fill { transition:all 0.5s cubic-bezier(0.23,1,0.32,1); }
         .filter-btn { padding:10px 20px; border-radius:12px; border:1px solid rgba(196,164,132,0.3); background:rgba(196,164,132,0.05); color:#c4a484; font-weight:700; font-size:0.85rem; cursor:pointer; transition:0.25s; }
         .filter-btn.active { background:#c4a484; color:#070504; border-color:#c4a484; }
@@ -149,7 +161,7 @@ const Analytics = () => {
       {/* Header */}
       <div style={{ position:'relative', zIndex:1, marginBottom:'20px' }}>
         <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:'2.8rem', color:'#c4a484', lineHeight:1 }}>
-          Faculty <span style={{ color:'#fff', fontStyle:'italic' }}>Coffee.</span>
+          CaffAIne <span style={{ color:'#fff', fontStyle:'italic' }}>Coffee.</span>
         </div>
         <div className="page-badge">
           <BarChart3 size={28} color="#c4a484" />
@@ -161,7 +173,7 @@ const Analytics = () => {
           <div style={{ display:'flex', gap:'15px', marginTop:'15px', flexWrap:'wrap' }}>
             <div style={{ background:'rgba(56,239,125,0.05)', border:'1px solid rgba(56,239,125,0.15)', padding:'10px 20px', borderRadius:'14px' }}>
               <div style={{ fontSize:'0.6rem', color:'#38ef7d', fontWeight:'bold', textTransform:'uppercase', letterSpacing:'1px' }}>Today's Revenue</div>
-              <div style={{ fontSize:'1.2rem', color:'#fff', fontWeight:'900' }}>£{parseFloat(allTime.todaySales||0).toFixed(2)}</div>
+              <div style={{ fontSize:'1.2rem', color:'#fff', fontWeight:'900' }}>{parseFloat(allTime.todaySales||0).toFixed(2)} JOD</div>
             </div>
             <div style={{ background:'rgba(79,172,254,0.05)', border:'1px solid rgba(79,172,254,0.15)', padding:'10px 20px', borderRadius:'14px' }}>
               <div style={{ fontSize:'0.6rem', color:'#4facfe', fontWeight:'bold', textTransform:'uppercase', letterSpacing:'1px' }}>Today's Orders</div>
@@ -245,7 +257,7 @@ const Analytics = () => {
               <div style={{ flex:1, display:'flex', alignItems:'flex-end', gap:'8px', paddingBottom:'10px', height:'240px', overflowX:'auto' }}>
                 {weeklyData.length > 0 ? weeklyData.map((d, i) => (
                   <div key={i} className="bar-wrapper" style={{ minWidth:'40px' }}>
-                    <div className="bar-tooltip">£{d.total.toFixed(2)}</div>
+                    <div className="bar-tooltip">{d.total.toFixed(2)} JOD</div>
                     <div className="bar-fill" style={{ width:'100%', maxWidth:'40px', backgroundColor: i === weeklyData.length-1 ? '#c4a484' : 'rgba(196,164,132,0.15)', height:`${Math.max((d.total/Math.max(...weeklyData.map(x=>x.total),1))*100,2)}%`, borderRadius:'8px 8px 4px 4px', boxShadow: i === weeklyData.length-1 ? '0 0 20px #c4a48444':'' }} />
                     <div style={{ color: theme.text, opacity:0.5, fontSize:'0.6rem', fontWeight:'800', textAlign:'center', marginTop:'8px' }}>
                       {d.day}<div style={{ fontSize:'0.55rem', opacity:0.4 }}>{d.fullDate}</div>
@@ -299,7 +311,7 @@ const Analytics = () => {
                             {parseFloat(p.total_sold||0).toFixed(0)} Sold
                           </span>
                           <span style={{ background:'rgba(196,164,132,0.1)', color:'#c4a484', padding:'3px 10px', borderRadius:'20px', fontSize:'0.78rem', fontWeight:'700' }}>
-                            £{parseFloat(p.revenue||0).toFixed(2)} Revenue
+                            {parseFloat(p.revenue||0).toFixed(2)} JOD Revenue
                           </span>
                         </div>
                       </div>

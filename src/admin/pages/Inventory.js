@@ -70,7 +70,7 @@ const Inventory = () => {
       // Header
       doc.setFontSize(22);
       doc.setTextColor(45, 41, 38);
-      doc.text('Faculty Coffee - Inventory Report', 14, 22);
+      doc.text('CaffAIne - Inventory Report', 14, 22);
       
       doc.setFontSize(10);
       doc.setTextColor(100);
@@ -114,7 +114,7 @@ const Inventory = () => {
         }
       });
 
-      doc.save(`Faculty_Coffee_Inventory_${Date.now()}.pdf`);
+      doc.save(`CaffAIne_Coffee_Inventory_${Date.now()}.pdf`);
     } catch (error) {
       console.error("PDF Export Error:", error);
       alert("Error generating PDF: " + error.message);
@@ -296,7 +296,7 @@ const Inventory = () => {
       }}>
         <div>
           <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: colors.crema, lineHeight: 1 }}>
-            Faculty <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
+            CaffAIne <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
           </div>
 
           <div className="page-badge">
@@ -305,7 +305,7 @@ const Inventory = () => {
           </div>
 
           <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '1rem', fontWeight: 500, marginTop: '5px' }}>
-            Faculty Coffee | Raw Materials & Stock Level Management
+            CaffAIne | Raw Materials & Stock Level Management
           </p>
         </div>
         <div style={{ display: 'flex', gap: '15px' }}>

@@ -24,7 +24,7 @@ const Offers = () => {
       const doc = new jsPDF();
       doc.setFontSize(22);
       doc.setTextColor(45, 41, 38);
-      doc.text('Faculty Coffee - Marketing Promotions', 14, 22);
+      doc.text('CaffAIne - Marketing Promotions', 14, 22);
       doc.setFontSize(10);
       doc.setTextColor(100);
       doc.text(`Generated on: ${new Date().toLocaleString('en-GB')}`, 14, 32);
@@ -45,7 +45,7 @@ const Offers = () => {
         theme: 'grid',
         headStyles: { fillColor: [196, 164, 132], textColor: [255, 255, 255] }
       });
-      doc.save(`Faculty_Coffee_Offers_${Date.now()}.pdf`);
+      doc.save(`CaffAIne_Coffee_Offers_${Date.now()}.pdf`);
     } catch (error) {
       console.error("PDF Export Error:", error);
       alert("Error generating PDF: " + error.message);
@@ -300,7 +300,7 @@ const Offers = () => {
       }}>
         <div>
           <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: colors.crema, lineHeight: 1 }}>
-            Faculty <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
+            CaffAIne <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
           </div>
 
           <div className="page-badge">
@@ -309,7 +309,7 @@ const Offers = () => {
           </div>
 
           <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '1rem', fontWeight: 500, marginTop: '5px' }}>
-            Faculty Coffee | Promotional Campaigns & Seasonal Discounts
+            CaffAIne | Promotional Campaigns & Seasonal Discounts
           </p>
         </div>
         <div style={{ display: 'flex', gap: '15px' }}>

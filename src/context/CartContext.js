@@ -52,7 +52,7 @@ function cartReducer(state, action) {
     }
 }
 
-const STORAGE_KEY = 'faculty_coffee_cart';
+const STORAGE_KEY = 'CaffAIne_coffee_cart';
 
 const CART_VERSION = 2; // Increment this to force-fix old cached carts
 

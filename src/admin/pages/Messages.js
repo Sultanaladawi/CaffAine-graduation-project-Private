@@ -26,7 +26,7 @@ const Messages = () => {
       // Header
       doc.setFontSize(22);
       doc.setTextColor(45, 41, 38);
-      doc.text('Faculty Coffee - Customer Inquiries', 14, 22);
+      doc.text('CaffAIne - Customer Inquiries', 14, 22);
       
       doc.setFontSize(10);
       doc.setTextColor(100);
@@ -62,7 +62,7 @@ const Messages = () => {
         }
       });
 
-      doc.save(`Faculty_Coffee_Messages_${Date.now()}.pdf`);
+      doc.save(`CaffAIne_Coffee_Messages_${Date.now()}.pdf`);
     } catch (error) {
       console.error("PDF Export Error:", error);
       alert("Error generating PDF: " + error.message);
@@ -114,7 +114,7 @@ const Messages = () => {
   };
 
   const handleReply = (email, name) => {
-    const subject = encodeURIComponent("Re: Your message to Faculty Coffee");
+    const subject = encodeURIComponent("Re: Your message to CaffAIne");
     const body = encodeURIComponent(`Hi ${name},\n\nThank you for reaching out to us.\n\n`);
     window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
   };
@@ -174,7 +174,7 @@ const Messages = () => {
       }}>
         <div>
           <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: colors.crema, lineHeight: 1 }}>
-            Faculty <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
+            CaffAIne <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
           </div>
 
           <div className="page-badge">
@@ -183,7 +183,7 @@ const Messages = () => {
           </div>
 
           <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '1rem', fontWeight: 500, marginTop: '5px' }}>
-            Faculty Coffee | Customer Support & Feedback Inquiries
+            CaffAIne | Customer Support & Feedback Inquiries
           </p>
         </div>
         <button 

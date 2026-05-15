@@ -52,9 +52,9 @@ export default function Gallery() {
         >
           <div className="label">The Space</div>
           <div className="divider" />
-          <h2 className="h2">Inside Faculty Coffee</h2>
+          <h2 className="h2">Inside CaffAIne</h2>
           <p className={styles.headerSub}>
-            14 Piccadilly Arcade — a tucked-away corner of Birmingham
+            Al-Balqa — a vibrant corner of As-Salt
             where good coffee happens slowly.
           </p>
         </div>
@@ -96,11 +96,11 @@ export default function Gallery() {
           <i className="fab fa-instagram" />
           Follow us{' '}
           <a
-            href="https://instagram.com/facultycoffee"
+            href="https://instagram.com/caffaine.ai"
             target="_blank"
             rel="noopener noreferrer"
           >
-            @facultycoffee
+            @caffaine.ai
           </a>
         </p>
       </div>

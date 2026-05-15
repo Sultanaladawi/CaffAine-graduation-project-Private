@@ -43,16 +43,16 @@ export default function Hero() {
 
           <div className={styles.eyebrow}>
             <div className={styles.eyebrowDot} />
-            <div className="label">Specialty Coffee · Birmingham</div>
+            <div className="label">Specialty Coffee · As-Salt</div>
           </div>
 
           <h1 className={`display ${styles.headline}`}>
-            Faculty<br /><em>Coffee</em>
+            Caff<br /><em>AIne</em>
           </h1>
 
           <p className={styles.sub}>
-            Independent specialty coffee at the heart of Birmingham's
-            Piccadilly Arcade. Precision-crafted drinks, warm welcome,
+            Independent specialty coffee at the heart of As-Salt's
+            vibrant Al-Balqa district. Precision-crafted drinks, warm welcome,
             unhurried pace.
           </p>
 
@@ -82,7 +82,7 @@ export default function Hero() {
         <img
           ref={imgRef}
           src="/images/window.png"
-          alt="Faculty Coffee window view"
+          alt="CaffAIne window view"
           className={styles.windowImg}
         />
 

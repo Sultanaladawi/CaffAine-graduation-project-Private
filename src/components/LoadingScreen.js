@@ -49,7 +49,7 @@ export default function LoadingScreen({ onComplete }) {
               fill: 'none'
             }}
           >
-            Faculty
+            Caff
           </text>
           
           <text
@@ -68,11 +68,11 @@ export default function LoadingScreen({ onComplete }) {
               fill: 'none'
             }}
           >
-            Coffee
+            AIne
           </text>
         </svg>
 
-        <p className={styles.tagline}>Birmingham · Est. 2020</p>
+        <p className={styles.tagline}>As-Salt · Est. 2020</p>
 
         <div className={styles.progressBar}>
           <div className={styles.progressFill} />

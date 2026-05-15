@@ -118,7 +118,7 @@ export default function Navbar({ onCartOpen }) {
         )}
 
         <div className={styles.inner}>
-          <a href="#home" className={styles.logo} aria-label="Faculty Coffee home" style={{ textDecoration: 'none' }}>
+          <a href="#home" className={styles.logo} aria-label="CaffAIne home" style={{ textDecoration: 'none' }}>
             <div style={{ 
               fontFamily: "'DM Serif Display', serif", 
               fontSize: '2rem', 
@@ -128,7 +128,7 @@ export default function Navbar({ onCartOpen }) {
               alignItems: 'center',
               gap: '4px'
             }}>
-              Faculty<span style={{ color: '#c4a484', fontStyle: 'italic' }}>Coffee.</span>
+              Caff<span style={{ color: '#c4a484', fontStyle: 'italic' }}>AIne.</span>
             </div>
           </a>
 

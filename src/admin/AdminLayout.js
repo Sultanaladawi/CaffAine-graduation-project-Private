@@ -242,7 +242,7 @@ const AdminLayout = () => {
             margin: 0, fontSize: '1.1rem', color: '#fff', fontWeight: '900',
             letterSpacing: '2px', textTransform: 'uppercase', fontFamily: "'DM Serif Display', serif"
           }}>
-            Faculty <span style={{ color: 'var(--admin-accent)' }}>Coffee</span>
+            CaffAIne <span style={{ color: 'var(--admin-accent)' }}>Coffee</span>
           </h1>
         </div>
 

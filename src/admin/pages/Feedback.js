@@ -35,7 +35,7 @@ const Feedback = () => {
       doc.setFontSize(22);
       doc.setTextColor(45, 41, 38);
       const title = activeTab === 'general' ? 'General Store Feedback' : 'Product Reviews';
-      doc.text(`Faculty Coffee - ${title}`, 14, 22);
+      doc.text(`CaffAIne - ${title}`, 14, 22);
       
       doc.setFontSize(10);
       doc.setTextColor(100);
@@ -83,7 +83,7 @@ const Feedback = () => {
         }
       });
 
-      doc.save(`Faculty_Coffee_Feedback_${activeTab}_${Date.now()}.pdf`);
+      doc.save(`CaffAIne_Coffee_Feedback_${activeTab}_${Date.now()}.pdf`);
     } catch (error) {
       console.error("PDF Export Error:", error);
       alert("Error generating PDF: " + error.message);
@@ -200,7 +200,7 @@ const Feedback = () => {
       }}>
         <div>
           <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: colors.crema, lineHeight: 1 }}>
-            Faculty <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
+            CaffAIne <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
           </div>
 
           <div className="page-badge">
@@ -209,7 +209,7 @@ const Feedback = () => {
           </div>
 
           <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '1rem', fontWeight: 500, marginTop: '5px' }}>
-            Faculty Coffee | Monitoring Customer Satisfaction & Product Ratings
+            CaffAIne | Monitoring Customer Satisfaction & Product Ratings
           </p>
           <button 
             onClick={exportPDF}

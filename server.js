@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 require('dotenv').config();
@@ -46,8 +46,8 @@ if (API_KEY && API_KEY !== 'your_key_here') {
   });
 
   console.log('------------------------------------------');
-  console.log(`🤖 AI PROVIDER: ${IS_GITHUB ? 'GitHub Models' : 'Standard OpenAI'} Detected`);
-  console.log(`🔗 BASE URL: ${BASE_URL}`);
+  console.log(`ًں¤– AI PROVIDER: ${IS_GITHUB ? 'GitHub Models' : 'Standard OpenAI'} Detected`);
+  console.log(`ًں”— BASE URL: ${BASE_URL}`);
   console.log('------------------------------------------');
 } else {
   console.warn('[WARNING] AI API Key missing or default. AI Assistant in Fallback Mode.');
@@ -55,10 +55,10 @@ if (API_KEY && API_KEY !== 'your_key_here') {
 
 const app = express();
 
-// ✅ Azure uses process.env.PORT; locally falls back to SERVER_PORT to avoid conflict with React client
+// âœ… Azure uses process.env.PORT; locally falls back to SERVER_PORT to avoid conflict with React client
 const PORT = process.env.PORT || process.env.SERVER_PORT || 8080;
 
-// ✅ FIXED: CORS now allows Azure and localhost
+// âœ… FIXED: CORS now allows Azure and localhost
 app.use(cors({
   origin: true,
   credentials: true,
@@ -69,7 +69,7 @@ app.use(cors({
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// ✅ ENFORCE HTTPS (For Azure Production)
+// âœ… ENFORCE HTTPS (For Azure Production)
 app.use((req, res, next) => {
   if (req.headers['x-forwarded-proto'] && req.headers['x-forwarded-proto'] !== 'https' && process.env.NODE_ENV === 'production') {
     return res.redirect('https://' + req.get('host') + req.url);
@@ -385,7 +385,7 @@ app.post('/api/store-status', (req, res) => {
 
 db.query(`CREATE TABLE IF NOT EXISTS contact_messages (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, message TEXT NOT NULL, status VARCHAR(50) DEFAULT 'new', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure contact_messages table error:', err); });
 db.query(`CREATE TABLE IF NOT EXISTS job_applications (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, phone VARCHAR(60) DEFAULT NULL, position VARCHAR(255) DEFAULT NULL, cover_letter TEXT DEFAULT NULL, resume_url VARCHAR(1024) DEFAULT NULL, status VARCHAR(50) DEFAULT 'new', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure job_applications table error:', err); });
-db.query(`CREATE TABLE IF NOT EXISTS careers (id INT AUTO_INCREMENT PRIMARY KEY, title VARCHAR(255) NOT NULL, type VARCHAR(100) DEFAULT 'Full-time', location VARCHAR(255) DEFAULT 'Birmingham', description TEXT, active TINYINT(1) DEFAULT 1, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure careers table error:', err); });
+db.query(`CREATE TABLE IF NOT EXISTS careers (id INT AUTO_INCREMENT PRIMARY KEY, title VARCHAR(255) NOT NULL, type VARCHAR(100) DEFAULT 'Full-time', location VARCHAR(255) DEFAULT 'As-Salt', description TEXT, active TINYINT(1) DEFAULT 1, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure careers table error:', err); });
 db.query(`CREATE TABLE IF NOT EXISTS site_settings (\`key\` VARCHAR(255) PRIMARY KEY, \`value\` TEXT, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure site_settings table error:', err); });
 db.query(`CREATE TABLE IF NOT EXISTS offers (id INT AUTO_INCREMENT PRIMARY KEY, title VARCHAR(255) NOT NULL, description TEXT, discount_percent DECIMAL(5,2), active TINYINT(1) DEFAULT 1, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure offers table error:', err); });
 db.query(`CREATE TABLE IF NOT EXISTS chat_messages (id INT AUTO_INCREMENT PRIMARY KEY, user_msg TEXT, ai_msg TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure chat_messages table error:', err); });
@@ -583,7 +583,7 @@ app.get('/api/dashboard-stats', async (req, res) => {
   }
 });
 
-// ── Monthly Analytics API ──────────────────────────────────────────────────
+// â”€â”€ Monthly Analytics API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // GET /api/analytics-monthly?year=2026&month=5
 app.get('/api/analytics-monthly', async (req, res) => {
   try {
@@ -624,6 +624,18 @@ app.get('/api/analytics-monthly', async (req, res) => {
       [year, month]
     );
 
+    // Category stats for that month
+    const [categoryStats] = await promiseDb.query(
+      `SELECT COALESCE(c.${categoryNameColumn}, 'Other') as name, COUNT(oi.id) as count 
+       FROM order_items oi 
+       JOIN menu_items mi ON oi.product_id = mi.id 
+       JOIN orders o ON oi.order_id = o.id
+       LEFT JOIN categories c ON mi.category_id = c.id 
+       WHERE YEAR(o.created_at)=? AND MONTH(o.created_at)=?
+       GROUP BY COALESCE(c.${categoryNameColumn}, 'Other')`,
+      [year, month]
+    );
+
     const totalOrders = monthStats.totalOrders || 0;
     const totalSales  = parseFloat(monthStats.totalSales) || 0;
 
@@ -633,7 +645,8 @@ app.get('/api/analytics-monthly', async (req, res) => {
       totalProducts: products.count,
       avgOrderValue: totalOrders > 0 ? (totalSales / totalOrders) : 0,
       topProducts: topProducts || [],
-      dailySales: dailySales || []
+      dailySales: dailySales || [],
+      categoryStats: categoryStats || []
     });
   } catch (err) {
     console.error('[Monthly Analytics Error]', err);
@@ -641,7 +654,7 @@ app.get('/api/analytics-monthly', async (req, res) => {
   }
 });
 
-// ── Date-Range Analytics API ──────────────────────────────────────────────
+// â”€â”€ Date-Range Analytics API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // GET /api/analytics-range?from=2026-01-01&to=2026-05-15
 app.get('/api/analytics-range', async (req, res) => {
   try {
@@ -676,6 +689,18 @@ app.get('/api/analytics-range', async (req, res) => {
       [from, to]
     );
 
+    // Category stats for that range
+    const [categoryStats] = await promiseDb.query(
+      `SELECT COALESCE(c.${categoryNameColumn}, 'Other') as name, COUNT(oi.id) as count 
+       FROM order_items oi 
+       JOIN menu_items mi ON oi.product_id = mi.id 
+       JOIN orders o ON oi.order_id = o.id
+       LEFT JOIN categories c ON mi.category_id = c.id 
+       WHERE DATE(o.created_at) BETWEEN ? AND ?
+       GROUP BY COALESCE(c.${categoryNameColumn}, 'Other')`,
+      [from, to]
+    );
+
     const totalOrders = rangeStats.totalOrders || 0;
     const totalSales  = parseFloat(rangeStats.totalSales) || 0;
 
@@ -684,7 +709,8 @@ app.get('/api/analytics-range', async (req, res) => {
       totalSales,
       avgOrderValue: totalOrders > 0 ? (totalSales / totalOrders) : 0,
       topProducts: topProducts || [],
-      dailySales: dailySales || []
+      dailySales: dailySales || [],
+      categoryStats: categoryStats || []
     });
   } catch (err) {
     console.error('[Range Analytics Error]', err);
@@ -870,8 +896,8 @@ app.put('/api/mark-ready/:id', (req, res) => {
       db.query("SELECT customer_name, email, phone FROM orders WHERE id = ?", [id], (err, rows) => {
         if (!err && rows.length > 0) {
           const order = rows[0];
-          if (order.phone) console.log(`📱 SMS to ${order.phone}: "Hello ${order.customer_name}, your order is ready!"`);
-          if (order.email) console.log(`📧 Email to ${order.email}: "Order Ready!"`);
+          if (order.phone) console.log(`ًں“± SMS to ${order.phone}: "Hello ${order.customer_name}, your order is ready!"`);
+          if (order.email) console.log(`ًں“§ Email to ${order.email}: "Order Ready!"`);
         }
       });
     }
@@ -1057,7 +1083,7 @@ app.post('/api/ai', async (req, res) => {
     if (!openai) return res.json({ answer: "[Local Mode] AI Assistant is currently unavailable." });
     const now = new Date();
     const currentDateTime = now.toLocaleString('en-GB', { timeZone: 'Europe/London' });
-    let context = `You are Sophie, the friendly Barista Bot for Faculty Coffee. Focus on helping customers with the menu, opening hours (Mon-Fri 07:30-17:00, Sat 09:00-18:00, Sun 10:00-16:00). Current UK time: ${currentDateTime}.`;
+    let context = `You are Sophie, the friendly Barista Bot for CaffAIne. Focus on helping customers with the menu, opening hours (Mon-Fri 07:30-17:00, Sat 09:00-18:00, Sun 10:00-16:00). Current UK time: ${currentDateTime}.`;
     const response = await openai.chat.completions.create({ model: 'gpt-4o-mini', messages: [{ role: 'system', content: context }, { role: 'user', content: prompt }], max_tokens: 500 });
     res.json({ answer: response.choices[0].message.content });
   } catch (err) {
@@ -1202,7 +1228,7 @@ app.post('/api/products', async (req, res) => {
     const nextOrder = (rows[0].maxOrder || 0) + 1;
     const rawPrice = price_num ? convertNumerals(price_num.toString()).replace(/[^0-9.]/g, '') : null;
     const cleanPrice = (rawPrice && rawPrice.trim() !== '') ? rawPrice : null;
-    const price_display = cleanPrice ? `£${parseFloat(cleanPrice).toFixed(2)}` : null;
+    const price_display = cleanPrice ? `JOD${parseFloat(cleanPrice).toFixed(2)}` : null;
     const [result] = await conn.query('INSERT INTO menu_items (category_id, name, price_num, price_display, description, tags, available, image_url, addons, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [category_id || null, name, cleanPrice, price_display, description || null, tags || null, available ?? 1, image_url || null, addons || null, nextOrder]);
     const productId = result.insertId;
     if (Array.isArray(addon_ids)) for (const aid of addon_ids) if (aid) await conn.query('INSERT IGNORE INTO menu_item_addons (menu_item_id, addon_id) VALUES (?, ?)', [productId, aid]);
@@ -1267,7 +1293,7 @@ app.post('/api/ai-chat', async (req, res) => {
   const currentDateTime = now.toLocaleString('en-GB', { timeZone: 'Europe/London' });
   let businessContext = isAdmin
     ? `You are the CaffAIne Internal Business Intelligence AI. Current UK time is ${currentDateTime}.`
-    : `You are Sophie, the friendly Barista Bot for Faculty Coffee. Opening hours: Mon-Fri 07:30-17:00, Sat 09:00-18:00, Sun 10:00-16:00. Current UK time: ${currentDateTime}.`;
+    : `You are Sophie, the friendly Barista Bot for CaffAIne. Opening hours: Mon-Fri 07:30-17:00, Sat 09:00-18:00, Sun 10:00-16:00. Current UK time: ${currentDateTime}.`;
 
   try {
     const promiseDb = db.promise();
@@ -1323,34 +1349,34 @@ app.post('/api/ai-chat', async (req, res) => {
         const lowStock = inventory.filter(i => i.stock_status === 'LOW');
         const okStock  = inventory.filter(i => i.stock_status === 'OK');
 
-        businessContext = `You are the CaffAIne Business Intelligence Expert for Faculty Coffee, Birmingham.
-Current UK Date/Time: ${currentDateTime}
+        businessContext = `You are the CaffAIne Business Intelligence Expert for CaffAIne, As-Salt.
+Current Jordan Date/Time: ${currentDateTime}
 
 === TODAY ===
-Revenue: £${parseFloat(todayRow.today_revenue).toFixed(2)} | Orders: ${todayRow.today_orders}
-Orders Detail: ${todayOrders.map(o => `${o.customer_name} £${o.total_amount} (${o.status}) at ${o.time}`).join(' | ') || 'None yet'}
+Revenue: JOD${parseFloat(todayRow.today_revenue).toFixed(2)} | Orders: ${todayRow.today_orders}
+Orders Detail: ${todayOrders.map(o => `${o.customer_name} JOD${o.total_amount} (${o.status}) at ${o.time}`).join(' | ') || 'None yet'}
 
 === YESTERDAY ===
-Revenue: £${parseFloat(yesterdayRow.yesterday_revenue).toFixed(2)} | Orders: ${yesterdayRow.yesterday_orders}
+Revenue: JOD${parseFloat(yesterdayRow.yesterday_revenue).toFixed(2)} | Orders: ${yesterdayRow.yesterday_orders}
 
 === ALL-TIME ===
-Total Revenue: £${allTime.total_revenue} | Total Orders: ${allTime.total_orders}
-Best Day Ever: ${bestDay ? `${bestDay.best_date}: £${bestDay.daily_rev}` : 'N/A'}
+Total Revenue: JOD${allTime.total_revenue} | Total Orders: ${allTime.total_orders}
+Best Day Ever: ${bestDay ? `${bestDay.best_date}: JOD${bestDay.daily_rev}` : 'N/A'}
 By Status: ${orderStatuses.map(s => `${s.status}: ${s.count}`).join(', ')}
 
 === TOP PRODUCTS ===
 ${topProducts.map((p,i) => `${i+1}. ${p.name} (${p.sold} sold)`).join(' | ')}
 
 === SALES TREND (15 DAYS) ===
-${salesTrend.map(d => `${d.date}: £${d.revenue} (${d.orders} orders)`).join(' | ')}
+${salesTrend.map(d => `${d.date}: JOD${d.revenue} (${d.orders} orders)`).join(' | ')}
 
 === INVENTORY ===
-⚠️ LOW (${lowStock.length}): ${lowStock.map(i => `${i.item_name} ${i.quantity}${i.unit||''}`).join(', ') || 'None'}
-✅ OK: ${okStock.map(i => `${i.item_name}: ${i.quantity}${i.unit||''}`).join(', ')}
+âڑ ï¸ڈ LOW (${lowStock.length}): ${lowStock.map(i => `${i.item_name} ${i.quantity}${i.unit||''}`).join(', ') || 'None'}
+âœ… OK: ${okStock.map(i => `${i.item_name}: ${i.quantity}${i.unit||''}`).join(', ')}
 
 === MENU & RATINGS ===
 Items: ${menuItems.map(m => `${m.name} (${m.price_display})`).join(', ') || 'None'}
-Ratings: ${productRatings.map(p => `${p.product}: ${p.rating}⭐ (${p.count} reviews)`).join(' | ') || 'No ratings yet'}
+Ratings: ${productRatings.map(p => `${p.product}: ${p.rating}â­گ (${p.count} reviews)`).join(' | ') || 'No ratings yet'}
 
 === OFFERS ===
 ${offers.filter(o => o.active == 1).map(o => `${o.product_name}: ${o.discount_percent}% OFF (${o.reason})`).join(' | ') || 'No active offers'}
@@ -1365,7 +1391,7 @@ Avg: ${feedbackSummary.avg_rating}/5 (${feedbackSummary.total} reviews)
 Recent: ${recentFeedback.map(f => `${f.reviewer_name} (${f.rating}/5): "${f.comment}"`).join(' | ') || 'None'}
 
 === TEAM ACTIVITY ===
-${teamActivity.map(log => `[${log.time}] ${log.admin_name}: ${log.action} — ${log.details}`).join('\n')}
+${teamActivity.map(log => `[${log.time}] ${log.admin_name}: ${log.action} â€” ${log.details}`).join('\n')}
 
 Rule: Answer ONLY from the data above. Be precise and professional.`;
       } catch (dbError) {
@@ -1393,7 +1419,7 @@ Rule: Answer ONLY from the data above. Be precise and professional.`;
       max_tokens: 500,
       temperature: 0.7
     });
-    return res.json({ reply: completion.choices[0]?.message?.content || "I'm a bit stuck! Reach us at hello@facultycoffee.co.uk ☕" });
+    return res.json({ reply: completion.choices[0]?.message?.content || "I'm a bit stuck! Reach us at hello@CaffAInecoffee.co.uk âک•" });
   } catch (error) {
     console.error('[AI] Chat Error:', error.message);
     return res.status(200).json({ reply: `[Local Mode] AI service temporarily unavailable. Please try again later.` });
@@ -1427,13 +1453,13 @@ app.post('/api/ai-assistant-logs', (req, res) => {
 
 // Production static files already served at top
 
-// ✅ Catch-all for React Router
+// âœ… Catch-all for React Router
 app.get(/.*/, (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-// ✅ START SERVER - Single PORT definition
+// âœ… START SERVER - Single PORT definition
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 CaffAIne Server is LIVE on port: ${PORT}`);
-  console.log(`🔗 Local Access: http://127.0.0.1:${PORT}`);
+  console.log(`ًںڑ€ CaffAIne Server is LIVE on port: ${PORT}`);
+  console.log(`ًں”— Local Access: http://127.0.0.1:${PORT}`);
 });

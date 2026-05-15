@@ -7,7 +7,7 @@ const AIAssistant = () => {
   const [messages, setMessages] = useState([
     { 
       id: 1, type: 'bot', 
-      text: "Welcome back, Admin. I'm your Faculty Coffee AI, now synced with your live data. How can I help you analyze the business today?",
+      text: "Welcome back, Admin. I'm your CaffAIne AI, now synced with your live data. How can I help you analyze the business today?",
       metrics: { status: "Active", db: "Connected" }
     }
   ]);
@@ -217,7 +217,7 @@ const AIAssistant = () => {
         <header style={{ borderBottom: `1px dashed ${theme.border}`, paddingBottom: '20px', marginBottom: '25px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
             <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: theme.crema, lineHeight: 1 }}>
-              Faculty <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
+              CaffAIne <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
             </div>
             <div className="page-badge">
               <BrainCircuit size={28} color={theme.crema} />
@@ -228,7 +228,7 @@ const AIAssistant = () => {
             <div style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
               <div style={{ background: 'rgba(56, 239, 125, 0.05)', border: '1px solid rgba(56, 239, 125, 0.15)', padding: '10px 20px', borderRadius: '14px' }}>
                 <div style={{ fontSize: '0.6rem', color: '#38ef7d', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>Today's Revenue</div>
-                <div style={{ fontSize: '1.2rem', color: '#fff', fontWeight: '900' }}>Â£{parseFloat(liveStats.todaySales || 0).toFixed(2)}</div>
+                <div style={{ fontSize: '1.2rem', color: '#fff', fontWeight: '900' }}>ÂJOD{parseFloat(liveStats.todaySales || 0).toFixed(2)}</div>
               </div>
               <div style={{ background: 'rgba(79, 172, 254, 0.05)', border: '1px solid rgba(79, 172, 254, 0.15)', padding: '10px 20px', borderRadius: '14px' }}>
                 <div style={{ fontSize: '0.6rem', color: '#4facfe', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>Today's Orders</div>

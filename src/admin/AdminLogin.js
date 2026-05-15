@@ -171,7 +171,7 @@ export default function AdminLogin() {
             <ShieldCheck size={38} strokeWidth={1.5} />
           </div>
           <h1 style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.2rem', color: '#fff', margin: '0 0 8px 0', lineHeight: 1 }}>
-            Faculty <span style={{ color: colors.latte, fontStyle: 'italic' }}>Vault.</span>
+            CaffAIne <span style={{ color: colors.latte, fontStyle: 'italic' }}>Vault.</span>
           </h1>
           <p style={{ color: 'rgba(255,255,255,0.15)', fontSize: '0.65rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '4px' }}>
             Restricted Terminal
@@ -208,7 +208,7 @@ export default function AdminLogin() {
         <div style={{ marginTop: '40px', textAlign: 'center' }}>
           <div style={{ height: '1px', background: `linear-gradient(90deg, transparent, ${colors.border}, transparent)`, marginBottom: '15px' }} />
           <p style={{ color: 'rgba(255,255,255,0.1)', fontSize: '0.55rem', fontWeight: 900, letterSpacing: '2px', textTransform: 'uppercase' }}>
-            Faculty Coffee Protocol <Coffee size={10} style={{ marginLeft: '4px' }} />
+            CaffAIne Protocol <Coffee size={10} style={{ marginLeft: '4px' }} />
           </p>
         </div>
       </div>
