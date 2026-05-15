@@ -345,7 +345,7 @@ const Offers = () => {
           display: 'grid', 
           gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', 
           gap: '25px',
-          alignItems: 'start'
+          alignItems: 'stretch'
         }}>
           {offers.length > 0 ? offers.map((offer) => (
             <div key={offer.id} className="premium-row" style={{ 
@@ -355,6 +355,8 @@ const Offers = () => {
               border: `1px solid rgba(196, 164, 132, 0.15)`,
               padding: '30px',
               position: 'relative',
+              display: 'flex',
+              flexDirection: 'column'
             }}>
               <div style={{ position: 'absolute', top: '25px', right: '20px', display: 'flex', gap: '10px' }}>
                 <button onClick={() => handleOpenModal('edit', offer)} style={{ background: 'none', border: 'none', color: colors.crema, cursor: 'pointer', opacity: 0.7 }}>
@@ -366,18 +368,20 @@ const Offers = () => {
               </div>
               
               <div style={{ display: 'flex', gap: '15px', marginBottom: '25px' }}>
-                <div style={{ background: 'rgba(196,164,132,0.15)', padding: '15px', borderRadius: '16px' }}>
+                <div style={{ background: 'rgba(196,164,132,0.15)', padding: '15px', borderRadius: '16px', height: 'fit-content' }}>
                   <Tag color={colors.crema} size={24} />
                 </div>
-                <div>
-                  <h3 style={{ margin: 0, color: '#fff', fontSize: '1.3rem' }}>{offer.product_name}</h3>
+                <div style={{ flex: 1, paddingRight: '45px' }}>
+                  <h3 style={{ margin: 0, color: '#fff', fontSize: '1.3rem', lineHeight: '1.3', wordWrap: 'break-word', overflowWrap: 'break-word' }}>
+                    {offer.product_name}
+                  </h3>
                   <div style={{ color: colors.crema, fontSize: '1rem', fontWeight: 'bold', marginTop: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <Sparkles size={16} /> {offer.discount_percent}% OFF
                   </div>
                 </div>
               </div>
 
-              <p style={{ color: '#bbb', fontSize: '1rem', lineHeight: '1.7', marginBottom: '30px', minHeight: '60px' }}>
+              <p style={{ color: '#bbb', fontSize: '1rem', lineHeight: '1.7', marginBottom: '30px', minHeight: '60px', flexGrow: 1 }}>
                 {offer.reason}
               </p>
 
