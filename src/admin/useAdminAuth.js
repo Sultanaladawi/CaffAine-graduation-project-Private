@@ -48,7 +48,7 @@ export function useAdminAuth() {
         return false;
       }
     } catch (err) {
-      console.warn("Backend unreachable. Triggering local fallback for presentation.");
+      console.warn("Backend unreachable. Triggering local fallback mode.");
       
       const team = [
         { email: 'omar@coffee.com', pass: 'omar2026', name: 'Omar Al-Ajarma', role: 'super_admin' },

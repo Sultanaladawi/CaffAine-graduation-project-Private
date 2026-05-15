@@ -17,6 +17,9 @@ export default function Checkout({ onClose, onBack }) {
   const [errors, setErrors] = useState({});
   const [storeRating, setStoreRating] = useState(5);
   const [storeComment, setStoreComment] = useState('');
+  const [savedDetails, setSavedDetails] = useState(null);
+  // Luxury offer-denial modal
+  const [offerModal, setOfferModal] = useState({ show: false, message: '' });
 
   // Offers State
   const [offers, setOffers] = useState([]);
@@ -37,10 +40,14 @@ export default function Checkout({ onClose, onBack }) {
     // Fetch active offers from backend
     fetch('/api/offers')
       .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) setOffers(data);
-      })
+      .then(data => { if (Array.isArray(data)) setOffers(data); })
       .catch(err => console.error('Error fetching offers:', err));
+
+    // Load saved customer details from localStorage
+    try {
+      const saved = localStorage.getItem('coffaine_customer');
+      if (saved) setSavedDetails(JSON.parse(saved));
+    } catch(e) {}
   }, []);
 
   const handleOfferClick = (offer) => {
@@ -60,17 +67,17 @@ export default function Checkout({ onClose, onBack }) {
     const isEmployeeOffer = offer.reason.toLowerCase().includes('corporate') || offer.reason.toLowerCase().includes('employee') || offer.reason.toLowerCase().includes('faculty');
 
     if (!hasItem) {
-      alert(`This offer doesn't work for you because the product '${offer.product_name}' is not in your cart.`);
+      setOfferModal({ show: true, message: `The product "${offer.product_name}" is not in your cart.\nThis exclusive offer applies only to that specific item.` });
       return;
     }
 
     if (isStudentOffer && customerType !== 'Student') {
-      alert("This offer doesn't work for you because this offer is for students and you are not a student.");
+      setOfferModal({ show: true, message: 'This exclusive offer is reserved for Students only.\nPlease select the correct customer category to apply this deal.' });
       return;
     }
 
     if (isEmployeeOffer && customerType !== 'Employee') {
-      alert("This offer doesn't work for you because this offer is for faculty/employees and you are not one.");
+      setOfferModal({ show: true, message: 'This exclusive offer is reserved for Faculty & Employees only.\nPlease select the correct customer category to apply this deal.' });
       return;
     }
 
@@ -252,6 +259,18 @@ export default function Checkout({ onClose, onBack }) {
       if (result.success) {
         setOrderId(result.orderId);
         setTimeRemaining(120);
+        // Save customer details (incl. card) to localStorage for next visit
+        try {
+          localStorage.setItem('coffaine_customer', JSON.stringify({
+            name: form.name.trim(),
+            email: form.email.trim(),
+            phone: form.phone.trim(),
+            cardNumber: form.cardNumber,
+            expiry: form.expiry,
+            cvc: form.cvc
+          }));
+          setSavedDetails({ name: form.name.trim(), email: form.email.trim(), phone: form.phone.trim(), cardNumber: form.cardNumber, expiry: form.expiry, cvc: form.cvc });
+        } catch(e) {}
       }
       return result.success;
     } catch (error) {
@@ -396,6 +415,73 @@ export default function Checkout({ onClose, onBack }) {
 
   return (
     <div className={styles.overlay} onClick={onClose}>
+
+      {/* ── Luxury Offer-Denial Modal ───────────────────────────────────────── */}
+      {offerModal.show && (
+        <div onClick={() => setOfferModal({ show: false, message: '' })} style={{
+          position: 'fixed', inset: 0, zIndex: 9999,
+          backgroundColor: 'rgba(0,0,0,0.75)',
+          backdropFilter: 'blur(10px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '20px', animation: 'fadeIn 0.3s ease'
+        }}>
+          <div onClick={e => e.stopPropagation()} style={{
+            background: 'linear-gradient(145deg, #1a0f07, #2c1810)',
+            border: '1px solid rgba(196,164,132,0.4)',
+            borderRadius: '28px',
+            padding: '45px 40px',
+            maxWidth: '420px',
+            width: '100%',
+            textAlign: 'center',
+            boxShadow: '0 30px 80px rgba(0,0,0,0.6), 0 0 60px rgba(196,164,132,0.08)',
+            position: 'relative'
+          }}>
+            {/* Decorative top glow */}
+            <div style={{ position:'absolute', top:0, left:'50%', transform:'translateX(-50%)', width:'160px', height:'3px', background:'linear-gradient(90deg, transparent, #c4a484, transparent)', borderRadius:'50%' }} />
+            {/* Icon */}
+            <div style={{
+              width: '72px', height: '72px', borderRadius: '50%',
+              background: 'linear-gradient(135deg, rgba(196,164,132,0.15), rgba(196,164,132,0.05))',
+              border: '1px solid rgba(196,164,132,0.3)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              margin: '0 auto 24px',
+              boxShadow: '0 0 30px rgba(196,164,132,0.1)'
+            }}>
+              <i className="fas fa-gem" style={{ fontSize: '1.8rem', color: '#c4a484' }} />
+            </div>
+            {/* Title */}
+            <h3 style={{
+              fontFamily: "'DM Serif Display', serif",
+              fontSize: '1.7rem', color: '#fff', margin: '0 0 10px',
+              fontWeight: '700', letterSpacing: '-0.3px'
+            }}>Offer Unavailable</h3>
+            {/* Divider */}
+            <div style={{ width:'50px', height:'2px', background:'linear-gradient(90deg,#c4a484,#a47c4f)', borderRadius:'2px', margin:'0 auto 18px' }} />
+            {/* Message */}
+            <p style={{
+              color: 'rgba(255,255,255,0.65)',
+              fontSize: '1rem', lineHeight: '1.7',
+              margin: '0 0 32px', whiteSpace: 'pre-line'
+            }}>{offerModal.message}</p>
+            {/* Button */}
+            <button
+              onClick={() => setOfferModal({ show: false, message: '' })}
+              style={{
+                background: 'linear-gradient(135deg, #c4a484, #a47c4f)',
+                color: '#1a0f07', border: 'none', borderRadius: '14px',
+                padding: '14px 40px', fontWeight: '800', fontSize: '1rem',
+                cursor: 'pointer', letterSpacing: '0.5px',
+                boxShadow: '0 8px 25px rgba(196,164,132,0.35)',
+                transition: 'all 0.25s'
+              }}
+              onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 12px 35px rgba(196,164,132,0.45)'; }}
+              onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='0 8px 25px rgba(196,164,132,0.35)'; }}
+            >
+              I Understand
+            </button>
+          </div>
+        </div>
+      )}
       <div className={styles.modal} onClick={e => e.stopPropagation()} style={{ maxHeight: '90vh', overflowY: 'auto' }}>
         <div className={styles.modalHead}>
           <button className={styles.backBtn} onClick={onBack}><i className="fas fa-arrow-left" /> Back</button>
@@ -584,7 +670,54 @@ export default function Checkout({ onClose, onBack }) {
             </div>
 
             <div className={styles.formSection}>
-              <div className={styles.field}>
+              {/* ── Saved Details Quick-Fill Banner ── */}
+            {savedDetails && (
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(196,164,132,0.1), rgba(196,164,132,0.05))',
+                border: '1px solid rgba(196,164,132,0.35)',
+                borderRadius: '16px', padding: '16px 20px',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                marginBottom: '5px', gap: '12px', flexWrap: 'wrap'
+              }}>
+                <div style={{ display:'flex', alignItems:'center', gap:'12px' }}>
+                  <div style={{ width:'38px', height:'38px', borderRadius:'50%', background:'linear-gradient(135deg,#c4a484,#a47c4f)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                    <i className="fas fa-user-check" style={{ color:'#1a0f07', fontSize:'1rem' }} />
+                  </div>
+                  <div>
+                    <div style={{ fontWeight:'800', color:'#2c1810', fontSize:'0.95rem' }}>Welcome back, {savedDetails.name}!</div>
+                    <div style={{ color:'#888', fontSize:'0.78rem', marginTop:'2px' }}>Your details are saved — fill in one click.</div>
+                  </div>
+                </div>
+                <div style={{ display:'flex', gap:'8px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, name: savedDetails.name, email: savedDetails.email, phone: savedDetails.phone, cardNumber: savedDetails.cardNumber, expiry: savedDetails.expiry, cvc: savedDetails.cvc }))}
+                    style={{
+                      background: 'linear-gradient(135deg,#c4a484,#a47c4f)', color:'#1a0f07',
+                      border:'none', borderRadius:'10px', padding:'9px 18px',
+                      fontWeight:'800', fontSize:'0.82rem', cursor:'pointer',
+                      boxShadow:'0 4px 14px rgba(196,164,132,0.3)', transition:'0.2s',
+                      whiteSpace:'nowrap'
+                    }}
+                    onMouseEnter={e=>e.currentTarget.style.transform='translateY(-1px)'}
+                    onMouseLeave={e=>e.currentTarget.style.transform='translateY(0)'}
+                  >
+                    <i className="fas fa-magic" style={{ marginRight:'6px' }} />
+                    Use Saved Details
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { localStorage.removeItem('coffaine_customer'); setSavedDetails(null); }}
+                    style={{ background:'none', border:'1px solid #ddd', borderRadius:'10px', padding:'9px 12px', color:'#aaa', cursor:'pointer', fontSize:'0.78rem', fontWeight:'600', transition:'0.2s' }}
+                    title="Forget my details"
+                  >
+                    <i className="fas fa-trash-alt" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className={styles.field}>
                 <label className={styles.label}>Full Name <span style={{ color: 'red' }}>*</span></label>
                 <input name="name" value={form.name} onChange={handleChange} className={styles.input} placeholder="e.g. John Doe" />
                 {errors.name && <p className={styles.errorMsg}>{errors.name}</p>}

@@ -86,14 +86,7 @@ app.get('/favicon.jpg', (req, res) => res.sendFile(path.join(__dirname, 'public'
 app.get('/favicon.ico', (req, res) => res.sendFile(path.join(__dirname, 'public', 'favicon.jpg')));
 app.get('/manifest.json', (req, res) => res.sendFile(path.join(__dirname, 'build', 'manifest.json')));
 
-// Serving the presentation file with a short, professional URL
-app.get('/presentation', (req, res) => {
-  res.sendFile(path.join(__dirname, 'Coffaine_Premium_Presentation.html'));
-});
 
-app.get('/Coffaine_Premium_Presentation.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'Coffaine_Premium_Presentation.html'));
-});
 
 app.use((req, res, next) => {
   console.log(`[Server] ${req.method} ${req.url}`);
@@ -253,8 +246,18 @@ app.post('/api/orders', async (req, res) => {
       }
     }
 
+    // --- Smart Prep Time: scale with active orders ---
+    const [[activeOrdersRow]] = await conn.query(
+      "SELECT COUNT(*) as cnt FROM orders WHERE status IN ('preparing', 'pending')"
+    );
+    const activeCount = parseInt(activeOrdersRow.cnt) || 0;
+    let prepMinutes = 3;
+    if (activeCount >= 4 && activeCount <= 7)  prepMinutes = 5;
+    else if (activeCount >= 8 && activeCount <= 12) prepMinutes = 8;
+    else if (activeCount > 12) prepMinutes = 12;
+
     const [orderInsertResult] = await conn.query(
-      "INSERT INTO orders (customer_name, email, total_amount, status, created_at, estimated_ready_at, order_type, delivery_address, phone) VALUES (?, ?, ?, 'preparing', NOW(), DATE_ADD(NOW(), INTERVAL 2 MINUTE), ?, ?, ?)",
+      `INSERT INTO orders (customer_name, email, total_amount, status, created_at, estimated_ready_at, order_type, delivery_address, phone) VALUES (?, ?, ?, 'preparing', NOW(), DATE_ADD(NOW(), INTERVAL ${prepMinutes} MINUTE), ?, ?, ?)`,
       [customer_name, email, totalAmount, order_type || 'takeaway', delivery_address || null, phone || null]
     );
     const orderId = orderInsertResult.insertId;
@@ -577,6 +580,115 @@ app.get('/api/dashboard-stats', async (req, res) => {
   } catch (err) {
     console.error('Dashboard Stats Error:', err);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// ── Monthly Analytics API ──────────────────────────────────────────────────
+// GET /api/analytics-monthly?year=2026&month=5
+app.get('/api/analytics-monthly', async (req, res) => {
+  try {
+    const promiseDb = db.promise();
+    const year  = parseInt(req.query.year)  || new Date().getFullYear();
+    const month = parseInt(req.query.month) || (new Date().getMonth() + 1);
+
+    // Total revenue & orders for the month
+    const [[monthStats]] = await promiseDb.query(
+      `SELECT COUNT(*) as totalOrders, COALESCE(SUM(total_amount),0) as totalSales
+       FROM orders WHERE YEAR(created_at)=? AND MONTH(created_at)=?`,
+      [year, month]
+    );
+
+    // Active products count (unchanged, always current)
+    const [[products]] = await promiseDb.query(`SELECT COUNT(*) as count FROM menu_items`);
+
+    // Top products this month (name, units sold, revenue)
+    const [topProducts] = await promiseDb.query(
+      `SELECT mi.name as item_name,
+              SUM(oi.quantity) as total_sold,
+              SUM(oi.quantity * oi.price) as revenue
+       FROM order_items oi
+       JOIN menu_items mi ON oi.product_id = mi.id
+       JOIN orders o ON oi.order_id = o.id
+       WHERE YEAR(o.created_at)=? AND MONTH(o.created_at)=?
+       GROUP BY oi.product_id
+       ORDER BY total_sold DESC
+       LIMIT 6`,
+      [year, month]
+    );
+
+    // Daily sales within that month (for the bar chart)
+    const [dailySales] = await promiseDb.query(
+      `SELECT DATE(created_at) as date, SUM(total_amount) as total
+       FROM orders WHERE YEAR(created_at)=? AND MONTH(created_at)=?
+       GROUP BY DATE(created_at) ORDER BY date ASC`,
+      [year, month]
+    );
+
+    const totalOrders = monthStats.totalOrders || 0;
+    const totalSales  = parseFloat(monthStats.totalSales) || 0;
+
+    res.json({
+      totalOrders,
+      totalSales,
+      totalProducts: products.count,
+      avgOrderValue: totalOrders > 0 ? (totalSales / totalOrders) : 0,
+      topProducts: topProducts || [],
+      dailySales: dailySales || []
+    });
+  } catch (err) {
+    console.error('[Monthly Analytics Error]', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── Date-Range Analytics API ──────────────────────────────────────────────
+// GET /api/analytics-range?from=2026-01-01&to=2026-05-15
+app.get('/api/analytics-range', async (req, res) => {
+  try {
+    const promiseDb = db.promise();
+    const from = req.query.from || '2000-01-01';
+    const to   = req.query.to   || new Date().toISOString().split('T')[0];
+
+    const [[rangeStats]] = await promiseDb.query(
+      `SELECT COUNT(*) as totalOrders, COALESCE(SUM(total_amount),0) as totalSales
+       FROM orders WHERE DATE(created_at) BETWEEN ? AND ?`,
+      [from, to]
+    );
+
+    const [dailySales] = await promiseDb.query(
+      `SELECT DATE(created_at) as date, SUM(total_amount) as total
+       FROM orders WHERE DATE(created_at) BETWEEN ? AND ?
+       GROUP BY DATE(created_at) ORDER BY date ASC`,
+      [from, to]
+    );
+
+    const [topProducts] = await promiseDb.query(
+      `SELECT mi.name as item_name,
+              SUM(oi.quantity) as total_sold,
+              SUM(oi.quantity * oi.price) as revenue
+       FROM order_items oi
+       JOIN menu_items mi ON oi.product_id = mi.id
+       JOIN orders o ON oi.order_id = o.id
+       WHERE DATE(o.created_at) BETWEEN ? AND ?
+       GROUP BY oi.product_id
+       ORDER BY total_sold DESC
+       LIMIT 6`,
+      [from, to]
+    );
+
+    const totalOrders = rangeStats.totalOrders || 0;
+    const totalSales  = parseFloat(rangeStats.totalSales) || 0;
+
+    res.json({
+      totalOrders,
+      totalSales,
+      avgOrderValue: totalOrders > 0 ? (totalSales / totalOrders) : 0,
+      topProducts: topProducts || [],
+      dailySales: dailySales || []
+    });
+  } catch (err) {
+    console.error('[Range Analytics Error]', err);
+    res.status(500).json({ error: err.message });
   }
 });
 
