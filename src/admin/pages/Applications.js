@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { User, Mail, Phone, Briefcase, Trash2, CheckCircle, XCircle, Download } from 'lucide-react';
 import jsPDF from 'jspdf';

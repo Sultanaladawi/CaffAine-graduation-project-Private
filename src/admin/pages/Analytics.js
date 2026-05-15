@@ -25,7 +25,7 @@ const Analytics = () => {
     border: 'var(--admin-border)'
   };
 
-  /* ── helpers ─────────────────────────────────────── */
+  /* â”€â”€ helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   const formatDate = (d) => {
     const dt = new Date(d);
     return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
@@ -58,7 +58,7 @@ const Analytics = () => {
     return result;
   };
 
-  /* ── all-time fetch ─────── */
+  /* â”€â”€ all-time fetch â”€â”€â”€â”€â”€â”€â”€ */
   const fetchAllTime = useCallback(async () => {
     try {
       const res = await axios.get('/api/dashboard-stats');
@@ -68,7 +68,7 @@ const Analytics = () => {
     } catch(e) { console.error(e); }
   }, [viewMode]);
 
-  /* ── main stats fetch ────────────────────────────── */
+  /* â”€â”€ main stats fetch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   const fetchStats = useCallback(async () => {
     setLoading(true);
     try {
@@ -119,7 +119,7 @@ const Analytics = () => {
   const topProducts = stats?.topProducts || [];
 
   const cards = stats ? [
-    { title: 'Total Revenue',    value: `${parseFloat(stats.totalSales||0).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})} JOD`, icon: DollarSign, color: '#38ef7d', desc: viewMode==='monthly'?`${MONTH_NAMES[selectedMonth-1]} ${selectedYear}`: viewMode==='range'?`${rangeFrom} → ${rangeTo}`:'All Time' },
+    { title: 'Total Revenue',    value: `${parseFloat(stats.totalSales||0).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})} JOD`, icon: DollarSign, color: '#38ef7d', desc: viewMode==='monthly'?`${MONTH_NAMES[selectedMonth-1]} ${selectedYear}`: viewMode==='range'?`${rangeFrom} -> ${rangeTo}`:'All Time' },
     { title: 'Total Orders',     value: stats.totalOrders||0, icon: ShoppingBag, color: '#c4a484', desc: 'Orders Count' },
     { title: 'Avg Order Value',  value: `${parseFloat(stats.avgOrderValue||0).toFixed(2)} JOD`, icon: TrendingUp, color: '#4facfe', desc: 'Per Transaction' },
     { title: 'Active Products',  value: stats.totalProducts || (allTime?.totalProducts||0), icon: BarChart3, color: '#f093fb', desc: 'In Menu' },
@@ -183,7 +183,7 @@ const Analytics = () => {
         )}
       </div>
 
-      {/* ── Filter Bar ── */}
+      {/* â”€â”€ Filter Bar â”€â”€ */}
       <div style={{ position:'relative', zIndex:1, background:'rgba(255,255,255,0.02)', border:'1px solid rgba(196,164,132,0.12)', borderRadius:'20px', padding:'20px 25px', marginBottom:'25px', display:'flex', flexWrap:'wrap', gap:'15px', alignItems:'center' }}>
         <Calendar size={20} color="#c4a484" />
         <span style={{ color:'rgba(255,255,255,0.5)', fontWeight:'700', fontSize:'0.85rem', textTransform:'uppercase', letterSpacing:'1px' }}>View By:</span>
@@ -206,7 +206,7 @@ const Analytics = () => {
         {viewMode === 'range' && (
           <>
             <input type="date" className="filter-date" value={rangeFrom} onChange={e => setRangeFrom(e.target.value)} />
-            <span style={{ color:'#c4a484', fontWeight:'700' }}>→</span>
+            <span style={{ color:'#c4a484', fontWeight:'700' }}>&rarr;</span>
             <input type="date" className="filter-date" value={rangeTo}   onChange={e => setRangeTo(e.target.value)}   />
             {rangeFrom && rangeTo && (
               <button className="filter-btn active" style={{ display:'flex', alignItems:'center', gap:'6px' }} onClick={fetchStats}>
@@ -228,7 +228,7 @@ const Analytics = () => {
         </div>
       ) : (
         <>
-          {/* ── 5 Stat Cards ── */}
+          {/* â”€â”€ 5 Stat Cards â”€â”€ */}
           <div style={{ position:'relative', zIndex:1, display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))', gap:'20px', marginBottom:'30px' }}>
             {cards.map((c, i) => (
               <div key={i} className="premium-row" style={{ backgroundColor: theme.card, padding:'25px', borderRadius:'20px', border:`1px solid ${theme.border}`, display:'flex', flexDirection:'column', gap:'15px', boxShadow:'0 10px 30px rgba(0,0,0,0.2)' }}>
@@ -248,11 +248,11 @@ const Analytics = () => {
             ))}
           </div>
 
-          {/* ── Bar Chart + Category Dominance ── */}
+          {/* â”€â”€ Bar Chart + Category Dominance â”€â”€ */}
           <div style={{ position:'relative', zIndex:1, display:'grid', gridTemplateColumns:'2fr 1fr', gap:'30px', marginBottom:'30px' }}>
             <div style={{ backgroundColor: theme.card, padding:'35px', borderRadius:'24px', border:`1px solid ${theme.border}`, minHeight:'380px', boxShadow:'0 15px 45px rgba(0,0,0,0.3)', display:'flex', flexDirection:'column' }}>
               <h3 style={{ color:'#fff', marginBottom:'30px', fontFamily:'serif', fontSize:'1.5rem' }}>
-                {viewMode === 'monthly' ? `Daily Sales — ${MONTH_NAMES[selectedMonth-1]} ${selectedYear}` : viewMode === 'range' ? `Sales: ${rangeFrom} → ${rangeTo}` : 'Last 7 Days Sales'}
+                {viewMode === 'monthly' ? `Daily Sales â€” ${MONTH_NAMES[selectedMonth-1]} ${selectedYear}` : viewMode === 'range' ? `Sales: ${rangeFrom} -> ${rangeTo}` : 'Last 7 Days Sales'}
               </h3>
               <div style={{ flex:1, display:'flex', alignItems:'flex-end', gap:'8px', paddingBottom:'10px', height:'240px', overflowX:'auto' }}>
                 {weeklyData.length > 0 ? weeklyData.map((d, i) => (
@@ -286,14 +286,14 @@ const Analytics = () => {
             </div>
           </div>
 
-          {/* ── Top Selling Products ── */}
+          {/* â”€â”€ Top Selling Products â”€â”€ */}
           <div style={{ position:'relative', zIndex:1 }}>
             <div style={{ backgroundColor: theme.card, padding:'35px', borderRadius:'24px', border:`1px solid ${theme.border}`, boxShadow:'0 15px 45px rgba(0,0,0,0.3)' }}>
               <h3 style={{ color:'#fff', marginBottom:'5px', fontFamily:'serif', fontSize:'1.5rem' }}>
                 Top Selling Products
               </h3>
               <p style={{ color:'rgba(255,255,255,0.35)', fontSize:'0.8rem', marginBottom:'25px', fontWeight:'600' }}>
-                {viewMode==='monthly' ? `${MONTH_NAMES[selectedMonth-1]} ${selectedYear}` : viewMode==='range' ? `${rangeFrom} → ${rangeTo}` : 'All Time'}
+                {viewMode==='monthly' ? `${MONTH_NAMES[selectedMonth-1]} ${selectedYear}` : viewMode==='range' ? `${rangeFrom} -> ${rangeTo}` : 'All Time'}
               </p>
               {topProducts.length === 0 ? (
                 <div style={{ textAlign:'center', color:'#555', padding:'40px', fontSize:'1rem' }}>No sales data for this period.</div>

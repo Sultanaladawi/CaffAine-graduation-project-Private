@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Activity, AlertTriangle, ShieldAlert, User, Clock, Search, Filter, Download } from 'lucide-react';
 import { useAdminContext } from '../AdminContext';
@@ -234,7 +234,7 @@ const LeaderDashboard = () => {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
                   <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '1.1rem' }}>{item.reviewer_name || 'Anonymous'}</span>
-                  <span style={{ color: '#ff4d4d', fontWeight: '900', fontSize: '1rem' }}>{item.rating} ⭐</span>
+                  <span style={{ color: '#ff4d4d', fontWeight: '900', fontSize: '1rem' }}>{item.rating} â­گ</span>
                 </div>
                 <div style={{ color: colors.crema, fontSize: '0.75rem', marginBottom: '12px', textTransform: 'uppercase', fontWeight: '800', letterSpacing: '1px' }}>
                   {item.type}

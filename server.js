@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 require('dotenv').config();
@@ -46,8 +46,8 @@ if (API_KEY && API_KEY !== 'your_key_here') {
   });
 
   console.log('------------------------------------------');
-  console.log(`ًں¤– AI PROVIDER: ${IS_GITHUB ? 'GitHub Models' : 'Standard OpenAI'} Detected`);
-  console.log(`ًں”— BASE URL: ${BASE_URL}`);
+  console.log(`🤖 AI PROVIDER: ${IS_GITHUB ? 'GitHub Models' : 'Standard OpenAI'} Detected`);
+  console.log(`🔗 BASE URL: ${BASE_URL}`);
   console.log('------------------------------------------');
 } else {
   console.warn('[WARNING] AI API Key missing or default. AI Assistant in Fallback Mode.');
@@ -55,10 +55,10 @@ if (API_KEY && API_KEY !== 'your_key_here') {
 
 const app = express();
 
-// âœ… Azure uses process.env.PORT; locally falls back to SERVER_PORT to avoid conflict with React client
+// ✅ Azure uses process.env.PORT; locally falls back to SERVER_PORT to avoid conflict with React client
 const PORT = process.env.PORT || process.env.SERVER_PORT || 8080;
 
-// âœ… FIXED: CORS now allows Azure and localhost
+// ✅ FIXED: CORS now allows Azure and localhost
 app.use(cors({
   origin: true,
   credentials: true,
@@ -69,7 +69,7 @@ app.use(cors({
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// âœ… ENFORCE HTTPS (For Azure Production)
+// ✅ ENFORCE HTTPS (For Azure Production)
 app.use((req, res, next) => {
   if (req.headers['x-forwarded-proto'] && req.headers['x-forwarded-proto'] !== 'https' && process.env.NODE_ENV === 'production') {
     return res.redirect('https://' + req.get('host') + req.url);
@@ -199,6 +199,42 @@ db.getConnection((err, connection) => {
         }
       } catch (e) {
         console.error('[Migration] Addon price fix failed:', e.message);
+      }
+
+      try {
+        console.log('[Sanitation] Cleaning database artifacts...');
+        const [items] = await promiseDb.query("SELECT id, name, price_display, image_url FROM menu_items");
+        for (const item of items) {
+          let updated = false;
+          let newName = item.name;
+          let newPrice = item.price_display;
+          let newImg = item.image_url;
+
+          if (newName && (newName.includes('آ') || newName.includes('Â') || newName.includes('£'))) {
+             newName = newName.replace(/[آÂ£]/g, '').trim();
+             updated = true;
+          }
+          if (newPrice && (newPrice.includes('آ') || newPrice.includes('Â') || newPrice.includes('£'))) {
+             newPrice = newPrice.replace(/[آÂ£]/g, 'JOD').replace(/JODJOD/g, 'JOD').trim();
+             updated = true;
+          }
+          if (newImg && (newImg.includes('آ') || newImg.includes('Â'))) {
+             newImg = newImg.replace(/[آÂ]/g, '').trim();
+             updated = true;
+          }
+
+          if (updated) {
+            await promiseDb.query("UPDATE menu_items SET name = ?, price_display = ?, image_url = ? WHERE id = ?", [newName, newPrice, newImg, item.id]);
+          }
+        }
+        
+        // Clean Orders too
+        await promiseDb.query("UPDATE orders SET total_amount = REPLACE(total_amount, 'آ', '') WHERE total_amount LIKE '%آ%'");
+        await promiseDb.query("UPDATE orders SET total_amount = REPLACE(total_amount, 'Â', '') WHERE total_amount LIKE '%Â%'");
+
+        console.log('[Sanitation] Database artifacts purged.');
+      } catch (sanErr) {
+        console.error('[Sanitation] DB cleanup failed:', sanErr.message);
       }
 
       console.log('[Migration] Schema verification complete.');
@@ -390,6 +426,12 @@ db.query(`CREATE TABLE IF NOT EXISTS site_settings (\`key\` VARCHAR(255) PRIMARY
 db.query(`CREATE TABLE IF NOT EXISTS offers (id INT AUTO_INCREMENT PRIMARY KEY, title VARCHAR(255) NOT NULL, description TEXT, discount_percent DECIMAL(5,2), active TINYINT(1) DEFAULT 1, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure offers table error:', err); });
 db.query(`CREATE TABLE IF NOT EXISTS chat_messages (id INT AUTO_INCREMENT PRIMARY KEY, user_msg TEXT, ai_msg TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure chat_messages table error:', err); });
 db.query(`CREATE TABLE IF NOT EXISTS ai_assistant_messages (id INT AUTO_INCREMENT PRIMARY KEY, admin_query TEXT, ai_response TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure ai_assistant_messages table error:', err); });
+db.query(`CREATE TABLE IF NOT EXISTS inventory (id INT AUTO_INCREMENT PRIMARY KEY, item_name VARCHAR(255) NOT NULL, quantity DECIMAL(10,2) DEFAULT 0, unit VARCHAR(50) DEFAULT 'g', min_threshold DECIMAL(10,2) DEFAULT 0, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure inventory table error:', err); });
+db.query(`CREATE TABLE IF NOT EXISTS tags (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255) NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure tags table error:', err); });
+db.query(`CREATE TABLE IF NOT EXISTS addons (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255) NOT NULL, price DECIMAL(10,2) DEFAULT 0, inventory_id INT DEFAULT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure addons table error:', err); });
+db.query(`CREATE TABLE IF NOT EXISTS menu_item_tags (menu_item_id INT NOT NULL, tag_id INT NOT NULL, PRIMARY KEY (menu_item_id, tag_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure menu_item_tags table error:', err); });
+db.query(`CREATE TABLE IF NOT EXISTS menu_item_addons (menu_item_id INT NOT NULL, addon_id INT NOT NULL, PRIMARY KEY (menu_item_id, addon_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure menu_item_addons table error:', err); });
+db.query(`CREATE TABLE IF NOT EXISTS recipes (id INT AUTO_INCREMENT PRIMARY KEY, menu_item_id INT NOT NULL, inventory_id INT NOT NULL, quantity_required DECIMAL(10,2) NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure recipes table error:', err); });
 
 let categoryNameColumn = 'name';
 
@@ -896,8 +938,8 @@ app.put('/api/mark-ready/:id', (req, res) => {
       db.query("SELECT customer_name, email, phone FROM orders WHERE id = ?", [id], (err, rows) => {
         if (!err && rows.length > 0) {
           const order = rows[0];
-          if (order.phone) console.log(`ًں“± SMS to ${order.phone}: "Hello ${order.customer_name}, your order is ready!"`);
-          if (order.email) console.log(`ًں“§ Email to ${order.email}: "Order Ready!"`);
+          if (order.phone) console.log(`📱 SMS to ${order.phone}: "Hello ${order.customer_name}, your order is ready!"`);
+          if (order.email) console.log(`📧 Email to ${order.email}: "Order Ready!"`);
         }
       });
     }
@@ -1212,12 +1254,17 @@ app.put('/api/products/reorder', async (req, res) => {
 
 app.post('/api/products', async (req, res) => {
   let { name, price_num, description, available, category_id, image_url, tags, addons, addon_ids, tag_ids } = req.body;
-  if (category_id === 'espresso') category_id = '2';
-  if (category_id === 'tea') category_id = '6';
-  if (category_id === 'cold') category_id = '1';
-  if (category_id === 'food') category_id = '3';
-  if (category_id === 'sweets') category_id = '5';
-  if (category_id === 'soft') category_id = '4';
+  
+  // Dynamic Category Mapping
+  if (isNaN(parseInt(category_id))) {
+    try {
+      const [catRows] = await db.promise().query("SELECT id FROM categories WHERE LOWER(name) = ? OR LOWER(label) = ?", [String(category_id).toLowerCase(), String(category_id).toLowerCase()]);
+      if (catRows.length > 0) category_id = catRows[0].id;
+    } catch (catErr) {
+      console.error('Category mapping failed:', catErr);
+    }
+  }
+
   if (!name) return res.status(400).json({ error: 'Missing name' });
 
   let conn;
@@ -1252,8 +1299,18 @@ app.put('/api/products/:id', async (req, res) => {
     conn = await db.promise().getConnection();
     await conn.beginTransaction();
     let cleanPrice = null;
-    if (price_num !== undefined && price_num !== null) cleanPrice = convertNumerals(price_num.toString()).replace(/[^0-9.]/g, '');
-    await conn.query("UPDATE menu_items SET name = ?, price_num = ?, description = ?, available = ?, category_id = ?, image_url = ?, tags = ?, addons = ? WHERE id = ?", [name, cleanPrice, description, available, category_id || null, image_url || null, tags || null, addons || null, id]);
+    if (price_num !== undefined && price_num !== null) {
+      cleanPrice = convertNumerals(price_num.toString()).replace(/[^0-9.]/g, '');
+    }
+    const price_display = cleanPrice ? `JOD${parseFloat(cleanPrice).toFixed(2)}` : null;
+
+    // Dynamic Category Mapping for Update
+    if (category_id && isNaN(parseInt(category_id))) {
+      const [catRows] = await conn.query("SELECT id FROM categories WHERE LOWER(name) = ? OR LOWER(label) = ?", [String(category_id).toLowerCase(), String(category_id).toLowerCase()]);
+      if (catRows.length > 0) category_id = catRows[0].id;
+    }
+
+    await conn.query("UPDATE menu_items SET name = ?, price_num = ?, price_display = ?, description = ?, available = ?, category_id = ?, image_url = ?, tags = ?, addons = ? WHERE id = ?", [name, cleanPrice, price_display, description, available, category_id || null, image_url || null, tags || null, addons || null, id]);
     if (Array.isArray(addon_ids)) {
       await conn.query('DELETE FROM menu_item_addons WHERE menu_item_id = ?', [id]);
       for (const aid of addon_ids) if (aid) await conn.query('INSERT INTO menu_item_addons (menu_item_id, addon_id) VALUES (?, ?)', [id, aid]);
@@ -1371,8 +1428,8 @@ ${topProducts.map((p,i) => `${i+1}. ${p.name} (${p.sold} sold)`).join(' | ')}
 ${salesTrend.map(d => `${d.date}: JOD${d.revenue} (${d.orders} orders)`).join(' | ')}
 
 === INVENTORY ===
-âڑ ï¸ڈ LOW (${lowStock.length}): ${lowStock.map(i => `${i.item_name} ${i.quantity}${i.unit||''}`).join(', ') || 'None'}
-âœ… OK: ${okStock.map(i => `${i.item_name}: ${i.quantity}${i.unit||''}`).join(', ')}
+⚠️ LOW (${lowStock.length}): ${lowStock.map(i => `${i.item_name} ${i.quantity}${i.unit||''}`).join(', ') || 'None'}
+✅ OK: ${okStock.map(i => `${i.item_name}: ${i.quantity}${i.unit||''}`).join(', ')}
 
 === MENU & RATINGS ===
 Items: ${menuItems.map(m => `${m.name} (${m.price_display})`).join(', ') || 'None'}
@@ -1419,7 +1476,7 @@ Rule: Answer ONLY from the data above. Be precise and professional.`;
       max_tokens: 500,
       temperature: 0.7
     });
-    return res.json({ reply: completion.choices[0]?.message?.content || "I'm a bit stuck! Reach us at hello@CaffAInecoffee.co.uk âک•" });
+    return res.json({ reply: completion.choices[0]?.message?.content || "I'm a bit stuck! Reach us at hello@CaffAInecoffee.co.uk ☕" });
   } catch (error) {
     console.error('[AI] Chat Error:', error.message);
     return res.status(200).json({ reply: `[Local Mode] AI service temporarily unavailable. Please try again later.` });
@@ -1453,13 +1510,13 @@ app.post('/api/ai-assistant-logs', (req, res) => {
 
 // Production static files already served at top
 
-// âœ… Catch-all for React Router
+// ✅ Catch-all for React Router
 app.get(/.*/, (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-// âœ… START SERVER - Single PORT definition
+// ✅ START SERVER - Single PORT definition
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`ًںڑ€ CaffAIne Server is LIVE on port: ${PORT}`);
-  console.log(`ًں”— Local Access: http://127.0.0.1:${PORT}`);
+  console.log(`🚀 CaffAIne Server is LIVE on port: ${PORT}`);
+  console.log(`🔗 Local Access: http://127.0.0.1:${PORT}`);
 });

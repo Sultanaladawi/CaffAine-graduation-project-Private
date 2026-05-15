@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+﻿import React, { useEffect, useState, useRef } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useAdminContext } from './AdminContext';
@@ -104,7 +104,7 @@ const AdminLayout = () => {
         const currentCount = pendingOrders.length;
 
         if (lastOrderCount.current === null) {
-          // First load — just record the count, don't alert
+          // First load â€” just record the count, don't alert
           lastOrderCount.current = currentCount;
         } else if (currentCount > lastOrderCount.current) {
           const diff = currentCount - lastOrderCount.current;

@@ -28,7 +28,7 @@ export default function Checkout({ onClose, onBack }) {
 
   const formatPrice = (n) => {
     const val = parseFloat(n) || 0;
-    return `ÂJOD${val.toFixed(2)}`;
+    return `JOD${val.toFixed(2)}`;
   };
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
