@@ -55,7 +55,7 @@ function Tags({ tags = [], linkedTags = [] }) {
     if (lower.includes('snack') || lower.includes('fry') || lower.includes('chips'))
       return { gradient: 'linear-gradient(135deg, #d97706, #b45309)', border: '#fbbf24', color: '#fffbeb', emoji: 'ðŸŸ' };
     if (lower.includes('soup'))
-      return { gradient: 'linear-gradient(135deg, #c2410c, #7c2d12)', border: '#fdba74', color: '#fff7ed', emoji: 'JOD' };
+      return { gradient: 'linear-gradient(135deg, #c2410c, #7c2d12)', border: '#fdba74', color: '#fff7ed', emoji: 'ðŸ¥JOD' };
     if (lower.includes('meat') || lower.includes('chicken') || lower.includes('beef'))
       return { gradient: 'linear-gradient(135deg, #451a03, #1b0c03)', border: '#92400e', color: '#fffbeb', emoji: 'ðŸ—' };
     if (lower.includes('evening') || lower.includes('night') || lower.includes('sunset'))
@@ -233,7 +233,7 @@ export default function Menu() {
     .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
     .map(item => ({
       ...item,
-      displayPrice: `JOD${parsePrice(item.price_num || item.price).toFixed(2)}`,
+      displayPrice: `ÂJOD${parsePrice(item.price_num || item.price).toFixed(2)}`,
       tags: item.tags ? (typeof item.tags === 'string' ? item.tags.split(',') : item.tags) : [],
     }));
 
@@ -298,7 +298,7 @@ export default function Menu() {
       addItem({
         id: selectedProduct.id,
         name: selectedProduct.name,
-        price: `JOD${getTotalPrice().toFixed(2)}`,
+        price: `ÂJOD${getTotalPrice().toFixed(2)}`,
         priceNum: getTotalPrice(),
         addons: selectedAddons
       });
@@ -382,7 +382,7 @@ export default function Menu() {
             <div className={styles.modalBodyFull}>
               <div className={styles.titleRow}>
                 <h3>{selectedProduct.name}</h3>
-                <span className={styles.priceHighlight}>JOD{getBasePrice().toFixed(2)}</span>
+                <span className={styles.priceHighlight}>ÂJOD{getBasePrice().toFixed(2)}</span>
               </div>
               <p className={styles.descText}>{selectedProduct.desc || selectedProduct.description}</p>
               <div className={styles.addonSection}>
@@ -391,7 +391,7 @@ export default function Menu() {
                   {currentAddons.map(addon => (
                     <div key={addon.id} className={`${styles.addonRow} ${selectedAddons.find(a => a.id === addon.id) ? styles.addonRowSelected : ''}`} onClick={() => toggleAddon(addon)}>
                       <span className={styles.addonName}>{addon.name}</span>
-                      <span className={styles.addonPrice}>+JOD{addon.price.toFixed(2)}</span>
+                      <span className={styles.addonPrice}>+ÂJOD{addon.price.toFixed(2)}</span>
                     </div>
                   ))}
                 </div>
@@ -447,7 +447,7 @@ export default function Menu() {
                   <i className="fas fa-shopping-basket" style={{ fontSize: '1.3rem' }} />
                   <span>ADD TO CART</span>
                 </div>
-                <span style={{ fontSize: '1.3rem', background: 'rgba(255,255,255,0.1)', padding: '5px 15px', borderRadius: '12px' }}>JOD{getTotalPrice().toFixed(2)}</span>
+                <span style={{ fontSize: '1.3rem', background: 'rgba(255,255,255,0.1)', padding: '5px 15px', borderRadius: '12px' }}>ÂJOD{getTotalPrice().toFixed(2)}</span>
               </button>
             </div>
           </div>
@@ -781,7 +781,7 @@ export default function Menu() {
                     <span className="addon-price" style={{ 
                       fontSize: '0.8rem', fontWeight: '900', color: '#8c6a56', 
                       marginLeft: '5px', transition: 'color 0.3s'
-                    }}>+JOD{(parseFloat(addon.price) || 0.50).toFixed(2)}</span>
+                    }}>+ÂJOD{(parseFloat(addon.price) || 0.50).toFixed(2)}</span>
                   </button>
                 ))}
               </div>

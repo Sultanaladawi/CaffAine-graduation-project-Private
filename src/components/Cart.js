@@ -7,7 +7,7 @@ export default function Cart({ onClose, onCheckout }) {
 
   const formatPrice = (n) => {
     const val = parseFloat(n) || 0;
-    return `JOD${val.toFixed(2)}`;
+    return `ÂJOD${val.toFixed(2)}`;
   };
 
   useEffect(() => {

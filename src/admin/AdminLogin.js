@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAdminContext } from './AdminContext';
 import { ShieldCheck, Eye, EyeOff, Lock, Mail, ChevronRight, Loader2, AlertTriangle, Coffee, Zap } from 'lucide-react';
@@ -187,7 +187,7 @@ export default function AdminLogin() {
           <div className="input-group">
             <label className="label-text"><Lock size={12} /> Security Key</label>
             <div style={{ position: 'relative' }}>
-              <input type={showPass ? 'text' : 'password'} className="lux-input" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" value={form.password} onChange={e => setForm({...form, password: e.target.value})} required />
+              <input type={showPass ? 'text' : 'password'} className="lux-input" placeholder="••••••••" value={form.password} onChange={e => setForm({...form, password: e.target.value})} required />
               <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: 'absolute', right: '15px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: colors.latte, cursor: 'pointer', padding: '5px', opacity: 0.5 }}>
                 {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>

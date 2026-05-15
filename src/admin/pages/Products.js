@@ -240,7 +240,7 @@ const Products = () => {
         // Log the creation
         await axios.post('/api/log-action', {
           action: 'Product Created',
-          details: `Added new product: ${cleanFormData.name} (JOD${cleanFormData.price_num})`
+          details: `Added new product: ${cleanFormData.name} (�JOD${cleanFormData.price_num})`
         });
         showToast("Product created with precision");
       } else {
@@ -248,7 +248,7 @@ const Products = () => {
         // Log the update
         await axios.post('/api/log-action', {
           action: 'Product Updated',
-          details: `Modified product: ${cleanFormData.name} (JOD${cleanFormData.price_num})`
+          details: `Modified product: ${cleanFormData.name} (�JOD${cleanFormData.price_num})`
         });
         showToast("Product details refined");
       }
@@ -405,8 +405,8 @@ const Products = () => {
         item.name || 'Unnamed',
         dbCategories.find(c => String(c.id) === String(item.category_id))?.name || dbCategories.find(c => String(c.id) === String(item.category_id))?.label || item.category_id || 'N/A',
         item.discounted_price 
-          ? `JOD${parseFloat(item.discounted_price).toFixed(2)} (Off: JOD${parseFloat(item.price_num).toFixed(2)})`
-          : `JOD${parseFloat(item.price_num || 0).toFixed(2)}`,
+          ? `�JOD${parseFloat(item.discounted_price).toFixed(2)} (Off: �JOD${parseFloat(item.price_num).toFixed(2)})`
+          : `�JOD${parseFloat(item.price_num || 0).toFixed(2)}`,
         item.available === 0 ? 'OUT OF STOCK' : 'AVAILABLE'
       ]);
 
@@ -589,7 +589,7 @@ const Products = () => {
                   />
                 </div>
                 <div style={{ width: '150px' }}>
-                  <label style={labelStyle}>Price (JOD)</label>
+                  <label style={labelStyle}>Price (�JOD)</label>
                   <input 
                     type="text" value={formData.price_num} 
                     onChange={(e) => setFormData({...formData, price_num: e.target.value})}
@@ -704,11 +704,11 @@ const Products = () => {
                             <span style={{ flex: 1, fontSize: '0.82rem', color: isSelected ? colors.crema : colors.latte }}>{tag.name}</span>
                           )}
                           {isEditing ? (
-                            <button type="button" onClick={() => handleSaveTagEdit(tag.id)} style={{ background: 'rgba(56,239,125,0.15)', border: '1px solid rgba(56,239,125,0.3)', borderRadius: '6px', color: '#38ef7d', cursor: 'pointer', padding: '2px 8px', fontSize: '0.72rem', fontWeight: '700' }}>âœ“</button>
+                            <button type="button" onClick={() => handleSaveTagEdit(tag.id)} style={{ background: 'rgba(56,239,125,0.15)', border: '1px solid rgba(56,239,125,0.3)', borderRadius: '6px', color: '#38ef7d', cursor: 'pointer', padding: '2px 8px', fontSize: '0.72rem', fontWeight: '700' }}>✓</button>
                           ) : (
-                            <button type="button" onClick={() => { setTagEditId(tag.id); setTagEditName(tag.name); }} style={{ background: 'none', border: 'none', color: '#777', cursor: 'pointer', padding: '2px 5px', fontSize: '0.75rem', flexShrink: 0 }} title="Rename tag">📝</button>
+                            <button type="button" onClick={() => { setTagEditId(tag.id); setTagEditName(tag.name); }} style={{ background: 'none', border: 'none', color: '#777', cursor: 'pointer', padding: '2px 5px', fontSize: '0.75rem', flexShrink: 0 }} title="Rename tag">✏️</button>
                           )}
-                          <button type="button" onClick={() => handleDeleteTag(tag.id)} style={{ background: 'none', border: 'none', color: 'rgba(231,74,59,0.5)', cursor: 'pointer', padding: '2px 5px', fontSize: '0.75rem', flexShrink: 0 }} title="Delete tag">×</button>
+                          <button type="button" onClick={() => handleDeleteTag(tag.id)} style={{ background: 'none', border: 'none', color: 'rgba(231,74,59,0.5)', cursor: 'pointer', padding: '2px 5px', fontSize: '0.75rem', flexShrink: 0 }} title="Delete tag">✕</button>
                         </div>
                       );
                     })}
@@ -735,7 +735,7 @@ const Products = () => {
                         if (!addon) return null;
                         return (
                           <span key={`addon-${aid}-${idx}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', borderRadius: '20px', background: 'rgba(196,164,132,0.1)', border: '1px solid rgba(196,164,132,0.3)', color: colors.crema, fontSize: '0.72rem', fontWeight: '700' }}>
-                            {addon.name} (JOD{addon.price})
+                            {addon.name} (�JOD{addon.price})
                             <button type="button" onClick={() => setFormData(prev => ({...prev, addon_ids: prev.addon_ids.filter((_, i) => i !== idx)}))} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: colors.crema, fontSize: '1rem', lineHeight: 1, marginLeft: '2px' }}>×</button>
                           </span>
                         );
@@ -764,27 +764,27 @@ const Products = () => {
                                 style={{ flex: 2, background: 'rgba(255,255,255,0.05)', border: `1px solid ${colors.crema}`, borderRadius: '6px', color: colors.latte, padding: '2px 6px', fontSize: '0.75rem', outline: 'none' }}
                               />
                               <input value={addonEditPrice} onChange={e => setAddonEditPrice(e.target.value)}
-                                placeholder="JOD"
+                                placeholder="�JOD"
                                 style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: `1px solid ${colors.crema}`, borderRadius: '6px', color: colors.latte, padding: '2px 6px', fontSize: '0.75rem', outline: 'none' }}
                               />
                             </div>
                           ) : (
                             <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: isSelected ? colors.crema : colors.latte }}>
                               <span>{addon.name}</span>
-                              <span style={{ opacity: 0.6, fontSize: '0.75rem' }}>JOD{addon.price}</span>
+                              <span style={{ opacity: 0.6, fontSize: '0.75rem' }}>�JOD{addon.price}</span>
                             </div>
                           )}
                           {isEditing ? (
-                            <button type="button" onClick={() => handleSaveAddonEdit(addon.id)} style={{ background: 'rgba(56,239,125,0.15)', border: '1px solid rgba(56,239,125,0.3)', borderRadius: '6px', color: '#38ef7d', cursor: 'pointer', padding: '2px 8px', fontSize: '0.72rem', fontWeight: '700' }}>âœ“</button>
+                            <button type="button" onClick={() => handleSaveAddonEdit(addon.id)} style={{ background: 'rgba(56,239,125,0.15)', border: '1px solid rgba(56,239,125,0.3)', borderRadius: '6px', color: '#38ef7d', cursor: 'pointer', padding: '2px 8px', fontSize: '0.72rem', fontWeight: '700' }}>✓</button>
                           ) : (
                             <button type="button" onClick={() => { 
                               setAddonEditId(addon.id); 
                               setAddonEditName(addon.name); 
                               setAddonEditPrice(addon.price); 
                               setAddonEditInventoryId(addon.inventory_id || '');
-                            }} style={{ background: 'none', border: 'none', color: '#777', cursor: 'pointer', padding: '2px 5px', fontSize: '0.75rem', flexShrink: 0 }} title="Edit addon">📝</button>
+                            }} style={{ background: 'none', border: 'none', color: '#777', cursor: 'pointer', padding: '2px 5px', fontSize: '0.75rem', flexShrink: 0 }} title="Edit addon">✏️</button>
                           )}
-                          <button type="button" onClick={() => handleDeleteAddon(addon.id)} style={{ background: 'none', border: 'none', color: 'rgba(231,74,59,0.5)', cursor: 'pointer', padding: '2px 5px', fontSize: '0.75rem', flexShrink: 0 }} title="Delete addon">×</button>
+                          <button type="button" onClick={() => handleDeleteAddon(addon.id)} style={{ background: 'none', border: 'none', color: 'rgba(231,74,59,0.5)', cursor: 'pointer', padding: '2px 5px', fontSize: '0.75rem', flexShrink: 0 }} title="Delete addon">✕</button>
                         </div>
                       );
                     })}
@@ -797,7 +797,7 @@ const Products = () => {
                         placeholder="Name" style={{...inputStyle, width: '100px', flex: '2', padding: '10px', fontSize: '0.82rem'}} />
                       <input type="text" value={newAddonPrice} onChange={e => setNewAddonPrice(e.target.value)}
                         onKeyDown={e => { if(e.key === 'Enter') { e.preventDefault(); handleQuickAddAddon(); }}}
-                        placeholder="JOD" style={{...inputStyle, width: '50px', flex: '1', padding: '10px', fontSize: '0.82rem'}} />
+                        placeholder="�JOD" style={{...inputStyle, width: '50px', flex: '1', padding: '10px', fontSize: '0.82rem'}} />
                       <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleQuickAddAddon(); }} style={{backgroundColor: colors.crema, color: colors.espresso, border: 'none', borderRadius: '10px', width: '42px', height: '42px', cursor: 'pointer', fontWeight: 'bold', flexShrink: 0, fontSize: '1.2rem'}}>+</button>
                     </div>
                   </div>
@@ -854,7 +854,7 @@ const Products = () => {
                 {/* Add New Raw Material */}
                 <details style={{ borderTop: `1px solid ${colors.border}`, paddingTop: '15px' }}>
                   <summary style={{ cursor: 'pointer', color: '#aaa', fontSize: '0.82rem', fontWeight: '600', userSelect: 'none', listStyle: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontSize: '1rem' }}>â‍•</span> Create New Raw Material (if not in list above)
+                    <span style={{ fontSize: '1rem' }}>➕</span> Create New Raw Material (if not in list above)
                   </summary>
                   <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     <input type="text" value={newInvName} onChange={e => setNewInvName(e.target.value)}
@@ -890,7 +890,7 @@ const Products = () => {
                     </div>
                     <button type="button" onClick={handleQuickAddInventory}
                       style={{ backgroundColor: colors.crema, color: colors.espresso, border: 'none', borderRadius: '10px', padding: '10px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9rem' }}>
-                      â‍• Add to Inventory
+                      ➕ Add to Inventory
                     </button>
                   </div>
                 </details>
@@ -921,7 +921,7 @@ const Products = () => {
                     backgroundColor: uploadLoading ? '#555' : colors.latte,
                     color: colors.bean, border: 'none', transition: '0.2s'
                   }}>
-                    {uploadLoading ? 'âڈ³ Uploading...' : 'ًں“پ Upload from Device'}
+                    {uploadLoading ? '⏳ Uploading...' : '📁 Upload from Device'}
                     <input 
                       type="file" 
                       accept="image/*" 
@@ -972,8 +972,13 @@ const Products = () => {
                           alt={img} 
                           style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                           onError={(e) => {
-                             e.target.onerror = null;
-                             e.target.src = '/images/coffee-beans.png';
+                            if (!e.target.dataset.retried) {
+                               e.target.dataset.retried = 'true';
+                               e.target.src = `http://127.0.0.1:5000/images/${img}`; // Fallback direct to server if proxy misses the static folder
+                            } else {
+                               e.target.onerror = null;
+                               e.target.src = '/images/coffee-beans.png';
+                            }
                           }}
                         />
                       </div>
@@ -1140,7 +1145,7 @@ const Products = () => {
                         </div>
                         <div style={{ overflow: 'hidden' }}>
                           <div style={{ fontWeight: '600', color: colors.latte, fontSize: '0.9rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name || 'Unnamed Product'}</div>
-                          <div style={{ fontSize: '0.7rem', color: '#666', marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.description?.substring(0, 35)}{item.description?.length > 35 ? '...' : ''}</div>
+                          <div style={{ fontSize: '0.7rem', color: '#666', marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.description?.substring(0, 35)}{item.description?.length > 35 ? '…' : ''}</div>
                         </div>
                       </div>
                     </td>
@@ -1155,11 +1160,11 @@ const Products = () => {
                           fontSize: item.discounted_price ? '0.8rem' : '0.95rem',
                           color: item.discounted_price ? colors.latte : colors.crema
                         }}>
-                          JOD{parseFloat(item.price_num || 0).toFixed(2)}
+                          �JOD{parseFloat(item.price_num || 0).toFixed(2)}
                         </span>
                         {item.discounted_price && (
                           <span style={{ color: '#38ef7d', fontSize: '1rem', textShadow: '0 0 10px rgba(56, 239, 125, 0.2)' }}>
-                            JOD{parseFloat(item.discounted_price).toFixed(2)}
+                            �JOD{parseFloat(item.discounted_price).toFixed(2)}
                           </span>
                         )}
                       </div>
@@ -1190,7 +1195,7 @@ const Products = () => {
                           }}>
                             {tag.trim()}
                           </span>
-                        )) : <span style={{ color: '#444', fontSize: '0.7rem', fontStyle: 'italic' }}>â€”</span>}
+                        )) : <span style={{ color: '#444', fontSize: '0.7rem', fontStyle: 'italic' }}>—</span>}
                       </div>
                     </td>
                     <td style={{ padding: '12px' }}>
@@ -1209,7 +1214,7 @@ const Products = () => {
                           }}>
                             + {addon.trim()}
                           </span>
-                        )) : <span style={{ color: '#444', fontSize: '0.7rem', fontStyle: 'italic' }}>â€”</span>}
+                        )) : <span style={{ color: '#444', fontSize: '0.7rem', fontStyle: 'italic' }}>—</span>}
                         {item.linkedAddons && item.linkedAddons.length > 3 ? (
                           <span style={{ fontSize: '0.6rem', color: colors.gold, opacity: 0.5 }}>+{item.linkedAddons.length - 3} more</span>
                         ) : item.addons && item.addons.split(',').length > 3 && (
@@ -1267,10 +1272,10 @@ const Products = () => {
                       <div style={{ color: colors.crema, fontSize: '0.85rem', fontWeight: '700' }}>
                         {item.discounted_price ? (
                           <>
-                            <span style={{ textDecoration: 'line-through', opacity: 0.5, marginRight: '8px' }}>JOD{parseFloat(item.price_num).toFixed(2)}</span>
-                            <span style={{ color: '#38ef7d' }}>JOD{parseFloat(item.discounted_price).toFixed(2)}</span>
+                            <span style={{ textDecoration: 'line-through', opacity: 0.5, marginRight: '8px' }}>�JOD{parseFloat(item.price_num).toFixed(2)}</span>
+                            <span style={{ color: '#38ef7d' }}>�JOD{parseFloat(item.discounted_price).toFixed(2)}</span>
                           </>
-                        ) : `JOD${parseFloat(item.price_num || 0).toFixed(2)}`}
+                        ) : `�JOD${parseFloat(item.price_num || 0).toFixed(2)}`}
                       </div>
                       <div style={{ fontSize: '0.75rem', color: '#888', marginTop: '5px' }}>
                         {dbCategories.find(c => String(c.id) === String(item.category_id))?.name || 'Uncategorized'}
