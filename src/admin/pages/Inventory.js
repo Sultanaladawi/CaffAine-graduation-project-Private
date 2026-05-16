@@ -114,7 +114,7 @@ const Inventory = () => {
         }
       });
 
-      doc.save(`CaffAIne_Coffee_Inventory_${Date.now()}.pdf`);
+      doc.save(`CaffAIne_Inventory_${Date.now()}.pdf`);
     } catch (error) {
       console.error("PDF Export Error:", error);
       alert("Error generating PDF: " + error.message);
@@ -296,7 +296,7 @@ const Inventory = () => {
       }}>
         <div>
           <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: colors.crema, lineHeight: 1 }}>
-            CaffAIne <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
+            Caff<span style={{ color: '#fff', fontStyle: 'italic' }}>AIne.</span>
           </div>
 
           <div className="page-badge">

@@ -99,11 +99,11 @@ const Dashboard = () => {
   }, []);
 
   const cards = [
-    { title: 'Gross Revenue', value: `JOD${stats.totalSales.toFixed(2)}`, icon: DollarSign, color: theme.accent, desc: 'Real-time valuation', path: '/admin/orders' },
+    { title: 'Gross Revenue', value: `£${stats.totalSales.toFixed(2)}`, icon: DollarSign, color: theme.accent, desc: 'Real-time valuation', path: '/admin/orders' },
     { title: 'Active Orders', value: stats.totalOrders, icon: ShoppingBag, color: theme.info, desc: 'System processing', path: '/admin/orders' },
     { title: 'Catalog Density', value: stats.totalProducts, icon: LayoutGrid, color: theme.success, desc: 'Menu items verified', path: '/admin/products' },
     { title: 'Logistics Risk', value: stats.lowStock, icon: AlertTriangle, color: theme.danger, desc: stats.lowStock > 0 ? 'CRITICAL ALERT' : 'SUPPLY STABLE', path: '/admin/inventory' },
-    { title: 'Best Seller', value: stats.topProducts[0]?.item_name || 'None', icon: Zap, color: '#ff9a9e', desc: `${stats.topProducts[0]?.total_sold || 0} Sold (JOD${parseFloat(stats.topProducts[0]?.revenue || 0).toFixed(2)})`, path: '/admin/analytics' },
+    { title: 'Best Seller', value: stats.topProducts[0]?.item_name || 'None', icon: Zap, color: '#ff9a9e', desc: `${stats.topProducts[0]?.total_sold || 0} Sold (£${parseFloat(stats.topProducts[0]?.revenue || 0).toFixed(2)})`, path: '/admin/analytics' },
   ];
 
   const maxSales = Math.max(...stats.dailySales.map(d => d.total), 1);
@@ -174,7 +174,7 @@ const Dashboard = () => {
       {/* Clean & Elegant Header */}
       <div style={{ position: 'relative', zIndex: 1, marginBottom: '50px' }}>
         <div className="header-title" style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: theme.accent, lineHeight: 1 }}>
-          CaffAIne <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
+          Caff<span style={{ color: '#fff', fontStyle: 'italic' }}>AIne.</span>
         </div>
 
         <div className="page-badge">
@@ -190,7 +190,7 @@ const Dashboard = () => {
         <div style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
           <div style={{ background: 'rgba(56, 239, 125, 0.05)', border: '1px solid rgba(56, 239, 125, 0.15)', padding: '10px 20px', borderRadius: '14px' }}>
             <div style={{ fontSize: '0.6rem', color: '#38ef7d', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>Today's Revenue</div>
-            <div style={{ fontSize: '1.2rem', color: '#fff', fontWeight: '900' }}>JOD{parseFloat(stats.todaySales || 0).toFixed(2)}</div>
+            <div style={{ fontSize: '1.2rem', color: '#fff', fontWeight: '900' }}>£{parseFloat(stats.todaySales || 0).toFixed(2)}</div>
           </div>
           <div style={{ background: 'rgba(79, 172, 254, 0.05)', border: '1px solid rgba(79, 172, 254, 0.15)', padding: '10px 20px', borderRadius: '14px' }}>
             <div style={{ fontSize: '0.6rem', color: '#4facfe', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>Today's Orders</div>
@@ -246,8 +246,8 @@ const Dashboard = () => {
           <div style={{ height: '280px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '20px' }}>
             {stats.dailySales.map((d, i) => (
               <div key={i} className="bar-wrapper">
-                <div className="bar-tooltip">JOD{d.total.toFixed(2)}</div>
-                <div style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 900, opacity: d.total > 0 ? 0.9 : 0, marginBottom: '5px' }}>JOD{d.total.toFixed(0)}</div>
+                <div className="bar-tooltip">£{d.total.toFixed(2)}</div>
+                <div style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 900, opacity: d.total > 0 ? 0.9 : 0, marginBottom: '5px' }}>£{d.total.toFixed(0)}</div>
                 <div style={{ 
                   width: '100%', height: `${(d.total / maxSales) * 100}%`, minHeight: d.total > 0 ? '8px' : '4px',
                   background: d.isToday ? `linear-gradient(180deg, ${theme.accent}, #8c6a56)` : `linear-gradient(180deg, rgba(196,164,132,0.1), rgba(196,164,132,0.3))`,
@@ -273,7 +273,7 @@ const Dashboard = () => {
             <div style={{ color: theme.accent }}>[STATUS] CORE_RESOURCES_OPTIMAL...</div>
             <div style={{ color: '#fff', marginTop: '10px', fontWeight: 800 }}>RECENT METRICS:</div>
             {stats.dailySales.filter(d => d.total > 0).slice(-2).map((d, i) => (
-              <div key={i} style={{ color: '#eee' }}>- {d.fullDate} ({d.day}): JOD{d.total.toFixed(2)}</div>
+              <div key={i} style={{ color: '#eee' }}>- {d.fullDate} ({d.day}): £{d.total.toFixed(2)}</div>
             ))}
             <div style={{ marginTop: '15px', color: 'rgba(255,255,255,0.3)', fontStyle: 'italic' }}>$ Monitoring system health...</div>
           </div>

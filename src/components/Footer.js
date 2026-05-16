@@ -45,28 +45,29 @@ export default function Footer() {
     <footer className={styles.footer}>
       <div className={styles.inner}>
         <div className={styles.brand}>
-          <span className={styles.logoMark}>C</span>
-          <div>
-            <div className={styles.logoName}>CaffAIne</div>
-            <div className={styles.logoCity}>As-Salt, Al-Balqa</div>
+          <a href="#home" className={styles.logo} aria-label={shopInfo.name}>
+            <span className={styles.logoMark}>CAI</span>
+            <div>
+              <div className={styles.logoName}>{shopInfo.name}</div>
+              <div className={styles.logoCity}>{shopInfo.city}, {shopInfo.country}</div>
+            </div>
+          </a>
+          <p className={styles.brandDesc}>
+            Specialty coffee driven by intelligence and craft.
+            Located in the heart of {shopInfo.city}.
+            Experience the future of brewing.
+          </p>
+          <div className={styles.socialGroup}>
+            <a href={shopInfo.instagram} target="_blank" rel="noopener noreferrer" className={styles.socialIcon} aria-label="Instagram">
+              <InstagramIcon />
+            </a>
+            <a href="#" className={styles.socialIcon} aria-label="Facebook">
+              <FacebookIcon />
+            </a>
+            <a href="#" className={styles.socialIcon} aria-label="Twitter/X">
+              <TwitterIcon />
+            </a>
           </div>
-        </div>
-        
-        <p className={styles.brandDesc}>
-          Independent specialty coffee located in the heart of As-Salt.
-          Crafting moments of perfection in every cup since 2014.
-        </p>
-
-        <div className={styles.socialGroup}>
-          <a href="https://www.instagram.com/CaffAIne.coffee/" target="_blank" rel="noopener noreferrer" className={styles.socialIcon} aria-label="Instagram">
-            <InstagramIcon />
-          </a>
-          <a href="https://www.facebook.com/CaffAInecoffee" target="_blank" rel="noopener noreferrer" className={styles.socialIcon} aria-label="Facebook">
-            <FacebookIcon />
-          </a>
-          <a href="https://twitter.com/CaffAInecoffee" target="_blank" rel="noopener noreferrer" className={styles.socialIcon} aria-label="Twitter/X">
-            <TwitterIcon />
-          </a>
         </div>
 
         <div className={styles.col}>
@@ -94,7 +95,7 @@ export default function Footer() {
           <h4>Find Us</h4>
           <div className={styles.mapContainer}>
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3381.769437147048!2d35.7274026152063!3d32.03923598119858!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x151ca1c90f5c9e5d%3A0x7d6f5f0f0f0f0f0f!2sAs-Salt%2C%20Jordan!5e0!3m2!1sen!2sjo!4v1714838400000!5m2!1sen!2sjo"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3381.168707175514!2d35.7248981!3d32.024564!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x151ca726488d0115%3A0xc6641214041a7747!2sAl-Balqa%20Applied%20University!5e0!3m2!1sen!2sjo!4v1715000000000!5m2!1sen!2sjo"
               width="100%"
               height="100%"
               style={{ border: 0 }}
@@ -106,7 +107,7 @@ export default function Footer() {
           </div>
           <a href={shopInfo.mapsUrl} target="_blank" rel="noopener noreferrer" className={styles.address}>
             <MapPinIcon />
-            <span>{shopInfo.address}, {shopInfo.city}</span>
+            <span>{shopInfo.address}</span>
           </a>
           <a href={`mailto:${shopInfo.email}`} className={styles.emailLink}>
             <EnvelopeIcon /> {shopInfo.email}
@@ -115,8 +116,8 @@ export default function Footer() {
       </div>
 
       <div className={styles.bottom}>
-        <span>© {new Date().getFullYear()} CaffAIne. Crafted with Passion.</span>
-        <span>Independent &amp; Locally Roasted.</span>
+        <span>© {new Date().getFullYear()} {shopInfo.name}. Crafted with Passion.</span>
+        <span>Independent &amp; Locally Driven.</span>
       </div>
     </footer>
   );

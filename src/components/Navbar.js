@@ -118,7 +118,7 @@ export default function Navbar({ onCartOpen }) {
         )}
 
         <div className={styles.inner}>
-          <a href="#home" className={styles.logo} aria-label="CaffAIne home" style={{ textDecoration: 'none' }}>
+          <a href="#home" className={styles.logo} aria-label={`${shopInfo.name} home`} style={{ textDecoration: 'none' }}>
             <div style={{ 
               fontFamily: "'DM Serif Display', serif", 
               fontSize: '2rem', 
@@ -126,8 +126,13 @@ export default function Navbar({ onCartOpen }) {
               lineHeight: '1',
               display: 'flex',
               alignItems: 'center',
-              gap: '4px'
+              gap: '12px'
             }}>
+              <img 
+                src="/images/caffaine-logo.png" 
+                alt="CaffAIne Logo" 
+                style={{ height: '40px', width: 'auto', borderRadius: '8px' }} 
+              />
               Caff<span style={{ color: '#c4a484', fontStyle: 'italic' }}>AIne.</span>
             </div>
           </a>

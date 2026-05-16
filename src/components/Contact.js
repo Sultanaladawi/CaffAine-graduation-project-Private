@@ -73,7 +73,7 @@ export default function Contact() {
             <div className="divider" />
             <h2 className="h2">Get in Touch</h2>
             <p className={styles.infoDesc}>
-              Visit us in the heart of As-Salt or drop a message below. 
+              Visit us in the heart of {shopInfo.city} or drop a message below. 
               We're always happy to chat about coffee.
             </p>
 

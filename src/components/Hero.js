@@ -51,9 +51,8 @@ export default function Hero() {
           </h1>
 
           <p className={styles.sub}>
-            Independent specialty coffee at the heart of As-Salt's
-            vibrant Al-Balqa district. Precision-crafted drinks, warm welcome,
-            unhurried pace.
+            Independent specialty coffee at the heart of As-Salt. 
+            Precision-crafted drinks, warm welcome, unhurried pace.
           </p>
 
           <div className={styles.ctas}>

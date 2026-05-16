@@ -1093,7 +1093,11 @@ app.post('/api/ai', async (req, res) => {
     if (!openai) return res.json({ answer: "[Local Mode] AI Assistant is currently unavailable." });
     const now = new Date();
     const currentDateTime = now.toLocaleString('en-GB', { timeZone: 'Europe/London' });
+<<<<<<< HEAD
     let context = `You are Sophie, the friendly Barista Bot for CaffAIne. Focus on helping customers with the menu, opening hours (Mon-Fri 07:30-17:00, Sat 09:00-18:00, Sun 10:00-16:00). Current UK time: ${currentDateTime}.`;
+=======
+    let context = `You are Sophie, the friendly Barista Bot for CaffAIne. Focus on helping customers with the menu, opening hours (Mon-Fri 07:30-17:00, Sat 09:00-18:00, Sun 10:00-16:00). Current time: ${currentDateTime}.`;
+>>>>>>> f1d39ae (Final branding cleanup, image path resolution fixes, and removed legacy references)
     const response = await openai.chat.completions.create({ model: 'gpt-4o-mini', messages: [{ role: 'system', content: context }, { role: 'user', content: prompt }], max_tokens: 500 });
     res.json({ answer: response.choices[0].message.content });
   } catch (err) {
@@ -1303,7 +1307,7 @@ app.post('/api/ai-chat', async (req, res) => {
   const currentDateTime = now.toLocaleString('en-GB', { timeZone: 'Europe/London' });
   let businessContext = isAdmin
     ? `You are the CaffAIne Internal Business Intelligence AI. Current UK time is ${currentDateTime}.`
-    : `You are Sophie, the friendly Barista Bot for CaffAIne. Opening hours: Mon-Fri 07:30-17:00, Sat 09:00-18:00, Sun 10:00-16:00. Current UK time: ${currentDateTime}.`;
+    : `You are Sophie, the friendly Barista Bot for CaffAIne. Opening hours: Mon-Fri 07:30-17:00, Sat 09:00-18:00, Sun 10:00-16:00. Current time: ${currentDateTime}.`;
 
   try {
     const promiseDb = db.promise();
@@ -1360,7 +1364,7 @@ app.post('/api/ai-chat', async (req, res) => {
         const okStock  = inventory.filter(i => i.stock_status === 'OK');
 
         businessContext = `You are the CaffAIne Business Intelligence Expert for CaffAIne, As-Salt.
-Current Jordan Date/Time: ${currentDateTime}
+Current UK Date/Time: ${currentDateTime}
 
 === TODAY ===
 Revenue: JOD${parseFloat(todayRow.today_revenue).toFixed(2)} | Orders: ${todayRow.today_orders}

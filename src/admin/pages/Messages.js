@@ -62,7 +62,7 @@ const Messages = () => {
         }
       });
 
-      doc.save(`CaffAIne_Coffee_Messages_${Date.now()}.pdf`);
+      doc.save(`CaffAIne_Messages_${Date.now()}.pdf`);
     } catch (error) {
       console.error("PDF Export Error:", error);
       alert("Error generating PDF: " + error.message);
@@ -174,7 +174,7 @@ const Messages = () => {
       }}>
         <div>
           <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: colors.crema, lineHeight: 1 }}>
-            CaffAIne <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
+              Caff<span style={{ color: '#fff', fontStyle: 'italic' }}>AIne.</span>
           </div>
 
           <div className="page-badge">

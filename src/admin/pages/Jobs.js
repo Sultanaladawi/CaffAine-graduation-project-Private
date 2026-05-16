@@ -75,7 +75,7 @@ const Jobs = () => {
         theme: 'grid',
         headStyles: { fillColor: [196, 164, 132], textColor: [255, 255, 255] }
       });
-      doc.save(`CaffAIne_Coffee_Jobs_${Date.now()}.pdf`);
+      doc.save(`CaffAIne_Jobs_${Date.now()}.pdf`);
     } catch (error) {
       console.error("PDF Export Error:", error);
       alert("Error generating PDF: " + error.message);
@@ -234,7 +234,7 @@ const Jobs = () => {
       }}>
         <div>
           <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: colors.crema, lineHeight: 1 }}>
-            CaffAIne <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
+            Caff<span style={{ color: '#fff', fontStyle: 'italic' }}>AIne.</span>
           </div>
 
           <div className="page-badge">

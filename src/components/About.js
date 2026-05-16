@@ -4,7 +4,7 @@ import styles from './About.module.css';
 const PILLARS = [
   { icon: 'fa-mug-hot',       title: 'Specialty Only',  desc: 'We serve exclusively specialty-grade coffee, sourced from farms we know and trust.' },
   { icon: 'fa-leaf',          title: 'Plant-Friendly',  desc: 'Extensive vegan and vegetarian menu options — no compromise on flavour.' },
-  { icon: 'fa-map-marker-alt',title: 'Heart of As-Salt',desc: 'Tucked inside the vibrant Al-Balqa District — a calm refuge from the city’s bustle.' },
+  { icon: 'fa-map-marker-alt',title: 'Heart of As-Salt',   desc: 'Located at Al-Balqa Applied University — a calm refuge from the academic hustle.' },
 ];
 
 export default function About() {
@@ -44,8 +44,8 @@ export default function About() {
             <h2 className="h2">A Warm Corner of As-Salt</h2>
             
             <p className={styles.body}>
-              CaffAIne is an independent specialty café settled inside the vibrant
-              Al-Balqa District. We opened with one purpose: to serve extraordinary coffee in a space
+              CaffAIne is an independent specialty café settled inside the beautiful surroundings
+              of Al-Balqa Applied University. We opened with one purpose: to serve extraordinary coffee in a space
               that feels genuinely welcoming.
             </p>
             

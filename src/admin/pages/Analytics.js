@@ -258,7 +258,7 @@ const Analytics = () => {
                 {weeklyData.length > 0 ? weeklyData.map((d, i) => (
                   <div key={i} className="bar-wrapper" style={{ minWidth:'40px' }}>
                     <div className="bar-tooltip">{d.total.toFixed(2)} JOD</div>
-                    <div className="bar-fill" style={{ width:'100%', maxWidth:'40px', backgroundColor: i === weeklyData.length-1 ? '#c4a484' : 'rgba(196,164,132,0.15)', height:`${Math.max((d.total/Math.max(...weeklyData.map(x=>x.total),1))*100,2)}%`, borderRadius:'8px 8px 4px 4px', boxShadow: i === weeklyData.length-1 ? '0 0 20px #c4a48444':'' }} />
+                    <div className="bar-fill" style={{ width:'100%', maxWidth:'40px', backgroundColor: i === weeklyData.length-1 ? '#c4a484' : 'rgba(196,164,132,0.15)', height:`${Math.max((d.total/maxBar)*100,2)}%`, borderRadius:'8px 8px 4px 4px', boxShadow: i === weeklyData.length-1 ? '0 0 20px #c4a48444':'' }} />
                     <div style={{ color: theme.text, opacity:0.5, fontSize:'0.6rem', fontWeight:'800', textAlign:'center', marginTop:'8px' }}>
                       {d.day}<div style={{ fontSize:'0.55rem', opacity:0.4 }}>{d.fullDate}</div>
                     </div>
