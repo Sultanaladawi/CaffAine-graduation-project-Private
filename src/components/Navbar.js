@@ -123,11 +123,6 @@ export default function Navbar({ onCartOpen }) {
               alignItems: 'center',
               gap: '12px'
             }}>
-              <img 
-                src="/images/caffaine-logo.png" 
-                alt="CaffAIne Logo" 
-                style={{ height: '40px', width: 'auto', borderRadius: '8px' }} 
-              />
               Caff<span style={{ color: '#c4a484', fontStyle: 'italic' }}>AIne.</span>
             </div>
           </a>
