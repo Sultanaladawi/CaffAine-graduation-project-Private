@@ -229,7 +229,7 @@ const Analytics = () => {
       ) : (
         <>
           {/* ── 5 Stat Cards ── */}
-          <div style={{ position:'relative', zIndex:1, display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))', gap:'20px', marginBottom:'30px' }}>
+          <div style={{ position:'relative', zIndex:1, display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:'20px', marginBottom:'30px' }}>
             {cards.map((c, i) => (
               <div key={i} className="premium-row" style={{ backgroundColor: theme.card, padding:'25px', borderRadius:'20px', border:`1px solid ${theme.border}`, display:'flex', flexDirection:'column', gap:'15px', boxShadow:'0 10px 30px rgba(0,0,0,0.2)' }}>
                 <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
@@ -254,16 +254,26 @@ const Analytics = () => {
               <h3 style={{ color:'#fff', marginBottom:'30px', fontFamily:'serif', fontSize:'1.5rem' }}>
                 {viewMode === 'monthly' ? `Daily Sales — ${MONTH_NAMES[selectedMonth-1]} ${selectedYear}` : viewMode === 'range' ? `Sales: ${rangeFrom} → ${rangeTo}` : 'Last 7 Days Sales'}
               </h3>
-              <div style={{ flex:1, display:'flex', alignItems:'flex-end', gap:'8px', paddingBottom:'10px', height:'240px', overflowX:'auto' }}>
-                {weeklyData.length > 0 ? weeklyData.map((d, i) => (
+              <div style={{ flex:1, display:'flex', alignItems:'flex-end', justifyContent:'space-between', gap:'10px', paddingBottom:'10px', height:'260px', overflowX:'auto' }}>
+                {weeklyData.length > 0 ? weeklyData.map((d, i) => {
+                  const isLast = i === weeklyData.length - 1;
+                  return (
                   <div key={i} className="bar-wrapper" style={{ minWidth:'40px' }}>
                     <div className="bar-tooltip">{d.total.toFixed(2)} JOD</div>
-                    <div className="bar-fill" style={{ width:'100%', maxWidth:'40px', backgroundColor: i === weeklyData.length-1 ? '#c4a484' : 'rgba(196,164,132,0.15)', height:`${Math.max((d.total/maxBar)*100,2)}%`, borderRadius:'8px 8px 4px 4px', boxShadow: i === weeklyData.length-1 ? '0 0 20px #c4a48444':'' }} />
-                    <div style={{ color: theme.text, opacity:0.5, fontSize:'0.6rem', fontWeight:'800', textAlign:'center', marginTop:'8px' }}>
-                      {d.day}<div style={{ fontSize:'0.55rem', opacity:0.4 }}>{d.fullDate}</div>
+                    <div style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 900, opacity: d.total > 0 ? 0.9 : 0, marginBottom: '5px' }}>{d.total.toFixed(0)}</div>
+                    <div className="bar-fill" style={{ 
+                      width:'100%', maxWidth:'50px', 
+                      background: isLast ? `linear-gradient(180deg, #c4a484, #8c6a56)` : `linear-gradient(180deg, rgba(196,164,132,0.15), rgba(196,164,132,0.3))`, 
+                      height:`${Math.max((d.total/maxBar)*100,2)}%`, minHeight: d.total > 0 ? '8px' : '4px',
+                      borderRadius:'12px', 
+                      boxShadow: isLast && d.total > 0 ? '0 0 25px #c4a48444' : 'none',
+                      border: isLast ? `1px solid #c4a48466` : 'none'
+                    }} />
+                    <div style={{ color: isLast ? '#c4a484' : 'rgba(255,255,255,0.4)', fontSize:'0.7rem', fontWeight:'900', textAlign:'center', marginTop:'10px' }}>
+                      {d.day}<div style={{ fontSize:'0.55rem', opacity:0.5 }}>{d.fullDate}</div>
                     </div>
                   </div>
-                )) : (
+                )}) : (
                   <div style={{ color:'#555', width:'100%', textAlign:'center' }}>No sales data for this period.</div>
                 )}
               </div>
