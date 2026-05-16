@@ -508,6 +508,7 @@ const Products = () => {
         }
 
         /* Mobile View: Hide Table, Show Cards */
+        .mobile-cards { display: none; }
         @media screen and (max-width: 1024px) {
           .desktop-table { display: none !important; }
           .mobile-cards { display: grid !important; }
