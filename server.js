@@ -1461,6 +1461,24 @@ app.post('/api/ai-assistant-logs', (req, res) => {
   });
 });
 
+app.get('/api/debug-images', (req, res) => {
+  try {
+    const dir = path.resolve(__dirname, 'public/images');
+    if (!fs.existsSync(dir)) return res.json({ error: 'Directory not found', path: dir });
+    const files = fs.readdirSync(dir);
+    res.json({ 
+      cwd: process.cwd(),
+      dirname: __dirname,
+      imageDir: dir,
+      count: files.length,
+      files: files.slice(0, 50) // only first 50 to avoid huge response
+    });
+  } catch (e) {
+    res.json({ error: e.message });
+  }
+});
+
+
 // Production static files already served at top
 
 // âœ… Catch-all for React Router
