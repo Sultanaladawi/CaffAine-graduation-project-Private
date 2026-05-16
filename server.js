@@ -1093,11 +1093,7 @@ app.post('/api/ai', async (req, res) => {
     if (!openai) return res.json({ answer: "[Local Mode] AI Assistant is currently unavailable." });
     const now = new Date();
     const currentDateTime = now.toLocaleString('en-GB', { timeZone: 'Europe/London' });
-<<<<<<< HEAD
-    let context = `You are Sophie, the friendly Barista Bot for CaffAIne. Focus on helping customers with the menu, opening hours (Mon-Fri 07:30-17:00, Sat 09:00-18:00, Sun 10:00-16:00). Current UK time: ${currentDateTime}.`;
-=======
     let context = `You are Sophie, the friendly Barista Bot for CaffAIne. Focus on helping customers with the menu, opening hours (Mon-Fri 07:30-17:00, Sat 09:00-18:00, Sun 10:00-16:00). Current time: ${currentDateTime}.`;
->>>>>>> f1d39ae (Final branding cleanup, image path resolution fixes, and removed legacy references)
     const response = await openai.chat.completions.create({ model: 'gpt-4o-mini', messages: [{ role: 'system', content: context }, { role: 'user', content: prompt }], max_tokens: 500 });
     res.json({ answer: response.choices[0].message.content });
   } catch (err) {
