@@ -25,7 +25,7 @@ export default function Checkout({ onClose, onBack }) {
 
   const formatPrice = (n) => {
     const val = parseFloat(n) || 0;
-    return `£${val.toFixed(2)}`;
+    return "JOD " + val.toFixed(2);
   };
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -46,12 +46,19 @@ export default function Checkout({ onClose, onBack }) {
     const savedName = localStorage.getItem('caffaine_customer_name');
     const savedPhone = localStorage.getItem('caffaine_customer_phone');
     const savedEmail = localStorage.getItem('caffaine_customer_email');
-    if (savedName || savedPhone || savedEmail) {
+    const savedCardNumber = localStorage.getItem('caffaine_customer_cardNumber');
+    const savedExpiry = localStorage.getItem('caffaine_customer_expiry');
+    const savedCvc = localStorage.getItem('caffaine_customer_cvc');
+
+    if (savedName || savedPhone || savedEmail || savedCardNumber || savedExpiry || savedCvc) {
       setForm(f => ({
         ...f,
         name: savedName || f.name,
         phone: savedPhone || f.phone,
-        email: savedEmail || f.email
+        email: savedEmail || f.email,
+        cardNumber: savedCardNumber || f.cardNumber,
+        expiry: savedExpiry || f.expiry,
+        cvc: savedCvc || f.cvc
       }));
     }
   }, []);
@@ -285,10 +292,13 @@ export default function Checkout({ onClose, onBack }) {
       clearCart();
       setStep('success');
 
-      // Save customer info for next time
+      // Save customer info for next time locally (not in database)
       localStorage.setItem('caffaine_customer_name', form.name);
       localStorage.setItem('caffaine_customer_phone', form.phone);
       localStorage.setItem('caffaine_customer_email', form.email);
+      localStorage.setItem('caffaine_customer_cardNumber', form.cardNumber);
+      localStorage.setItem('caffaine_customer_expiry', form.expiry);
+      localStorage.setItem('caffaine_customer_cvc', form.cvc);
 
       // Submit feedback if a rating was given (only once)
       if (storeRating > 0 || storeComment.trim()) {
