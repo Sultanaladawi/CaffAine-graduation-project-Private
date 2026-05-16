@@ -75,7 +75,7 @@ const Orders = () => {
       const tableRows = orders.map(order => [
         `ORD-${String(order.id).padStart(3, '0')}`,
         order.created_at ? new Date(order.created_at).toLocaleString('en-GB') : 'N/A',
-        `£${parseFloat(order.total_amount || 0).toFixed(2)}`,
+        `JOD ${parseFloat(order.total_amount || 0).toFixed(2)}`,
         (order.status || 'PENDING').toUpperCase()
       ]);
 
@@ -269,7 +269,7 @@ const Orders = () => {
                       <tr key={idx} style={{ borderBottom: `1px solid ${theme.border}` }}>
                             <td style={{ padding: '12px 10px', color: cellTextStyle.color, fontFamily: cellTextStyle.fontFamily, fontSize: cellTextStyle.fontSize }}>{item.item_name}</td>
                             <td style={{ padding: '12px 10px', textAlign: 'center', fontFamily: cellTextStyle.fontFamily }}>{item.quantity}</td>
-                            <td style={{ padding: '12px 10px', textAlign: 'right', color: theme.primary, fontFamily: cellTextStyle.fontFamily }}>£{(parseFloat(item.price) * item.quantity).toFixed(2)}</td>
+                            <td style={{ padding: '12px 10px', textAlign: 'right', color: theme.primary, fontFamily: cellTextStyle.fontFamily }}>JOD {(parseFloat(item.price) * item.quantity).toFixed(2)}</td>
                       </tr>
                     )) : (
                       <tr>
@@ -283,12 +283,12 @@ const Orders = () => {
                 {selectedOrder.order_type?.toLowerCase() === 'delivery' && (
                   <div style={{ marginTop: '15px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', color: 'rgba(255,255,255,0.6)', fontWeight: 'bold', fontSize: '0.95rem', borderTop: `1px dashed ${theme.border}`, paddingTop: '10px' }}>
                     <span>Delivery Service Fee:</span>
-                    <span style={{ color: theme.success }}>£3.00</span>
+                    <span style={{ color: theme.success }}>JOD 3.00</span>
                   </div>
                 )}
                 <div style={{ marginTop: selectedOrder.order_type?.toLowerCase() === 'delivery' ? '5px' : '20px', display: 'flex', justifyContent: 'space-between', color: theme.text, fontWeight: 'bold', fontSize: '1.2rem', borderTop: selectedOrder.order_type?.toLowerCase() === 'delivery' ? 'none' : `1px solid ${theme.border}`, paddingTop: selectedOrder.order_type?.toLowerCase() === 'delivery' ? '0' : '15px' }}>
                   <span>Total Amount:</span>
-                  <span style={{ color: theme.primary, fontSize: '1.4rem' }}>£{parseFloat(selectedOrder.total_amount).toFixed(2)}</span>
+                  <span style={{ color: theme.primary, fontSize: '1.4rem' }}>JOD {parseFloat(selectedOrder.total_amount).toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -382,7 +382,7 @@ const Orders = () => {
                     {order.created_at ? new Date(order.created_at).toLocaleString('en-GB') : 'N/A'}
                   </td>
                   <td style={{ padding: '20px', color: theme.primary, fontWeight: '700', fontSize: cellTextStyle.fontSize }}>
-                    £{parseFloat(order.total_amount || 0).toFixed(2)}
+                    JOD {parseFloat(order.total_amount || 0).toFixed(2)}
                   </td>
                   <td style={{ padding: '20px' }}>
                     <span style={{ 
