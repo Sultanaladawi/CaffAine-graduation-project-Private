@@ -1,4 +1,4 @@
-import { useCart } from '../context/CartContext';
+ï»¿import { useCart } from '../context/CartContext';
 import styles from './Cart.module.css';
 import { useEffect } from 'react';
 
@@ -7,7 +7,7 @@ export default function Cart({ onClose, onCheckout }) {
 
   const formatPrice = (n) => {
     const val = parseFloat(n) || 0;
-    return `ÂJOD${val.toFixed(2)}`;
+    return "JOD " + val.toFixed(2);
   };
 
   useEffect(() => {
