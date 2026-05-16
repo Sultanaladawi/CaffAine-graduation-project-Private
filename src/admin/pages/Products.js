@@ -1139,7 +1139,7 @@ const Products = () => {
                           alignItems: 'center', justifyContent: 'center', border: `1px solid ${colors.border}` 
                         }}>
                           <img 
-                            src={item.image_url ? (item.image_url.startsWith('/images/') || item.image_url.startsWith('http') ? item.image_url : `/images/${item.image_url}`) : '/images/coffee-beans.png'}
+                            src={item.image_url ? (item.image_url.startsWith('/images/') || item.image_url.startsWith('http') ? item.image_url : `/images/${item.image_url.toLowerCase()}`) : '/images/coffee-beans.png'}
                             alt={item.name} 
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             onError={(e) => {
@@ -1266,7 +1266,7 @@ const Products = () => {
                   <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
                     <div style={{ width: '80px', height: '80px', borderRadius: '15px', overflow: 'hidden', border: `1px solid ${colors.border}` }}>
                       <img 
-                        src={item.image_url ? (item.image_url.startsWith('/images/') || item.image_url.startsWith('http') ? item.image_url : `/images/${item.image_url}`) : '/images/coffee-beans.png'}
+                        src={item.image_url ? (item.image_url.startsWith('/images/') || item.image_url.startsWith('http') ? item.image_url : `/images/${item.image_url.toLowerCase()}`) : '/images/coffee-beans.png'}
                         alt={item.name} 
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         onError={e => { e.target.onerror = null; e.target.src = '/images/coffee-beans.png'; }}

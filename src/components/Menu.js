@@ -338,7 +338,7 @@ export default function Menu() {
     if (item.image_url.startsWith('http') || item.image_url.startsWith('/images/')) {
       return item.image_url;
     }
-    return `/images/${item.image_url}`;
+    return `/images/${item.image_url.toLowerCase()}`;
   };
 
   const handleImageError = (e) => {
