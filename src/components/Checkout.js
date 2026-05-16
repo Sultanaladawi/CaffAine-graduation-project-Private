@@ -41,6 +41,19 @@ export default function Checkout({ onClose, onBack }) {
         if (Array.isArray(data)) setOffers(data);
       })
       .catch(err => console.error('Error fetching offers:', err));
+
+    // Load saved customer info
+    const savedName = localStorage.getItem('caffaine_customer_name');
+    const savedPhone = localStorage.getItem('caffaine_customer_phone');
+    const savedEmail = localStorage.getItem('caffaine_customer_email');
+    if (savedName || savedPhone || savedEmail) {
+      setForm(f => ({
+        ...f,
+        name: savedName || f.name,
+        phone: savedPhone || f.phone,
+        email: savedEmail || f.email
+      }));
+    }
   }, []);
 
   const handleOfferClick = (offer) => {
@@ -271,6 +284,11 @@ export default function Checkout({ onClose, onBack }) {
     if (success) {
       clearCart();
       setStep('success');
+
+      // Save customer info for next time
+      localStorage.setItem('caffaine_customer_name', form.name);
+      localStorage.setItem('caffaine_customer_phone', form.phone);
+      localStorage.setItem('caffaine_customer_email', form.email);
 
       // Submit feedback if a rating was given (only once)
       if (storeRating > 0 || storeComment.trim()) {
