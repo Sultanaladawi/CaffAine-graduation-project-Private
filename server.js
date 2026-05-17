@@ -1379,25 +1379,25 @@ app.post('/api/ai-chat', async (req, res) => {
         const promiseDb = db.promise();
         const results = await Promise.allSettled([
           /* 0 */ promiseDb.query(`SELECT COUNT(*) as total_orders, COALESCE(SUM(total_amount),0) as total_revenue FROM orders`),
-          /* 1 */ promiseDb.query(`SELECT COUNT(*) as today_orders, COALESCE(SUM(total_amount),0) as today_revenue FROM orders WHERE DATE(created_at) = CURDATE()`),
-          /* 2 */ promiseDb.query(`SELECT COUNT(*) as yesterday_orders, COALESCE(SUM(total_amount),0) as yesterday_revenue FROM orders WHERE DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)`),
+          /* 1 */ promiseDb.query(`SELECT COUNT(*) as today_orders, COALESCE(SUM(total_amount),0) as today_revenue FROM orders WHERE DATE(CONVERT_TZ(created_at, '+00:00', '+03:00')) = DATE(CONVERT_TZ(NOW(), '@@session.time_zone', '+03:00'))`),
+          /* 2 */ promiseDb.query(`SELECT COUNT(*) as yesterday_orders, COALESCE(SUM(total_amount),0) as yesterday_revenue FROM orders WHERE DATE(CONVERT_TZ(created_at, '+00:00', '+03:00')) = DATE_SUB(DATE(CONVERT_TZ(NOW(), '@@session.time_zone', '+03:00')), INTERVAL 1 DAY)`),
           /* 3 */ promiseDb.query(`SELECT status, COUNT(*) as count FROM orders GROUP BY status`),
           /* 4 */ promiseDb.query(`SELECT mi.name, COUNT(oi.id) as sold FROM order_items oi JOIN menu_items mi ON oi.product_id = mi.id GROUP BY oi.product_id ORDER BY sold DESC LIMIT 8`),
-          /* 5 */ promiseDb.query(`SELECT DATE(created_at) as best_date, SUM(total_amount) as daily_rev FROM orders GROUP BY DATE(created_at) ORDER BY daily_rev DESC LIMIT 1`),
-          /* 6 */ promiseDb.query(`SELECT DATE_FORMAT(created_at,'%Y-%m-%d') as date, COUNT(*) as orders, COALESCE(SUM(total_amount),0) as revenue FROM orders WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 15 DAY) GROUP BY DATE(created_at) ORDER BY date DESC`),
+          /* 5 */ promiseDb.query(`SELECT DATE(CONVERT_TZ(created_at, '+00:00', '+03:00')) as best_date, SUM(total_amount) as daily_rev FROM orders GROUP BY DATE(CONVERT_TZ(created_at, '+00:00', '+03:00')) ORDER BY daily_rev DESC LIMIT 1`),
+          /* 6 */ promiseDb.query(`SELECT DATE_FORMAT(CONVERT_TZ(created_at, '+00:00', '+03:00'), '%Y-%m-%d') as date, COUNT(*) as orders, COALESCE(SUM(total_amount),0) as revenue FROM orders WHERE CONVERT_TZ(created_at, '+00:00', '+03:00') >= DATE_SUB(DATE(CONVERT_TZ(NOW(), '@@session.time_zone', '+03:00')), INTERVAL 15 DAY) GROUP BY DATE(CONVERT_TZ(created_at, '+00:00', '+03:00')) ORDER BY date DESC`),
           /* 7 */ promiseDb.query(`SELECT item_name, quantity, unit, min_threshold, CASE WHEN quantity <= min_threshold THEN 'LOW' ELSE 'OK' END as stock_status FROM inventory ORDER BY stock_status DESC, item_name`),
           /* 8 */ promiseDb.query(`SELECT name, price_display, available FROM menu_items WHERE available = 1`),
           /* 9 */ promiseDb.query(`SELECT * FROM offers`),
-          /* 10 */ promiseDb.query(`SELECT name, message, DATE_FORMAT(created_at,'%Y-%m-%d') as date FROM contact_messages ORDER BY created_at DESC LIMIT 10`),
+          /* 10 */ promiseDb.query(`SELECT name, message, DATE_FORMAT(CONVERT_TZ(created_at, '+00:00', '+03:00'), '%Y-%m-%d') as date FROM contact_messages ORDER BY created_at DESC LIMIT 10`),
           /* 11 */ promiseDb.query(`SELECT name, position, status FROM job_applications ORDER BY created_at DESC LIMIT 10`),
           /* 12 */ promiseDb.query(`SELECT title, type, location FROM careers WHERE active = 1`),
           /* 13 */ promiseDb.query(`SELECT ROUND(AVG(rating),1) as avg_rating, COUNT(*) as total FROM general_feedback`),
           /* 14 */ promiseDb.query(`SELECT reviewer_name, rating, comment FROM general_feedback ORDER BY created_at DESC LIMIT 5`),
-          /* 15 */ promiseDb.query(`SELECT admin_name, action, details, DATE_FORMAT(created_at,'%Y-%m-%d %H:%i') as time FROM admin_logs ORDER BY created_at DESC LIMIT 20`),
-          /* 16 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(created_at,'%H:%i') as time FROM orders WHERE DATE(created_at) = CURDATE() ORDER BY created_at DESC`),
+          /* 15 */ promiseDb.query(`SELECT admin_name, action, details, DATE_FORMAT(CONVERT_TZ(created_at, '+00:00', '+03:00'), '%Y-%m-%d %H:%i') as time FROM admin_logs ORDER BY created_at DESC LIMIT 20`),
+          /* 16 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(CONVERT_TZ(created_at, '+00:00', '+03:00'), '%H:%i') as time FROM orders WHERE DATE(CONVERT_TZ(created_at, '+00:00', '+03:00')) = DATE(CONVERT_TZ(NOW(), '@@session.time_zone', '+03:00')) ORDER BY created_at DESC`),
           /* 17 */ promiseDb.query(`SELECT mi.name as product, ROUND(AVG(pr.rating),1) as rating, COUNT(pr.id) as count FROM menu_items mi LEFT JOIN product_reviews pr ON mi.id = pr.product_id GROUP BY mi.id HAVING count > 0`),
-          /* 18 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(created_at,'%H:%i') as time FROM orders WHERE DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY) ORDER BY created_at DESC`),
-          /* 19 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(created_at,'%Y-%m-%d %H:%i') as time FROM orders ORDER BY created_at DESC LIMIT 150`)
+          /* 18 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(CONVERT_TZ(created_at, '+00:00', '+03:00'), '%H:%i') as time FROM orders WHERE DATE(CONVERT_TZ(created_at, '+00:00', '+03:00')) = DATE_SUB(DATE(CONVERT_TZ(NOW(), '@@session.time_zone', '+03:00')), INTERVAL 1 DAY) ORDER BY created_at DESC`),
+          /* 19 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(CONVERT_TZ(created_at, '+00:00', '+03:00'), '%Y-%m-%d %H:%i') as time FROM orders ORDER BY created_at DESC LIMIT 150`)
         ]);
 
         const getRes = (idx, def = []) => (results[idx] && results[idx].status === 'fulfilled' ? results[idx].value[0] : def);
