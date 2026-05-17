@@ -22,6 +22,7 @@ export default function Checkout({ onClose, onBack }) {
   const [offers, setOffers] = useState([]);
   const [customerType, setCustomerType] = useState('General');
   const [selectedOffer, setSelectedOffer] = useState(null);
+  const [offerError, setOfferError] = useState(null);
 
   const formatPrice = (n) => {
     const val = parseFloat(n) || 0;
@@ -63,9 +64,15 @@ export default function Checkout({ onClose, onBack }) {
     }
   }, []);
 
+  const showOfferError = (msg) => {
+    setOfferError(msg);
+    setTimeout(() => setOfferError(null), 4000);
+  };
+
   const handleOfferClick = (offer) => {
     if (selectedOffer?.id === offer.id) {
       setSelectedOffer(null);
+      setOfferError(null);
       return;
     }
 
@@ -80,20 +87,21 @@ export default function Checkout({ onClose, onBack }) {
     const isEmployeeOffer = offer.reason.toLowerCase().includes('corporate') || offer.reason.toLowerCase().includes('employee') || offer.reason.toLowerCase().includes('faculty');
 
     if (!hasItem) {
-      alert(`This offer doesn't work for you because the product '${offer.product_name}' is not in your cart.`);
+      showOfferError(`❌ هذا العرض لا ينطبق على طلبك — المنتج "${offer.product_name}" غير موجود في سلتك.\nThis offer requires "${offer.product_name}" in your cart.`);
       return;
     }
 
     if (isStudentOffer && customerType !== 'Student') {
-      alert("This offer doesn't work for you because this offer is for students and you are not a student.");
+      showOfferError('🎓 هذا العرض مخصص للطلاب فقط. الرجاء اختيار فئة "Student" من القائمة أعلاه.\nThis offer is for students only — please select the "Student" category.');
       return;
     }
 
     if (isEmployeeOffer && customerType !== 'Employee') {
-      alert("This offer doesn't work for you because this offer is for faculty/employees and you are not one.");
+      showOfferError('🏢 هذا العرض مخصص للموظفين وأعضاء هيئة التدريس فقط.\nThis offer is for staff/faculty/employees only.');
       return;
     }
 
+    setOfferError(null);
     setSelectedOffer(offer);
   };
 
@@ -679,7 +687,9 @@ export default function Checkout({ onClose, onBack }) {
                           cursor: 'pointer',
                           backgroundColor: selectedOffer?.id === offer.id ? 'rgba(196,164,132,0.1)' : '#fdfdfd',
                           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                          transition: 'all 0.2s ease'
+                          transition: 'all 0.3s ease',
+                          transform: selectedOffer?.id === offer.id ? 'scale(1.01)' : 'scale(1)',
+                          boxShadow: selectedOffer?.id === offer.id ? '0 8px 25px rgba(196,164,132,0.2)' : 'none'
                         }}
                       >
                         <div>
@@ -692,6 +702,91 @@ export default function Checkout({ onClose, onBack }) {
                       </div>
                     ))}
                   </div>
+
+                  {/* Premium Offer Error Message — فخم مثل رسالة إغلاق المتجر */}
+                  {offerError && (
+                    <div style={{
+                      marginTop: '16px',
+                      borderRadius: '20px',
+                      overflow: 'hidden',
+                      animation: 'fadeIn 0.4s ease',
+                      boxShadow: '0 15px 40px rgba(231, 74, 59, 0.15)',
+                      border: '1px solid rgba(231, 74, 59, 0.25)'
+                    }}>
+                      {/* Top accent bar */}
+                      <div style={{
+                        height: '4px',
+                        background: 'linear-gradient(90deg, #e74a3b, #ff8c7f, #e74a3b)',
+                        backgroundSize: '200% 100%',
+                        animation: 'shimmer 2s infinite linear'
+                      }} />
+                      <style>{`
+                        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+                        @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+                      `}</style>
+
+                      <div style={{
+                        padding: '22px 24px',
+                        background: 'linear-gradient(135deg, #fff8f7 0%, #fff 100%)',
+                        display: 'flex',
+                        gap: '18px',
+                        alignItems: 'flex-start'
+                      }}>
+                        {/* Icon */}
+                        <div style={{
+                          width: '46px', height: '46px', borderRadius: '50%', flexShrink: 0,
+                          background: 'linear-gradient(135deg, #e74a3b, #c0392b)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          boxShadow: '0 6px 18px rgba(231,74,59,0.35)'
+                        }}>
+                          <i className="fas fa-times-circle" style={{ color: '#fff', fontSize: '1.3rem' }} />
+                        </div>
+
+                        {/* Text content */}
+                        <div style={{ flex: 1 }}>
+                          <div style={{
+                            fontFamily: "'DM Serif Display', serif",
+                            fontSize: '1.05rem',
+                            color: '#2c1810',
+                            fontWeight: '700',
+                            marginBottom: '8px',
+                            lineHeight: 1.3
+                          }}>
+                            This Offer Is Not Available For You
+                          </div>
+                          {offerError.split('\n').map((line, i) => (
+                            <div key={i} style={{
+                              fontSize: i === 0 ? '0.9rem' : '0.8rem',
+                              color: i === 0 ? '#8B3A2F' : '#999',
+                              lineHeight: 1.6,
+                              marginTop: i === 0 ? 0 : '4px',
+                              direction: i === 0 ? 'rtl' : 'ltr',
+                              textAlign: i === 0 ? 'right' : 'left',
+                              fontWeight: i === 0 ? '600' : '400'
+                            }}>
+                              {line}
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Dismiss button */}
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setOfferError(null); }}
+                          style={{
+                            background: 'rgba(231,74,59,0.08)', border: 'none',
+                            borderRadius: '50%', width: '28px', height: '28px',
+                            cursor: 'pointer', color: '#e74a3b', fontSize: '0.9rem',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            flexShrink: 0, transition: 'background 0.2s'
+                          }}
+                          onMouseEnter={e => e.currentTarget.style.background = 'rgba(231,74,59,0.18)'}
+                          onMouseLeave={e => e.currentTarget.style.background = 'rgba(231,74,59,0.08)'}
+                        >
+                          <i className="fas fa-times" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

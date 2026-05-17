@@ -77,17 +77,41 @@ app.use((req, res, next) => {
   next();
 });
 
-// --- STATIC FILES SERVING (HARDENED) ---
-// 1. Explicitly serve images first to avoid any overlap
-app.use('/images', express.static(path.resolve(__dirname, 'public/images'), {
-  maxAge: '1d',
-  etag: true,
-  setHeaders: (res) => {
-    res.set('Access-Control-Allow-Origin', '*');
-  }
-}));
+// --- CHROME FIX: case-insensitive image serving ---
+// Chrome is stricter than Edge/Brave with URL case. This middleware
+// tries the exact path first, then falls back to the lowercase version.
+app.use('/images', (req, res, next) => {
+  const exactPath = path.resolve(__dirname, 'public/images', req.url.replace(/^\//, ''));
+  const lowerPath = path.resolve(__dirname, 'public/images', req.url.replace(/^\//, '').toLowerCase());
 
-// 2. Serve static assets from build and public
+  // Set headers that Chrome needs for proper image caching
+  res.set({
+    'Cache-Control': 'public, max-age=86400, stale-while-revalidate=3600',
+    'Access-Control-Allow-Origin': '*',
+    'Vary': 'Accept-Encoding',
+    'X-Content-Type-Options': 'nosniff'
+  });
+
+  if (fs.existsSync(exactPath)) {
+    return res.sendFile(exactPath);
+  } else if (fs.existsSync(lowerPath)) {
+    return res.sendFile(lowerPath);
+  } else {
+    // Try scanning directory for case-insensitive match
+    const filename = req.url.replace(/^\//, '').toLowerCase();
+    try {
+      const files = fs.readdirSync(imgDir);
+      const match = files.find(f => f.toLowerCase() === filename);
+      if (match) {
+        return res.sendFile(path.join(imgDir, match));
+      }
+    } catch (e) {}
+    next();
+  }
+});
+
+// --- STATIC FILES SERVING (HARDENED) ---
+// Serve static assets from build and public
 app.use(express.static(path.resolve(__dirname, 'build')));
 app.use(express.static(path.resolve(__dirname, 'public')));
 
