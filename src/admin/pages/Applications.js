@@ -46,7 +46,7 @@ const Applications = () => {
       doc.text('CaffAIne - Candidate Submissions', 14, 22);
       doc.setFontSize(10);
       doc.setTextColor(100);
-      doc.text(`Generated on: ${new Date().toLocaleString('en-GB')}`, 14, 32);
+      doc.text(`Generated on: ${new Date().toLocaleString('en-GB', { timeZone: 'Asia/Amman' })}`, 14, 32);
       doc.text('Full list of applicants and their current status.', 14, 38);
 
       const tableColumn = ["Name", "Position", "Email", "Phone", "Status"];

@@ -39,7 +39,7 @@ const Feedback = () => {
       
       doc.setFontSize(10);
       doc.setTextColor(100);
-      doc.text(`Generated on: ${new Date().toLocaleString('en-GB')}`, 14, 32);
+      doc.text(`Generated on: ${new Date().toLocaleString('en-GB', { timeZone: 'Asia/Amman' })}`, 14, 32);
       doc.text(`A complete record of customer ratings and comments for ${activeTab}.`, 14, 38);
       
       // Table
@@ -47,7 +47,7 @@ const Feedback = () => {
       if (activeTab === 'general') {
         tableColumn = ["Date", "Customer Name", "Rating", "Comment"];
         tableRows = data.general.map(f => [
-          new Date(f.created_at).toLocaleDateString('en-GB'),
+          new Date(f.created_at).toLocaleDateString('en-GB', { timeZone: 'Asia/Amman' }),
           f.reviewer_name || 'Anonymous',
           `${f.rating}/5`,
           f.comment || ''
@@ -55,7 +55,7 @@ const Feedback = () => {
       } else {
         tableColumn = ["Date", "Product", "Reviewer", "Rating", "Comment"];
         tableRows = data.products.map(f => [
-          new Date(f.created_at).toLocaleDateString('en-GB'),
+          new Date(f.created_at).toLocaleDateString('en-GB', { timeZone: 'Asia/Amman' }),
           f.product_name || 'N/A',
           f.reviewer_name || 'Anonymous',
           `${f.rating}/5`,
@@ -251,7 +251,7 @@ const Feedback = () => {
                 <div>
                   <h3 style={{ margin: 0, color: colors.crema, fontSize: '1.3rem', fontWeight: '700' }}>{item.reviewer_name}</h3>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: colors.muted, fontSize: '0.85rem', marginTop: '5px' }}>
-                    <Clock size={14} /> {new Date(item.created_at).toLocaleDateString('en-GB')}
+                    <Clock size={14} /> {new Date(item.created_at).toLocaleDateString('en-GB', { timeZone: 'Asia/Amman' })}
                   </div>
                 </div>
                 {renderStars(item.rating)}
@@ -278,7 +278,7 @@ const Feedback = () => {
                 <div>
                   <h3 style={{ margin: 0, color: colors.text, fontSize: '1.2rem' }}>{item.reviewer_name}</h3>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: colors.muted, fontSize: '0.85rem', marginTop: '5px' }}>
-                    <Clock size={14} /> {new Date(item.created_at).toLocaleDateString('en-GB')}
+                    <Clock size={14} /> {new Date(item.created_at).toLocaleDateString('en-GB', { timeZone: 'Asia/Amman' })}
                   </div>
                 </div>
                 {renderStars(item.rating)}

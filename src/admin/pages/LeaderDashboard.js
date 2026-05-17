@@ -75,7 +75,8 @@ const LeaderDashboard = () => {
     const date = new Date(dateString);
     return date.toLocaleString('en-GB', { 
       day: '2-digit', month: 'short', year: 'numeric',
-      hour: '2-digit', minute: '2-digit'
+      hour: '2-digit', minute: '2-digit',
+      timeZone: 'Asia/Amman'
     });
   };
 
@@ -100,7 +101,7 @@ const LeaderDashboard = () => {
       
       doc.setFontSize(10);
       doc.setTextColor(100);
-      doc.text(`Generated on: ${new Date().toLocaleString('en-GB')}`, 14, 32);
+      doc.text(`Generated on: ${new Date().toLocaleString('en-GB', { timeZone: 'Asia/Amman' })}`, 14, 32);
       doc.text('Complete synchronization and transaction audit history.', 14, 38);
       
       const tableColumn = ["Timestamp", "Administrator", "Action", "Details"];

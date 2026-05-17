@@ -27,7 +27,7 @@ const Offers = () => {
       doc.text('CaffAIne - Marketing Promotions', 14, 22);
       doc.setFontSize(10);
       doc.setTextColor(100);
-      doc.text(`Generated on: ${new Date().toLocaleString('en-GB')}`, 14, 32);
+      doc.text(`Generated on: ${new Date().toLocaleString('en-GB', { timeZone: 'Asia/Amman' })}`, 14, 32);
       doc.text('Current active promotions and seasonal discounts.', 14, 38);
 
       const tableColumn = ["Product Name", "Discount", "Description", "Expiry Date"];
@@ -35,7 +35,7 @@ const Offers = () => {
         offer.product_name || 'N/A',
         `${offer.discount_percent}%`,
         offer.reason || 'No description',
-        offer.end_date ? new Date(offer.end_date).toLocaleDateString('en-GB') : 'No Expiry'
+        offer.end_date ? new Date(offer.end_date).toLocaleDateString('en-GB', { timeZone: 'Asia/Amman' }) : 'No Expiry'
       ]);
 
       autoTable(doc, {

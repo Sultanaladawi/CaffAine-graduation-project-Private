@@ -182,13 +182,12 @@ ssl: {
   }
 });
 
-// Force all MySQL connections to use UK Time (Europe/London)
-// This handles Summer Time (+1) and Winter Time (+0) automatically.
+// Force all MySQL connections to use Jordan Time (Asia/Amman = UTC+3)
 pool.on('connection', (connection) => {
-  connection.query("SET time_zone = 'Europe/London'", (err) => {
+  connection.query("SET time_zone = 'Asia/Amman'", (err) => {
     if (err) {
       // Fallback in case Azure/MySQL lacks the timezone dictionary
-      connection.query("SET time_zone = '+01:00'");
+      connection.query("SET time_zone = '+03:00'");
     }
   });
 });
@@ -376,8 +375,8 @@ app.post('/api/orders', async (req, res) => {
 });
 
 const getAutoStoreStatus = () => {
-  // Use UK Time for auto-calculation
-  const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/London' }));
+  // Use Jordan Time (Asia/Amman = UTC+3) for auto-calculation
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Amman' }));
   const day = now.getDay();
   const currentTime = now.getHours() * 100 + now.getMinutes();
 
@@ -1116,7 +1115,7 @@ app.post('/api/ai', async (req, res) => {
   try {
     if (!openai) return res.json({ answer: "[Local Mode] AI Assistant is currently unavailable." });
     const now = new Date();
-    const currentDateTime = now.toLocaleString('en-GB', { timeZone: 'Europe/London' });
+    const currentDateTime = now.toLocaleString('en-GB', { timeZone: 'Asia/Amman' });
     let context = `You are Sophie, the friendly Barista Bot for CaffAIne. Focus on helping customers with the menu, opening hours (Mon-Fri 07:30-17:00, Sat 09:00-18:00, Sun 10:00-16:00). Current time: ${currentDateTime}.`;
     const response = await openai.chat.completions.create({ model: 'gpt-4o-mini', messages: [{ role: 'system', content: context }, { role: 'user', content: prompt }], max_tokens: 500 });
     res.json({ answer: response.choices[0].message.content });
@@ -1324,9 +1323,9 @@ app.post('/api/ai-chat', async (req, res) => {
   if (!message) return res.status(400).json({ error: 'Message is required' });
 
   const now = new Date();
-  const currentDateTime = now.toLocaleString('en-GB', { timeZone: 'Europe/London' });
+  const currentDateTime = now.toLocaleString('en-GB', { timeZone: 'Asia/Amman' });
   let businessContext = isAdmin
-    ? `You are the CaffAIne Internal Business Intelligence AI. Current UK time is ${currentDateTime}.`
+    ? `You are the CaffAIne Internal Business Intelligence AI. Current Jordan time is ${currentDateTime}.`
     : `You are Sophie, the friendly Barista Bot for CaffAIne. Opening hours: Mon-Fri 07:30-17:00, Sat 09:00-18:00, Sun 10:00-16:00. Current time: ${currentDateTime}.`;
 
   try {

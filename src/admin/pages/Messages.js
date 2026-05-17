@@ -30,13 +30,13 @@ const Messages = () => {
       
       doc.setFontSize(10);
       doc.setTextColor(100);
-      doc.text(`Generated on: ${new Date().toLocaleString('en-GB')}`, 14, 32);
+      doc.text(`Generated on: ${new Date().toLocaleString('en-GB', { timeZone: 'Asia/Amman' })}`, 14, 32);
       doc.text('Full log of messages received via the contact form.', 14, 38);
       
       // Table
       const tableColumn = ["Date", "Customer Name", "Email", "Message Content"];
       const tableRows = messages.map(msg => [
-        new Date(msg.created_at).toLocaleDateString('en-GB'),
+        new Date(msg.created_at).toLocaleDateString('en-GB', { timeZone: 'Asia/Amman' }),
         msg.name || 'Anonymous',
         msg.email || 'N/A',
         msg.message ? (msg.message.length > 80 ? msg.message.substring(0, 80) + '...' : msg.message) : ''

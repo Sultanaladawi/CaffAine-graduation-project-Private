@@ -74,7 +74,7 @@ const Inventory = () => {
       
       doc.setFontSize(10);
       doc.setTextColor(100);
-      doc.text(`Generated on: ${new Date().toLocaleString('en-GB')}`, 14, 32);
+      doc.text(`Generated on: ${new Date().toLocaleString('en-GB', { timeZone: 'Asia/Amman' })}`, 14, 32);
       doc.text('Current stock levels, thresholds, and replenishment needs.', 14, 38);
       
       // Table

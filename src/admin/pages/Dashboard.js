@@ -209,7 +209,7 @@ const Dashboard = () => {
         <div className="minimal-clock" style={{ position: 'absolute', top: 0, right: 0, textAlign: 'right' }}>
             <div style={{ color: theme.accent, fontSize: '1rem', fontWeight: 900, letterSpacing: '1px' }}>
               <Clock size={16} style={{ marginRight: '8px', verticalAlign: 'middle' }} /> 
-              {currentTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Europe/London' }).toUpperCase()}
+              {currentTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Amman' }).toUpperCase()}
             </div>
         </div>
       </div>

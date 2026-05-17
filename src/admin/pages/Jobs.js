@@ -57,7 +57,7 @@ const Jobs = () => {
       doc.text('CaffAIne - Career Openings', 14, 22);
       doc.setFontSize(10);
       doc.setTextColor(100);
-      doc.text(`Generated on: ${new Date().toLocaleString('en-GB')}`, 14, 32);
+      doc.text(`Generated on: ${new Date().toLocaleString('en-GB', { timeZone: 'Asia/Amman' })}`, 14, 32);
       doc.text('Current active job vacancies and position details.', 14, 38);
 
       const tableColumn = ["Title", "Type", "Location", "Posted Date"];
@@ -65,7 +65,7 @@ const Jobs = () => {
         job.title || 'Untitled',
         job.type || 'Full-time',
         job.location || 'N/A',
-        new Date(job.created_at).toLocaleDateString('en-GB')
+        new Date(job.created_at).toLocaleDateString('en-GB', { timeZone: 'Asia/Amman' })
       ]);
 
       autoTable(doc, {
@@ -295,7 +295,7 @@ const Jobs = () => {
 
               <div style={{ color: '#aaa', fontSize: '0.95rem', marginBottom: '25px', display: 'flex', gap: '20px' }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MapPin size={16} color={colors.crema} /> {job.location}</span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Clock size={16} color={colors.crema} /> {new Date(job.created_at).toLocaleDateString('en-GB')}</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Clock size={16} color={colors.crema} /> {new Date(job.created_at).toLocaleDateString('en-GB', { timeZone: 'Asia/Amman' })}</span>
               </div>
 
               <div style={{ height: '1px', background: 'linear-gradient(90deg, rgba(196,164,132,0.2) 0%, transparent 100%)', marginBottom: '25px' }}></div>

@@ -68,13 +68,13 @@ const Orders = () => {
       
       doc.setFontSize(10);
       doc.setTextColor(100);
-      doc.text(`Generated on: ${new Date().toLocaleString('en-GB')}`, 14, 32);
+      doc.text(`Generated on: ${new Date().toLocaleString('en-GB', { timeZone: 'Asia/Amman' })}`, 14, 32);
       doc.text('Total business performance and transaction history.', 14, 38);
       
       const tableColumn = ["Order No.", "Date & Time", "Total Amount", "Status"];
       const tableRows = orders.map(order => [
         `ORD-${String(order.id).padStart(3, '0')}`,
-        order.created_at ? new Date(order.created_at).toLocaleString('en-GB') : 'N/A',
+        order.created_at ? new Date(order.created_at).toLocaleString('en-GB', { timeZone: 'Asia/Amman' }) : 'N/A',
         `JOD ${parseFloat(order.total_amount || 0).toFixed(2)}`,
         (order.status || 'PENDING').toUpperCase()
       ]);
@@ -379,7 +379,7 @@ const Orders = () => {
                     <span style={{ display: 'inline-block', padding: '6px 14px', borderRadius: '8px', background: 'linear-gradient(135deg, #c7a57a 0%, #a47c4f 100%)', color: theme.bg, fontWeight: 900, letterSpacing: '1px', boxShadow: '0 4px 10px rgba(196, 164, 132, 0.3)' }}>{orderNo}</span>
                   </td>
                   <td className="mobile-hide-col" style={{ padding: '20px', color: cellTextStyle.color, fontSize: cellTextStyle.fontSize }}>
-                    {order.created_at ? new Date(order.created_at).toLocaleString('en-GB') : 'N/A'}
+                    {order.created_at ? new Date(order.created_at).toLocaleString('en-GB', { timeZone: 'Asia/Amman' }) : 'N/A'}
                   </td>
                   <td style={{ padding: '20px', color: theme.primary, fontWeight: '700', fontSize: cellTextStyle.fontSize }}>
                     JOD {parseFloat(order.total_amount || 0).toFixed(2)}
