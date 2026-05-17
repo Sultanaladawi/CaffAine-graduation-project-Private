@@ -1341,11 +1341,10 @@ app.post('/api/ai-chat', async (req, res) => {
 
   try {
     const promiseDb = db.promise();
-    // Force boolean conversion to handle any type mismatches
     const isActuallyAdmin = String(isAdmin) === 'true';
     
     if (isActuallyAdmin) {
-      console.log(`[AI] Processing Admin Query with full business context. (UK Time: ${currentDateTime})`);
+      console.log(`[AI] Processing Admin Query with full business context. (Jordan Time: ${currentDateTime})`);
       try {
         const promiseDb = db.promise();
         const results = await Promise.allSettled([
@@ -1366,7 +1365,9 @@ app.post('/api/ai-chat', async (req, res) => {
           /* 14 */ promiseDb.query(`SELECT reviewer_name, rating, comment FROM general_feedback ORDER BY created_at DESC LIMIT 5`),
           /* 15 */ promiseDb.query(`SELECT admin_name, action, details, DATE_FORMAT(created_at,'%Y-%m-%d %H:%i') as time FROM admin_logs ORDER BY created_at DESC LIMIT 20`),
           /* 16 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(created_at,'%H:%i') as time FROM orders WHERE DATE(created_at) = CURDATE() ORDER BY created_at DESC`),
-          /* 17 */ promiseDb.query(`SELECT mi.name as product, ROUND(AVG(pr.rating),1) as rating, COUNT(pr.id) as count FROM menu_items mi LEFT JOIN product_reviews pr ON mi.id = pr.product_id GROUP BY mi.id HAVING count > 0`)
+          /* 17 */ promiseDb.query(`SELECT mi.name as product, ROUND(AVG(pr.rating),1) as rating, COUNT(pr.id) as count FROM menu_items mi LEFT JOIN product_reviews pr ON mi.id = pr.product_id GROUP BY mi.id HAVING count > 0`),
+          /* 18 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(created_at,'%H:%i') as time FROM orders WHERE DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY) ORDER BY created_at DESC`),
+          /* 19 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(created_at,'%Y-%m-%d %H:%i') as time FROM orders ORDER BY created_at DESC LIMIT 150`)
         ]);
 
         const getRes = (idx, def = []) => (results[idx] && results[idx].status === 'fulfilled' ? results[idx].value[0] : def);
@@ -1389,12 +1390,14 @@ app.post('/api/ai-chat', async (req, res) => {
         const teamActivity    = getRes(15);
         const todayOrders     = getRes(16);
         const productRatings  = getRes(17);
+        const yesterdayOrders = getRes(18);
+        const recentOrdersDetail = getRes(19);
 
         const lowStock = inventory.filter(i => i.stock_status === 'LOW');
         const okStock  = inventory.filter(i => i.stock_status === 'OK');
 
         businessContext = `You are the CaffAIne Business Intelligence Expert for CaffAIne, As-Salt.
-Current UK Date/Time: ${currentDateTime}
+Current Jordan Date/Time: ${currentDateTime}
 
 === TODAY ===
 Revenue: JOD${parseFloat(todayRow.today_revenue).toFixed(2)} | Orders: ${todayRow.today_orders}
@@ -1402,11 +1405,13 @@ Orders Detail: ${todayOrders.map(o => `${o.customer_name} JOD${o.total_amount} (
 
 === YESTERDAY ===
 Revenue: JOD${parseFloat(yesterdayRow.yesterday_revenue).toFixed(2)} | Orders: ${yesterdayRow.yesterday_orders}
+Orders Detail: ${yesterdayOrders.map(o => `${o.customer_name} JOD${o.total_amount} (${o.status}) at ${o.time}`).join(' | ') || 'None'}
 
-=== ALL-TIME ===
+=== ALL-TIME & HISTORY ===
 Total Revenue: JOD${allTime.total_revenue} | Total Orders: ${allTime.total_orders}
 Best Day Ever: ${bestDay ? `${bestDay.best_date}: JOD${bestDay.daily_rev}` : 'N/A'}
 By Status: ${orderStatuses.map(s => `${s.status}: ${s.count}`).join(', ')}
+Recent Orders List (Last 150): ${recentOrdersDetail.map(o => `${o.customer_name} JOD${o.total_amount} (${o.status}) at ${o.time}`).join(' | ') || 'None'}
 
 === TOP PRODUCTS ===
 ${topProducts.map((p,i) => `${i+1}. ${p.name} (${p.sold} sold)`).join(' | ')}
@@ -1415,12 +1420,12 @@ ${topProducts.map((p,i) => `${i+1}. ${p.name} (${p.sold} sold)`).join(' | ')}
 ${salesTrend.map(d => `${d.date}: JOD${d.revenue} (${d.orders} orders)`).join(' | ')}
 
 === INVENTORY ===
-âڑ ï¸ڈ LOW (${lowStock.length}): ${lowStock.map(i => `${i.item_name} ${i.quantity}${i.unit||''}`).join(', ') || 'None'}
-âœ… OK: ${okStock.map(i => `${i.item_name}: ${i.quantity}${i.unit||''}`).join(', ')}
+⚠️ LOW (${lowStock.length}): ${lowStock.map(i => `${i.item_name} ${i.quantity}${i.unit||''}`).join(', ') || 'None'}
+✅ OK: ${okStock.map(i => `${i.item_name}: ${i.quantity}${i.unit||''}`).join(', ')}
 
 === MENU & RATINGS ===
 Items: ${menuItems.map(m => `${m.name} (${m.price_display})`).join(', ') || 'None'}
-Ratings: ${productRatings.map(p => `${p.product}: ${p.rating}â­گ (${p.count} reviews)`).join(' | ') || 'No ratings yet'}
+Ratings: ${productRatings.map(p => `${p.product}: ${p.rating}⭐️ (${p.count} reviews)`).join(' | ') || 'No ratings yet'}
 
 === OFFERS ===
 ${offers.filter(o => o.active == 1).map(o => `${o.product_name}: ${o.discount_percent}% OFF (${o.reason})`).join(' | ') || 'No active offers'}
@@ -1435,9 +1440,9 @@ Avg: ${feedbackSummary.avg_rating}/5 (${feedbackSummary.total} reviews)
 Recent: ${recentFeedback.map(f => `${f.reviewer_name} (${f.rating}/5): "${f.comment}"`).join(' | ') || 'None'}
 
 === TEAM ACTIVITY ===
-${teamActivity.map(log => `[${log.time}] ${log.admin_name}: ${log.action} â€” ${log.details}`).join('\n')}
+${teamActivity.map(log => `[${log.time}] ${log.admin_name}: ${log.action} — ${log.details}`).join('\n')}
 
-Rule: Answer ONLY from the data above. Be precise and professional.`;
+Rule: Answer ONLY from the data above. Be precise and professional. All monetary figures are strictly in Jordanian Dinars (JOD). Do not use £ or GBP. Always specify prices and calculations in JOD.`;
       } catch (dbError) {
         console.error('[AI] Data Merge Error:', dbError);
         businessContext = `You are the CaffAIne BI Assistant. System status: Operational. Please ask your business questions.`;
