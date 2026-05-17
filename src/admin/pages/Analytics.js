@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { TrendingUp, ShoppingBag, DollarSign, ArrowUpRight, BarChart3, Zap, Calendar, Search, X } from 'lucide-react';
+import { TrendingUp, ShoppingBag, DollarSign, ArrowUpRight, BarChart3, Zap, Calendar, Search, X, ArrowUpDown } from 'lucide-react';
 
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
@@ -16,6 +16,12 @@ const Analytics = () => {
   const [loading, setLoading] = useState(true);
   const [weeklyData,   setWeeklyData]   = useState([]);
   const [topCategory,  setTopCategory]  = useState({ name: 'None', percentage: 0 });
+  const [showAllSoldModal, setShowAllSoldModal] = useState(false);
+  const [allSoldProducts, setAllSoldProducts]   = useState([]);
+  const [modalLoading, setModalLoading]         = useState(false);
+  const [sortField, setSortField]               = useState('total_sold');
+  const [sortDirection, setSortDirection]       = useState('desc');
+  const [modalSearch, setModalSearch]           = useState('');
 
   const theme = {
     crema: 'var(--admin-accent)',
@@ -112,6 +118,24 @@ const Analytics = () => {
   // eslint-disable-next-line
   }, [viewMode, selectedYear, selectedMonth, rangeFrom, rangeTo]);
 
+  const fetchAllSoldProducts = useCallback(async () => {
+    setModalLoading(true);
+    try {
+      const res = await axios.get(`/api/analytics-all-sold-products?mode=${viewMode}&year=${selectedYear}&month=${selectedMonth}&from=${rangeFrom}&to=${rangeTo}`);
+      setAllSoldProducts(res.data);
+    } catch (e) {
+      console.error("Error fetching all sold products:", e);
+    } finally {
+      setModalLoading(false);
+    }
+  }, [viewMode, selectedYear, selectedMonth, rangeFrom, rangeTo]);
+
+  useEffect(() => {
+    if (showAllSoldModal) {
+      fetchAllSoldProducts();
+    }
+  }, [showAllSoldModal, fetchAllSoldProducts]);
+
   useEffect(() => { fetchAllTime(); }, [fetchAllTime]);
   useEffect(() => { fetchStats(); }, [fetchStats]);
 
@@ -128,6 +152,32 @@ const Analytics = () => {
 
   const years = [];
   for (let y = 2024; y <= now.getFullYear(); y++) years.push(y);
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('desc');
+    }
+  };
+
+  const filteredProducts = allSoldProducts
+    .filter(p => p.item_name.toLowerCase().includes(modalSearch.toLowerCase()))
+    .sort((a, b) => {
+      let valA = a[sortField];
+      let valB = b[sortField];
+      if (sortField === 'product_id' || sortField === 'unit_price' || sortField === 'total_sold' || sortField === 'revenue') {
+        valA = parseFloat(valA) || 0;
+        valB = parseFloat(valB) || 0;
+      } else {
+        valA = String(valA).toLowerCase();
+        valB = String(valB).toLowerCase();
+      }
+      if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
 
   return (
     <div className="dashboard-fade-in" style={{ color: theme.latte, backgroundColor: theme.espresso, minHeight: '100vh', padding: '40px 10px 40px 5px', position: 'relative' }}>
@@ -230,46 +280,76 @@ const Analytics = () => {
         <>
           {/* ── 5 Stat Cards ── */}
           <div style={{ position:'relative', zIndex:1, display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:'20px', marginBottom:'30px' }}>
-            {cards.map((c, i) => (
-              <div key={i} className="premium-row" style={{ backgroundColor: theme.card, padding:'25px', borderRadius:'20px', border:`1px solid ${theme.border}`, display:'flex', flexDirection:'column', gap:'15px', boxShadow:'0 10px 30px rgba(0,0,0,0.2)' }}>
-                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
-                  <div style={{ backgroundColor:`${c.color}15`, color:c.color, padding:'12px', borderRadius:'12px' }}>
-                    <c.icon size={24} />
+            {cards.map((c, i) => {
+              const isBestSelling = c.title === 'Best Selling';
+              return (
+                <div 
+                  key={i} 
+                  className="premium-row" 
+                  onClick={isBestSelling ? () => setShowAllSoldModal(true) : undefined}
+                  style={{ 
+                    backgroundColor: theme.card, 
+                    padding:'25px', 
+                    borderRadius:'20px', 
+                    border: isBestSelling ? '1px solid rgba(196,164,132,0.45)' : `1px solid ${theme.border}`, 
+                    display:'flex', 
+                    flexDirection:'column', 
+                    gap:'15px', 
+                    boxShadow: isBestSelling ? '0 15px 35px rgba(196,164,132,0.1)' : '0 10px 30px rgba(0,0,0,0.2)',
+                    cursor: isBestSelling ? 'pointer' : 'default',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}
+                >
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
+                    <div style={{ backgroundColor:`${c.color}15`, color:c.color, padding:'12px', borderRadius:'12px' }}>
+                      <c.icon size={24} />
+                    </div>
+                    <span style={{ color:'#38ef7d', fontSize:'0.75rem', fontWeight:'bold', display:'flex', alignItems:'center', gap:'4px' }}>
+                      <ArrowUpRight size={14} /> {c.desc}
+                    </span>
                   </div>
-                  <span style={{ color:'#38ef7d', fontSize:'0.75rem', fontWeight:'bold', display:'flex', alignItems:'center', gap:'4px' }}>
-                    <ArrowUpRight size={14} /> {c.desc}
-                  </span>
+                  <div style={{ paddingBottom: isBestSelling ? '10px' : '0px' }}>
+                    <p style={{ color: theme.text, opacity:0.6, fontSize:'0.8rem', textTransform:'uppercase', letterSpacing:'1px', margin:0 }}>{c.title}</p>
+                    <h3 style={{ color:'#fff', fontSize:'1.7rem', margin:'5px 0 0', fontWeight:'800', wordBreak:'break-word' }}>{c.value}</h3>
+                  </div>
+                  {isBestSelling && (
+                    <div style={{ position:'absolute', bottom:'8px', right:'15px', fontSize:'0.7rem', color:'#c4a484', fontWeight:'bold', display:'flex', alignItems:'center', gap:'2px' }}>
+                      View Full List →
+                    </div>
+                  )}
                 </div>
-                <div>
-                  <p style={{ color: theme.text, opacity:0.6, fontSize:'0.8rem', textTransform:'uppercase', letterSpacing:'1px', margin:0 }}>{c.title}</p>
-                  <h3 style={{ color:'#fff', fontSize:'1.7rem', margin:'5px 0 0', fontWeight:'800', wordBreak:'break-word' }}>{c.value}</h3>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* ── Bar Chart + Category Dominance ── */}
           <div style={{ position:'relative', zIndex:1, display:'grid', gridTemplateColumns:'2fr 1fr', gap:'30px', marginBottom:'30px' }}>
-            <div style={{ backgroundColor: theme.card, padding:'35px', borderRadius:'24px', border:`1px solid ${theme.border}`, minHeight:'380px', boxShadow:'0 15px 45px rgba(0,0,0,0.3)', display:'flex', flexDirection:'column' }}>
-              <h3 style={{ color:'#fff', marginBottom:'30px', fontFamily:'serif', fontSize:'1.5rem' }}>
-                {viewMode === 'monthly' ? `Daily Sales — ${MONTH_NAMES[selectedMonth-1]} ${selectedYear}` : viewMode === 'range' ? `Sales: ${rangeFrom} → ${rangeTo}` : 'Last 7 Days Sales'}
-              </h3>
-              <div style={{ flex:1, display:'flex', alignItems:'flex-end', justifyContent:'space-between', gap:'10px', paddingBottom:'10px', height:'260px', overflowX:'auto' }}>
+            <div style={{ background: 'rgba(255,255,255,0.015)', border: `1px solid ${theme.border}`, borderRadius: '35px', padding: '40px', minHeight: '380px', display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 1 }}>
+              <div style={{ marginBottom: '35px' }}>
+                <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: '1.8rem', color: '#fff', margin: 0 }}>
+                  {viewMode === 'monthly' ? `Daily Sales — ${MONTH_NAMES[selectedMonth-1]} ${selectedYear}` : viewMode === 'range' ? `Sales: ${rangeFrom} → ${rangeTo}` : 'Last 7 Days Sales'}
+                </h3>
+                <p style={{ color: '#c4a484', fontSize: '0.7rem', fontWeight: 900, letterSpacing: '2.5px', marginTop: '5px', textTransform: 'uppercase' }}>
+                  DATA SOURCE: LIVE METRICS SYNC
+                </p>
+              </div>
+              <div style={{ flex:1, display:'flex', alignItems:'flex-end', justifyContent:'space-between', gap:'20px', paddingBottom:'10px', height:'260px', overflowX:'auto' }}>
                 {weeklyData.length > 0 ? weeklyData.map((d, i) => {
                   const isLast = i === weeklyData.length - 1;
                   return (
                   <div key={i} className="bar-wrapper" style={{ minWidth:'40px' }}>
-                    <div className="bar-tooltip">{d.total.toFixed(2)} JOD</div>
-                    <div style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 900, opacity: d.total > 0 ? 0.9 : 0, marginBottom: '5px' }}>{d.total.toFixed(0)}</div>
+                    <div className="bar-tooltip">JOD {d.total.toFixed(2)}</div>
+                    <div style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 900, opacity: d.total > 0 ? 0.9 : 0, marginBottom: '5px' }}>JOD {d.total.toFixed(0)}</div>
                     <div className="bar-fill" style={{ 
                       width:'100%', maxWidth:'50px', 
-                      background: isLast ? `linear-gradient(180deg, #c4a484, #8c6a56)` : `linear-gradient(180deg, rgba(196,164,132,0.15), rgba(196,164,132,0.3))`, 
+                      background: isLast ? `linear-gradient(180deg, #c4a484, #8c6a56)` : `linear-gradient(180deg, rgba(196,164,132,0.1), rgba(196,164,132,0.3))`, 
                       height:`${Math.max((d.total/maxBar)*100,2)}%`, minHeight: d.total > 0 ? '8px' : '4px',
-                      borderRadius:'12px', 
+                      borderRadius:'12px', transition: '1s cubic-bezier(0.23, 1, 0.32, 1)',
                       boxShadow: isLast && d.total > 0 ? '0 0 25px #c4a48444' : 'none',
                       border: isLast ? `1px solid #c4a48466` : 'none'
                     }} />
-                    <div style={{ color: isLast ? '#c4a484' : 'rgba(255,255,255,0.4)', fontSize:'0.7rem', fontWeight:'900', textAlign:'center', marginTop:'10px' }}>
+                    <div style={{ color: isLast ? '#c4a484' : 'rgba(255,255,255,0.4)', fontSize:'0.75rem', fontWeight:'900', textAlign:'center', marginTop:'10px' }}>
                       {d.day}<div style={{ fontSize:'0.55rem', opacity:0.5 }}>{d.fullDate}</div>
                     </div>
                   </div>
@@ -333,6 +413,211 @@ const Analytics = () => {
             </div>
           </div>
         </>
+      )}
+      {/* ── All Sold Products Modal ── */}
+      {showAllSoldModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(7, 5, 4, 0.85)',
+          backdropFilter: 'blur(20px)',
+          zIndex: 9999,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          animation: 'fadeIn 0.3s ease-out',
+          padding: '20px'
+        }}>
+          <div style={{
+            backgroundColor: '#0d0806',
+            border: '1px solid rgba(196, 164, 132, 0.25)',
+            width: '100%', maxWidth: '900px',
+            borderRadius: '24px',
+            boxShadow: '0 25px 60px rgba(0,0,0,0.8), 0 0 40px rgba(196,164,132,0.1)',
+            maxHeight: '85vh',
+            display: 'flex', flexDirection: 'column',
+            overflow: 'hidden',
+            position: 'relative'
+          }}>
+            {/* Modal Header */}
+            <div style={{
+              padding: '25px 30px',
+              borderBottom: '1px solid rgba(196, 164, 132, 0.15)',
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              background: 'linear-gradient(135deg, #1b130e 0%, #0d0806 100%)'
+            }}>
+              <div>
+                <h3 style={{ margin: 0, color: '#fff', fontSize: '1.6rem', fontFamily: 'serif', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <ShoppingBag color="#c4a484" size={24} />
+                  All Sold Products History
+                </h3>
+                <p style={{ margin: '5px 0 0', color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                  Period: {viewMode === 'monthly' ? `${MONTH_NAMES[selectedMonth-1]} ${selectedYear}` : viewMode === 'range' ? `${rangeFrom} → ${rangeTo}` : 'All Time'}
+                </p>
+              </div>
+              <button 
+                onClick={() => setShowAllSoldModal(false)}
+                style={{
+                  background: 'rgba(196, 164, 132, 0.05)',
+                  border: '1px solid rgba(196, 164, 132, 0.15)',
+                  color: '#c4a484',
+                  width: '38px', height: '38px',
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: '0.2s'
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(196,164,132,0.2)'; e.currentTarget.style.color = '#fff'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(196, 164, 132, 0.05)'; e.currentTarget.style.color = '#c4a484'; }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Search Bar / Controls */}
+            <div style={{
+              padding: '20px 30px',
+              borderBottom: '1px solid rgba(196, 164, 132, 0.1)',
+              display: 'flex', gap: '15px', alignItems: 'center',
+              backgroundColor: 'rgba(196, 164, 132, 0.02)'
+            }}>
+              <div style={{ position: 'relative', flex: 1 }}>
+                <Search size={16} color="rgba(255,255,255,0.4)" style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)' }} />
+                <input 
+                  type="text" 
+                  placeholder="Search sold products by name..."
+                  value={modalSearch}
+                  onChange={e => setModalSearch(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px 15px 12px 45px',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(196, 164, 132, 0.2)',
+                    background: '#070504',
+                    color: '#fff',
+                    fontWeight: '600',
+                    fontSize: '0.9rem',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+              <div style={{ fontSize: '0.85rem', color: '#c4a484', fontWeight: 'bold', background: 'rgba(196,164,132,0.05)', padding: '10px 15px', borderRadius: '10px', border: '1px solid rgba(196,164,132,0.1)' }}>
+                {filteredProducts.length} Items Found
+              </div>
+            </div>
+
+            {/* Modal Body / Table */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '30px' }}>
+              {modalLoading ? (
+                <div style={{ padding: '80px 0', textAlign: 'center', color: '#c4a484', fontWeight: 'bold' }}>
+                  Loading Sold Products History...
+                </div>
+              ) : filteredProducts.length === 0 ? (
+                <div style={{ padding: '80px 0', textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontWeight: 'bold' }}>
+                  No sold products matching your query found.
+                </div>
+              ) : (
+                <div style={{ overflowX: 'auto', borderRadius: '16px', border: '1px solid rgba(196, 164, 132, 0.15)' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', color: '#fff', fontSize: '0.9rem' }}>
+                    <thead>
+                      <tr style={{ background: '#1b130e', borderBottom: '1px solid rgba(196, 164, 132, 0.25)' }}>
+                        {[
+                          { key: 'product_id', label: 'ID' },
+                          { key: 'item_name', label: 'Product Name' },
+                          { key: 'unit_price', label: 'Unit Price' },
+                          { key: 'total_sold', label: 'Total Sold' },
+                          { key: 'revenue', label: 'Total Revenue' }
+                        ].map(col => {
+                          const isActive = sortField === col.key;
+                          return (
+                            <th 
+                              key={col.key}
+                              onClick={() => handleSort(col.key)}
+                              style={{
+                                padding: '15px 20px',
+                                color: isActive ? '#fff' : '#c4a484',
+                                fontWeight: '900',
+                                fontSize: '0.8rem',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px',
+                                cursor: 'pointer',
+                                userSelect: 'none',
+                                transition: '0.2s',
+                                whiteSpace: 'nowrap'
+                              }}
+                              onMouseEnter={e => e.currentTarget.style.color = '#fff'}
+                              onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = '#c4a484'; }}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                {col.label}
+                                <ArrowUpDown size={12} style={{ opacity: isActive ? 1 : 0.3, transform: isActive && sortDirection === 'asc' ? 'rotate(180deg)' : 'none', transition: '0.3s' }} />
+                              </div>
+                            </th>
+                          );
+                        })}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredProducts.map((p, index) => (
+                        <tr 
+                          key={p.product_id}
+                          style={{
+                            borderBottom: '1px solid rgba(196, 164, 132, 0.1)',
+                            backgroundColor: index % 2 === 0 ? 'transparent' : 'rgba(196,164,132,0.02)',
+                            transition: '0.2s'
+                          }}
+                          onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(196,164,132,0.05)'}
+                          onMouseLeave={e => e.currentTarget.style.backgroundColor = index % 2 === 0 ? 'transparent' : 'rgba(196,164,132,0.02)'}
+                        >
+                          <td style={{ padding: '15px 20px', fontWeight: 'bold', color: 'rgba(255,255,255,0.4)' }}>
+                            #{p.product_id}
+                          </td>
+                          <td style={{ padding: '15px 20px', fontWeight: 'bold', color: '#fff' }}>
+                            {p.item_name}
+                          </td>
+                          <td style={{ padding: '15px 20px', color: '#c4a484', fontWeight: '600' }}>
+                            {parseFloat(p.unit_price || 0).toFixed(2)} JOD
+                          </td>
+                          <td style={{ padding: '15px 20px' }}>
+                            <span style={{ background: 'rgba(56, 239, 125, 0.1)', color: '#38ef7d', padding: '4px 10px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                              {parseFloat(p.total_sold || 0).toFixed(0)} Sold
+                            </span>
+                          </td>
+                          <td style={{ padding: '15px 20px', color: '#38ef7d', fontWeight: 'bold' }}>
+                            {parseFloat(p.revenue || 0).toFixed(2)} JOD
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+            {/* Modal Footer */}
+            <div style={{
+              padding: '20px 30px',
+              borderTop: '1px solid rgba(196, 164, 132, 0.15)',
+              display: 'flex', justifyContent: 'flex-end',
+              background: '#0d0806'
+            }}>
+              <button 
+                onClick={() => setShowAllSoldModal(false)}
+                style={{
+                  padding: '12px 25px',
+                  borderRadius: '12px',
+                  border: '1px solid #c4a484',
+                  background: '#c4a484',
+                  color: '#070504',
+                  fontWeight: 'bold',
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  transition: '0.2s'
+                }}
+                onMouseEnter={e => { e.currentTarget.style.filter = 'brightness(1.15)'; }}
+                onMouseLeave={e => { e.currentTarget.style.filter = 'none'; }}
+              >
+                Close Window
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

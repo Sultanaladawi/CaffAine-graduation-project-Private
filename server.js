@@ -761,6 +761,36 @@ app.get('/api/analytics-range', async (req, res) => {
   }
 });
 
+app.get('/api/analytics-all-sold-products', async (req, res) => {
+  try {
+    const promiseDb = db.promise();
+    const { from, to, year, month, mode } = req.query;
+    let query = `
+      SELECT mi.id as product_id, mi.name as item_name, mi.price_num as unit_price,
+             SUM(oi.quantity) as total_sold,
+             SUM(oi.quantity * oi.price) as revenue
+      FROM order_items oi
+      JOIN menu_items mi ON oi.product_id = mi.id
+      JOIN orders o ON oi.order_id = o.id
+    `;
+    const params = [];
+    if (mode === 'monthly') {
+      query += ` WHERE YEAR(o.created_at) = ? AND MONTH(o.created_at) = ?`;
+      params.push(parseInt(year) || new Date().getFullYear(), parseInt(month) || (new Date().getMonth() + 1));
+    } else if (mode === 'range') {
+      query += ` WHERE DATE(o.created_at) BETWEEN ? AND ?`;
+      params.push(from || '2000-01-01', to || new Date().toISOString().split('T')[0]);
+    }
+    query += ` GROUP BY oi.product_id ORDER BY total_sold DESC`;
+    const [results] = await promiseDb.query(query, params);
+    res.json(results);
+  } catch (err) {
+    console.error('[All Sold Products Error]', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 app.get('/api/offers', (req, res) => {
   db.query('SELECT * FROM offers ORDER BY id DESC', (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
