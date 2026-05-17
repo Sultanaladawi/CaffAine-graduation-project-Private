@@ -234,6 +234,16 @@ db.getConnection((err, connection) => {
         console.error('[Migration] Addon price fix failed:', e.message);
       }
 
+      // Ensure all legacy and existing price displays are formatted as JOD
+      const [migrationResult] = await promiseDb.query(`
+        UPDATE menu_items 
+        SET price_display = CONCAT('JOD ', FORMAT(price_num, 2)) 
+        WHERE price_num IS NOT NULL AND (price_display LIKE '£%' OR price_display NOT LIKE 'JOD %')
+      `);
+      if (migrationResult.affectedRows > 0) {
+        console.log(`[Migration] Updated ${migrationResult.affectedRows} legacy price formats to JOD in menu_items.`);
+      }
+
       console.log('[Migration] Schema verification complete.');
     } catch (dbErr) {
       console.error('[Migration] Schema check failed:', dbErr.message);
@@ -1261,7 +1271,7 @@ app.post('/api/products', async (req, res) => {
     const nextOrder = (rows[0].maxOrder || 0) + 1;
     const rawPrice = price_num ? convertNumerals(price_num.toString()).replace(/[^0-9.]/g, '') : null;
     const cleanPrice = (rawPrice && rawPrice.trim() !== '') ? rawPrice : null;
-    const price_display = cleanPrice ? `JOD${parseFloat(cleanPrice).toFixed(2)}` : null;
+    const price_display = cleanPrice ? `JOD ${parseFloat(cleanPrice).toFixed(2)}` : null;
     const [result] = await conn.query('INSERT INTO menu_items (category_id, name, price_num, price_display, description, tags, available, image_url, addons, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [category_id || null, name, cleanPrice, price_display, description || null, tags || null, available ?? 1, image_url || null, addons || null, nextOrder]);
     const productId = result.insertId;
     if (Array.isArray(addon_ids)) for (const aid of addon_ids) if (aid) await conn.query('INSERT IGNORE INTO menu_item_addons (menu_item_id, addon_id) VALUES (?, ?)', [productId, aid]);
@@ -1286,7 +1296,8 @@ app.put('/api/products/:id', async (req, res) => {
     await conn.beginTransaction();
     let cleanPrice = null;
     if (price_num !== undefined && price_num !== null) cleanPrice = convertNumerals(price_num.toString()).replace(/[^0-9.]/g, '');
-    await conn.query("UPDATE menu_items SET name = ?, price_num = ?, description = ?, available = ?, category_id = ?, image_url = ?, tags = ?, addons = ? WHERE id = ?", [name, cleanPrice, description, available, category_id || null, image_url || null, tags || null, addons || null, id]);
+    const price_display = cleanPrice ? `JOD ${parseFloat(cleanPrice).toFixed(2)}` : null;
+    await conn.query("UPDATE menu_items SET name = ?, price_num = ?, price_display = ?, description = ?, available = ?, category_id = ?, image_url = ?, tags = ?, addons = ? WHERE id = ?", [name, cleanPrice, price_display, description, available, category_id || null, image_url || null, tags || null, addons || null, id]);
     if (Array.isArray(addon_ids)) {
       await conn.query('DELETE FROM menu_item_addons WHERE menu_item_id = ?', [id]);
       for (const aid of addon_ids) if (aid) await conn.query('INSERT INTO menu_item_addons (menu_item_id, addon_id) VALUES (?, ?)', [id, aid]);
