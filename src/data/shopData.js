@@ -135,8 +135,8 @@ export const shopInfo = {
   country: "Jordan",
   email: "hello@caffainecoffee.com",
   careersEmail: "careers@caffainecoffee.com",
-  instagram: "https://instagram.com/caffaine.ai",
-  instagramHandle: "@caffaine.ai",
+  instagram: "https://instagram.com/caffainecoffee",
+  instagramHandle: "@caffainecoffee",
   mapsUrl: "https://maps.app.goo.gl/9u91NZFGSB13oEeK6",
 };
 
