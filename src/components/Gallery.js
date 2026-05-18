@@ -100,7 +100,7 @@ export default function Gallery() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            @caffaine.ai
+            @caffainecoffee
           </a>
         </p>
       </div>
