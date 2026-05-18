@@ -402,7 +402,7 @@ const Inventory = () => {
                       backgroundColor: isLow ? 'rgba(231, 74, 59, 0.03)' : 'transparent'
                     }}>
                       <td style={{ padding: '25px' }}>
-                        <span title={inventoryNo} style={{ display: 'inline-block', padding: '6px 14px', borderRadius: '8px', background: 'linear-gradient(135deg, #c7a57a 0%, #a47c4f 100%)', color: colors.espresso, fontWeight: 900, letterSpacing: '1px', boxShadow: '0 4px 10px rgba(196, 164, 132, 0.3)' }}>{inventoryNo}</span>
+                        <span title={inventoryNo} style={{ display: 'inline-block', padding: '6px 14px', borderRadius: '8px', background: 'linear-gradient(135deg, #c7a57a 0%, #a47c4f 100%)', color: colors.espresso, fontWeight: 900, letterSpacing: '1px', boxShadow: '0 4px 10px rgba(196, 164, 132, 0.3)', whiteSpace: 'nowrap' }}>{inventoryNo}</span>
                       </td>
                       <td style={{ padding: '25px' }}>
                         <strong style={cellTextStyle}>{item.item_name}</strong>
