@@ -5,7 +5,7 @@ import { useAdminContext } from './AdminContext';
 import { useStore } from '../context/StoreContext';
 import {
   LayoutGrid, ShoppingBag, ShoppingCart, Box,
-  BarChart3, MessageSquare, BotMessageSquare, LogOut, User, Coffee,
+  BarChart3, MessageSquare, BotMessageSquare, LogOut, User, Coffee, Sparkles,
   FileText, MessagesSquare, Volume2, VolumeX, Briefcase, BellRing,
   Power, Store, Mail, Activity, Menu, X
 } from 'lucide-react';
@@ -235,15 +235,16 @@ const AdminLayout = () => {
         transition: 'all 0.3s ease'
       }}>
         <div style={{ padding: '30px 20px', textAlign: 'center' }}>
-          <div style={{ color: 'var(--admin-accent)', marginBottom: '12px', display: 'flex', justifyContent: 'center' }}>
-            <Coffee size={36} />
+          <div style={{ color: 'var(--admin-accent)', marginBottom: '12px', display: 'flex', justifyContent: 'center', gap: '10px', alignItems: 'center' }}>
+            <Sparkles size={30} style={{ filter: 'drop-shadow(0 0 8px rgba(196,164,132,0.6))' }} />
           </div>
           <h1 style={{
-            margin: 0, fontSize: '1.1rem', color: '#fff', fontWeight: '900',
+            margin: 0, fontSize: '1.05rem', color: '#fff', fontWeight: '900',
             letterSpacing: '2px', textTransform: 'uppercase', fontFamily: "'DM Serif Display', serif"
           }}>
             Caff<span style={{ color: 'var(--admin-accent)' }}>AIne</span>
           </h1>
+          <div style={{ fontSize: '0.7rem', color: 'var(--admin-accent)', letterSpacing: '3px', marginTop: '4px', opacity: 0.8 }}>COFFEE.</div>
         </div>
 
         <nav style={{ marginTop: '20px', flexGrow: 1, overflowY: 'auto', paddingBottom: '20px' }}>

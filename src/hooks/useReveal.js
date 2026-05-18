@@ -19,8 +19,8 @@ export function useReveal(delay = 0) {
         return () => clearTimeout(timer);
       }
     }, { 
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
+      threshold: 0.05,
+      rootMargin: '0px 0px 0px 0px'
     });
 
     obs.observe(el);

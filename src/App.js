@@ -48,7 +48,9 @@ function PublicSite() {
   const ringRef = useRef(null);
 
   useEffect(() => {
+    // Disable smooth scroll on touch/mobile — causes jank and slowness
     if (!LenisClass) return;
+    if (window.matchMedia('(hover: none)').matches) return; // touch device
     const lenis = new LenisClass({ 
       duration: 1.25, 
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
