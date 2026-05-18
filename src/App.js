@@ -16,6 +16,7 @@ import Footer             from './components/Footer';
 import Chatbot            from './components/Chatbot';
 import Cart               from './components/Cart';
 import Checkout           from './components/Checkout';
+import Presentation       from './components/Presentation';
 import LoadingScreen      from './components/LoadingScreen';
 
 import { AdminProvider }  from './admin/AdminContext';
@@ -149,6 +150,8 @@ export default function App() {
           <CartProvider>
             <Routes>
               <Route path="/" element={<PublicSite />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/presentation" element={<Presentation />} />
 
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route
