@@ -174,7 +174,7 @@ const Messages = () => {
       }}>
         <div>
           <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: colors.crema, lineHeight: 1 }}>
-              Caff<span style={{ color: '#fff', fontStyle: 'italic' }}>AIne.</span>
+              CaffAIne <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
           </div>
 
           <div className="page-badge">
