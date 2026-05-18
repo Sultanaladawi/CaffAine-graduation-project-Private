@@ -585,7 +585,7 @@ app.get('/api/dashboard-stats', async (req, res) => {
     const [[sales]] = await promiseDb.query("SELECT COALESCE(SUM(total_amount),0) as total FROM orders");
     const [lowStockItems] = await promiseDb.query("SELECT item_name, quantity, min_threshold FROM inventory WHERE quantity <= min_threshold");
     const [dailySales] = await promiseDb.query(`SELECT DATE(created_at) as date, SUM(total_amount) as total FROM orders WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) GROUP BY DATE(created_at) ORDER BY DATE(created_at) ASC`);
-    const [categoryStats] = await promiseDb.query(`SELECT COALESCE(c.${categoryNameColumn}, 'Other') as name, COUNT(oi.id) as count FROM order_items oi JOIN menu_items mi ON oi.product_id = mi.id LEFT JOIN categories c ON mi.category_id = c.id GROUP BY COALESCE(c.${categoryNameColumn}, 'Other')`);
+    const [categoryStats] = await promiseDb.query(`SELECT COALESCE(c.${categoryNameColumn}, 'Other') as name, SUM(oi.quantity) as count FROM order_items oi JOIN menu_items mi ON (oi.product_id = mi.id OR oi.item_name = mi.name) LEFT JOIN categories c ON mi.category_id = c.id GROUP BY COALESCE(c.${categoryNameColumn}, 'Other')`);
     const [[todayStats]] = await promiseDb.query("SELECT COUNT(*) as count, COALESCE(SUM(total_amount),0) as revenue FROM orders WHERE DATE(created_at) = CURDATE()");
     const [[yesterdayStats]] = await promiseDb.query("SELECT COUNT(*) as count, COALESCE(SUM(total_amount),0) as revenue FROM orders WHERE DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)");
     const [[statusSetting]] = await promiseDb.query("SELECT value FROM site_settings WHERE `key` = 'store_status'");
@@ -598,8 +598,8 @@ app.get('/api/dashboard-stats', async (req, res) => {
     const [topProducts] = await promiseDb.query(`
       SELECT mi.name as item_name, SUM(oi.quantity) as total_sold, SUM(oi.quantity * oi.price) as revenue 
       FROM order_items oi 
-      JOIN menu_items mi ON oi.product_id = mi.id 
-      GROUP BY oi.product_id 
+      JOIN menu_items mi ON (oi.product_id = mi.id OR oi.item_name = mi.name) 
+      GROUP BY mi.id 
       ORDER BY total_sold DESC 
       LIMIT 6
     `);
@@ -650,10 +650,10 @@ app.get('/api/analytics-monthly', async (req, res) => {
               SUM(oi.quantity) as total_sold,
               SUM(oi.quantity * oi.price) as revenue
        FROM order_items oi
-       JOIN menu_items mi ON oi.product_id = mi.id
+       JOIN menu_items mi ON (oi.product_id = mi.id OR oi.item_name = mi.name)
        JOIN orders o ON oi.order_id = o.id
        WHERE YEAR(o.created_at)=? AND MONTH(o.created_at)=?
-       GROUP BY oi.product_id
+       GROUP BY mi.id
        ORDER BY total_sold DESC
        LIMIT 6`,
       [year, month]
@@ -669,9 +669,9 @@ app.get('/api/analytics-monthly', async (req, res) => {
 
     // Category stats for that month
     const [categoryStats] = await promiseDb.query(
-      `SELECT COALESCE(c.${categoryNameColumn}, 'Other') as name, COUNT(oi.id) as count 
+      `SELECT COALESCE(c.${categoryNameColumn}, 'Other') as name, SUM(oi.quantity) as count 
        FROM order_items oi 
-       JOIN menu_items mi ON oi.product_id = mi.id 
+       JOIN menu_items mi ON (oi.product_id = mi.id OR oi.item_name = mi.name) 
        JOIN orders o ON oi.order_id = o.id
        LEFT JOIN categories c ON mi.category_id = c.id 
        WHERE YEAR(o.created_at)=? AND MONTH(o.created_at)=?
@@ -723,10 +723,10 @@ app.get('/api/analytics-range', async (req, res) => {
               SUM(oi.quantity) as total_sold,
               SUM(oi.quantity * oi.price) as revenue
        FROM order_items oi
-       JOIN menu_items mi ON oi.product_id = mi.id
+       JOIN menu_items mi ON (oi.product_id = mi.id OR oi.item_name = mi.name)
        JOIN orders o ON oi.order_id = o.id
        WHERE DATE(o.created_at) BETWEEN ? AND ?
-       GROUP BY oi.product_id
+       GROUP BY mi.id
        ORDER BY total_sold DESC
        LIMIT 6`,
       [from, to]
@@ -734,9 +734,9 @@ app.get('/api/analytics-range', async (req, res) => {
 
     // Category stats for that range
     const [categoryStats] = await promiseDb.query(
-      `SELECT COALESCE(c.${categoryNameColumn}, 'Other') as name, COUNT(oi.id) as count 
+      `SELECT COALESCE(c.${categoryNameColumn}, 'Other') as name, SUM(oi.quantity) as count 
        FROM order_items oi 
-       JOIN menu_items mi ON oi.product_id = mi.id 
+       JOIN menu_items mi ON (oi.product_id = mi.id OR oi.item_name = mi.name) 
        JOIN orders o ON oi.order_id = o.id
        LEFT JOIN categories c ON mi.category_id = c.id 
        WHERE DATE(o.created_at) BETWEEN ? AND ?
@@ -770,7 +770,7 @@ app.get('/api/analytics-all-sold-products', async (req, res) => {
              SUM(oi.quantity) as total_sold,
              SUM(oi.quantity * oi.price) as revenue
       FROM order_items oi
-      JOIN menu_items mi ON oi.product_id = mi.id
+      JOIN menu_items mi ON (oi.product_id = mi.id OR oi.item_name = mi.name)
       JOIN orders o ON oi.order_id = o.id
     `;
     const params = [];
@@ -781,7 +781,7 @@ app.get('/api/analytics-all-sold-products', async (req, res) => {
       query += ` WHERE DATE(o.created_at) BETWEEN ? AND ?`;
       params.push(from || '2000-01-01', to || new Date().toISOString().split('T')[0]);
     }
-    query += ` GROUP BY oi.product_id ORDER BY total_sold DESC`;
+    query += ` GROUP BY mi.id ORDER BY total_sold DESC`;
     const [results] = await promiseDb.query(query, params);
     res.json(results);
   } catch (err) {
@@ -1399,7 +1399,7 @@ app.post('/api/ai-chat', async (req, res) => {
           /* 1 */ promiseDb.query(`SELECT COUNT(*) as today_orders, COALESCE(SUM(total_amount),0) as today_revenue FROM orders WHERE DATE(created_at) = CURDATE()`),
           /* 2 */ promiseDb.query(`SELECT COUNT(*) as yesterday_orders, COALESCE(SUM(total_amount),0) as yesterday_revenue FROM orders WHERE DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)`),
           /* 3 */ promiseDb.query(`SELECT status, COUNT(*) as count FROM orders GROUP BY status`),
-          /* 4 */ promiseDb.query(`SELECT mi.name, COUNT(oi.id) as sold FROM order_items oi JOIN menu_items mi ON oi.product_id = mi.id GROUP BY oi.product_id ORDER BY sold DESC LIMIT 8`),
+          /* 4 */ promiseDb.query(`SELECT mi.name, SUM(oi.quantity) as sold FROM order_items oi JOIN menu_items mi ON (oi.product_id = mi.id OR oi.item_name = mi.name) GROUP BY mi.id ORDER BY sold DESC LIMIT 8`),
           /* 5 */ promiseDb.query(`SELECT DATE(created_at) as best_date, SUM(total_amount) as daily_rev FROM orders GROUP BY DATE(created_at) ORDER BY daily_rev DESC LIMIT 1`),
           /* 6 */ promiseDb.query(`SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as date, COUNT(*) as orders, COALESCE(SUM(total_amount),0) as revenue FROM orders WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 15 DAY) GROUP BY DATE(created_at) ORDER BY date DESC`),
           /* 7 */ promiseDb.query(`SELECT item_name, quantity, unit, min_threshold, CASE WHEN quantity <= min_threshold THEN 'LOW' ELSE 'OK' END as stock_status FROM inventory ORDER BY stock_status DESC, item_name`),

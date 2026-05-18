@@ -198,7 +198,6 @@ const Analytics = () => {
         .bar-wrapper { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; gap:10px; position:relative; cursor:pointer; }
         .bar-tooltip { position:absolute; top:-30px; background:#c4a484; color:#070504; padding:5px 12px; border-radius:10px; font-size:0.75rem; font-weight:900; opacity:0; transition:0.3s; pointer-events:none; z-index:10; white-space:nowrap; }
         .bar-wrapper:hover .bar-tooltip { opacity:1; transform:translateY(-10px); }
-        .bar-wrapper:hover .bar-fill { filter:brightness(1.5); background:#fff !important; box-shadow: 0 0 15px rgba(255,255,255,0.5); }
         .bar-fill { transition:all 0.5s cubic-bezier(0.23,1,0.32,1); }
         .filter-btn { padding:10px 20px; border-radius:12px; border:1px solid rgba(196,164,132,0.3); background:rgba(196,164,132,0.05); color:#c4a484; font-weight:700; font-size:0.85rem; cursor:pointer; transition:0.25s; }
         .filter-btn.active { background:#c4a484; color:#070504; border-color:#c4a484; }
