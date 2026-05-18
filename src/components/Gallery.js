@@ -54,7 +54,7 @@ export default function Gallery() {
           <div className="divider" />
           <h2 className="h2">Inside CaffAIne</h2>
           <p className={styles.headerSub}>
-            Gate of Science, BAU — a tucked-away corner of As-Salt
+            Gate of Science, BAU — a tucked-away corner of Al-Salt
             where good coffee happens slowly.
           </p>
         </div>

@@ -72,7 +72,7 @@ export default function LoadingScreen({ onComplete }) {
           </text>
         </svg>
 
-        <p className={styles.tagline}>As-Salt · Est. 2024</p>
+        <p className={styles.tagline}>Al-Salt · Est. 2026</p>
 
         <div className={styles.progressBar}>
           <div className={styles.progressFill} />

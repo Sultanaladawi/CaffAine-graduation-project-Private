@@ -4,7 +4,7 @@ import styles from './About.module.css';
 const PILLARS = [
   { icon: 'fa-mug-hot',       title: 'Specialty Only',  desc: 'We serve exclusively specialty-grade coffee, sourced from farms we know and trust.' },
   { icon: 'fa-leaf',          title: 'Plant-Friendly',  desc: 'Extensive vegan and vegetarian menu options — no compromise on flavour.' },
-  { icon: 'fa-map-marker-alt',title: 'Heart of As-Salt',   desc: 'Located at Al-Balqa Applied University — a calm refuge from the academic hustle.' },
+  { icon: 'fa-map-marker-alt',title: 'Heart of Al-Salt',   desc: 'Located at Al-Balqa Applied University — a calm refuge from the academic hustle.' },
 ];
 
 export default function About() {
@@ -32,7 +32,7 @@ export default function About() {
               />
             </div>
             <div className={styles.badge}>
-              <span className={styles.badgeText}>One of As-Salt's</span>
+              <span className={styles.badgeText}>One of Al-Salt's</span>
               <span className={styles.badgeMain}>Top Specialty</span>
               <span className={styles.badgeText}>Coffee Spots</span>
             </div>
@@ -41,7 +41,7 @@ export default function About() {
           <div ref={textRef} className={`${styles.text} reveal ${textVis ? 'vis' : ''}`}>
             <div className="label">Our Story</div>
             <div className="divider" />
-            <h2 className="h2">A Warm Corner of As-Salt</h2>
+            <h2 className="h2">A Warm Corner of Al-Salt</h2>
             
             <p className={styles.body}>
               CaffAIne is an independent specialty café settled inside the beautiful surroundings
@@ -56,7 +56,7 @@ export default function About() {
             </p>
             
             <p className={styles.body}>
-              Widely regarded as one of As-Salt's finest specialty coffee destinations, we're proud
+              Widely regarded as one of Al-Salt's finest specialty coffee destinations, we're proud
               to be part of the city's growing independent food and drink scene.
             </p>
 

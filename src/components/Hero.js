@@ -43,7 +43,7 @@ export default function Hero() {
 
           <div className={styles.eyebrow}>
             <div className={styles.eyebrowDot} />
-            <div className="label">Specialty Coffee · As-Salt</div>
+            <div className="label">Specialty Coffee · Al-Salt</div>
           </div>
 
           <h1 className={`display ${styles.headline}`}>
@@ -51,7 +51,7 @@ export default function Hero() {
           </h1>
 
           <p className={styles.sub}>
-            Independent specialty coffee at the heart of As-Salt. 
+            Independent specialty coffee at the heart of Al-Salt. 
             Precision-crafted drinks, warm welcome, unhurried pace.
           </p>
 

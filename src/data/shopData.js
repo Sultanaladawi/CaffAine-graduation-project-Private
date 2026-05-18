@@ -130,8 +130,8 @@ export const featuredItems = [
 export const shopInfo = {
   name: "CaffAIne",
   tagline: "The Future of Specialty Coffee",
-  address: "Gate of Science, Prince Abdullah bin Ghazi Faculty of Information Technology, Al-Balqa Applied University, As-Salt",
-  city: "As-Salt",
+  address: "Gate of Science, Prince Abdullah bin Ghazi Faculty of Information Technology, Al-Balqa Applied University, Al-Salt",
+  city: "Al-Salt",
   country: "Jordan",
   email: "hello@caffainecoffee.com",
   careersEmail: "careers@caffainecoffee.com",

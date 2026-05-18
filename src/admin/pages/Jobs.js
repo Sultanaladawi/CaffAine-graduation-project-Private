@@ -13,7 +13,7 @@ const Jobs = () => {
   const [formData, setFormData] = useState({
     title: '',
     type: 'Full-time',
-    location: 'As-Salt',
+    location: 'Al-Salt',
     description: '',
     active: 1
   });
@@ -98,7 +98,7 @@ const Jobs = () => {
         active: job.active
       });
     } else {
-      setFormData({ title: '', type: 'Full-time', location: 'As-Salt', description: '', active: 1 });
+      setFormData({ title: '', type: 'Full-time', location: 'Al-Salt', description: '', active: 1 });
     }
     setShowModal(true);
   };
