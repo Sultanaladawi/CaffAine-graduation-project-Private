@@ -450,10 +450,28 @@
   margin-top: 0.5rem;
 }
 
+.mainModal {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.orderTypeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
 @media (max-width: 560px) {
   .modal {
-    max-height: 100%;
     border-radius: 0;
+  }
+  
+  .mainModal {
+    max-height: 100vh;
+  }
+
+  .orderTypeGrid {
+    grid-template-columns: 1fr;
   }
 
   .overlay {

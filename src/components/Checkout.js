@@ -24,6 +24,9 @@ export default function Checkout({ onClose, onBack }) {
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [offerError, setOfferError] = useState(null);
 
+  const [savedProfile, setSavedProfile] = useState(null);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+
   const formatPrice = (n) => {
     const val = parseFloat(n) || 0;
     return "JOD " + val.toFixed(2);
@@ -51,16 +54,15 @@ export default function Checkout({ onClose, onBack }) {
     const savedExpiry = localStorage.getItem('caffaine_customer_expiry');
     const savedCvc = localStorage.getItem('caffaine_customer_cvc');
 
-    if (savedName || savedPhone || savedEmail || savedCardNumber || savedExpiry || savedCvc) {
-      setForm(f => ({
-        ...f,
-        name: savedName || f.name,
-        phone: savedPhone || f.phone,
-        email: savedEmail || f.email,
-        cardNumber: savedCardNumber || f.cardNumber,
-        expiry: savedExpiry || f.expiry,
-        cvc: savedCvc || f.cvc
-      }));
+    if (savedName) {
+      setSavedProfile({
+        name: savedName,
+        phone: savedPhone || '',
+        email: savedEmail || '',
+        cardNumber: savedCardNumber || '',
+        expiry: savedExpiry || '',
+        cvc: savedCvc || ''
+      });
     }
   }, []);
 
@@ -87,17 +89,17 @@ export default function Checkout({ onClose, onBack }) {
     const isEmployeeOffer = offer.reason.toLowerCase().includes('corporate') || offer.reason.toLowerCase().includes('employee') || offer.reason.toLowerCase().includes('faculty');
 
     if (!hasItem) {
-      showOfferError(`❌ هذا العرض لا ينطبق على طلبك — المنتج "${offer.product_name}" غير موجود في سلتك.\nThis offer requires "${offer.product_name}" in your cart.`);
+      showOfferError(`❌ This offer requires "${offer.product_name}" in your cart.`);
       return;
     }
 
     if (isStudentOffer && customerType !== 'Student') {
-      showOfferError('🎓 هذا العرض مخصص للطلاب فقط. الرجاء اختيار فئة "Student" من القائمة أعلاه.\nThis offer is for students only — please select the "Student" category.');
+      showOfferError('🎓 This offer is for students only — please select the "Student" category.');
       return;
     }
 
     if (isEmployeeOffer && customerType !== 'Employee') {
-      showOfferError('🏢 هذا العرض مخصص للموظفين وأعضاء هيئة التدريس فقط.\nThis offer is for staff/faculty/employees only.');
+      showOfferError('🏢 This offer is for staff/faculty/employees only.');
       return;
     }
 
@@ -432,7 +434,7 @@ export default function Checkout({ onClose, onBack }) {
 
   return (
     <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={e => e.stopPropagation()} style={{ maxHeight: '90vh', overflowY: 'auto' }}>
+      <div className={`${styles.modal} ${styles.mainModal}`} onClick={e => e.stopPropagation()}>
         <div className={styles.modalHead}>
           <button className={styles.backBtn} onClick={onBack}><i className="fas fa-arrow-left" /> Back</button>
           <h2 className={styles.modalTitle}>Checkout</h2>
@@ -489,7 +491,7 @@ export default function Checkout({ onClose, onBack }) {
             {/* Order Type Selection */}
             <div className={styles.formSection} style={{ backgroundColor: '#fff', padding: '25px', borderRadius: '20px', border: '1px solid #eee', marginBottom: '25px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
               <label className={styles.label} style={{ fontSize: '1.2rem', color: '#2c1810', marginBottom: '20px', display: 'block', fontWeight: '800', fontFamily: "'DM Serif Display', serif", textAlign: 'center' }}>How would you like to receive your order?</label>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
+              <div className={styles.orderTypeGrid}>
                 <div
                   onClick={() => setOrderType('dine-in')}
                   style={{
@@ -620,9 +622,35 @@ export default function Checkout({ onClose, onBack }) {
             </div>
 
             <div className={styles.formSection}>
-              <div className={styles.field}>
+              <div className={styles.field} style={{ position: 'relative' }}>
                 <label className={styles.label}>Full Name <span style={{ color: 'red' }}>*</span></label>
-                <input name="name" value={form.name} onChange={handleChange} className={styles.input} placeholder="e.g. John Doe" />
+                <input 
+                  name="name" 
+                  value={form.name} 
+                  onChange={handleChange} 
+                  onFocus={() => setShowProfileDropdown(true)}
+                  onBlur={() => setTimeout(() => setShowProfileDropdown(false), 200)}
+                  className={styles.input} 
+                  placeholder="e.g. John Doe" 
+                  autoComplete="off"
+                />
+                {showProfileDropdown && savedProfile && (
+                  <div style={{
+                    position: 'absolute', top: '100%', left: 0, right: 0, 
+                    backgroundColor: '#fff', border: '1px solid #eee', 
+                    borderRadius: '12px', padding: '10px', marginTop: '5px',
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)', zIndex: 10, cursor: 'pointer'
+                  }}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    setForm(f => ({ ...f, ...savedProfile }));
+                    setShowProfileDropdown(false);
+                  }}>
+                    <div style={{ fontSize: '0.8rem', color: '#c4a484', fontWeight: 'bold', marginBottom: '4px' }}>Saved Profile</div>
+                    <div style={{ color: '#2c1810', fontWeight: 'bold' }}>{savedProfile.name}</div>
+                    <div style={{ fontSize: '0.85rem', color: '#666' }}>{savedProfile.phone}</div>
+                  </div>
+                )}
                 {errors.name && <p className={styles.errorMsg}>{errors.name}</p>}
               </div>
               <div className={styles.field}>
@@ -754,19 +782,15 @@ export default function Checkout({ onClose, onBack }) {
                           }}>
                             This Offer Is Not Available For You
                           </div>
-                          {offerError.split('\n').map((line, i) => (
-                            <div key={i} style={{
-                              fontSize: i === 0 ? '0.9rem' : '0.8rem',
-                              color: i === 0 ? '#8B3A2F' : '#999',
-                              lineHeight: 1.6,
-                              marginTop: i === 0 ? 0 : '4px',
-                              direction: i === 0 ? 'rtl' : 'ltr',
-                              textAlign: i === 0 ? 'right' : 'left',
-                              fontWeight: i === 0 ? '600' : '400'
-                            }}>
-                              {line}
-                            </div>
-                          ))}
+                          <div style={{
+                            fontSize: '0.9rem',
+                            color: '#8B3A2F',
+                            lineHeight: 1.6,
+                            textAlign: 'left',
+                            fontWeight: '600'
+                          }}>
+                            {offerError}
+                          </div>
                         </div>
 
                         {/* Dismiss button */}
