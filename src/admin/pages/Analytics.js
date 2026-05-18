@@ -410,6 +410,15 @@ const Analytics = () => {
                   ))}
                 </div>
               )}
+              {topProducts.length > 0 && (
+                <div 
+                  className="premium-row"
+                  onClick={() => setShowAllSoldModal(true)}
+                  style={{ marginTop: '20px', background: 'rgba(196,164,132,0.08)', border: `1px dashed rgba(196,164,132,0.4)`, padding: '20px', borderRadius: '16px', textAlign: 'center', color: '#c4a484', fontWeight: 'bold', fontSize: '1.1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
+                >
+                  View All Sold Products History →
+                </div>
+              )}
             </div>
           </div>
         </>

@@ -1156,8 +1156,25 @@ app.post('/api/ai', async (req, res) => {
     if (!openai) return res.json({ answer: "[Local Mode] AI Assistant is currently unavailable." });
     const now = new Date();
     const currentDateTime = now.toLocaleString('en-GB', { timeZone: 'Asia/Amman' });
-    let context = `You are Sophie, the friendly Barista Bot for CaffAIne. Focus on helping customers with the menu, opening hours (Mon-Fri 07:30-17:00, Sat 09:00-18:00, Sun 10:00-16:00). Current time: ${currentDateTime}.`;
-    const response = await openai.chat.completions.create({ model: 'gpt-4o-mini', messages: [{ role: 'system', content: context }, { role: 'user', content: prompt }], max_tokens: 500 });
+    
+    // Fetch menu to prevent hallucinations
+    const promiseDb = db.promise();
+    const [menuRes] = await promiseDb.query(`SELECT name, price_display FROM menu_items WHERE available = 1`);
+    const menuItems = menuRes.map(m => `${m.name} (${m.price_display})`).join(', ');
+
+    let context = `You are Sophie, the friendly Barista Bot for CaffAIne. Focus on helping customers with the menu, opening hours (Mon-Fri 07:30-17:00, Sat 09:00-18:00, Sun 10:00-16:00). Current time: ${currentDateTime}.
+Menu: ${menuItems}
+CRITICAL RULES:
+1. Do NOT invent, hallucinate, or guess any information. If you don't know, simply apologize and say you don't have that information.
+2. You MUST answer in Arabic if the user's question is in Arabic.
+3. Only recommend items from the Menu above.`;
+
+    const response = await openai.chat.completions.create({ 
+      model: 'gpt-4o-mini', 
+      messages: [{ role: 'system', content: context }, { role: 'user', content: prompt }], 
+      max_tokens: 500,
+      temperature: 0.0
+    });
     res.json({ answer: response.choices[0].message.content });
   } catch (err) {
     res.status(500).json({ error: 'AI service failure' });
@@ -1472,7 +1489,11 @@ Recent: ${recentFeedback.map(f => `${f.reviewer_name} (${f.rating}/5): "${f.comm
 === TEAM ACTIVITY ===
 ${teamActivity.map(log => `[${log.time}] ${log.admin_name}: ${log.action} — ${log.details}`).join('\n')}
 
-Rule: Answer ONLY from the data above. Be precise and professional. All monetary figures are strictly in Jordanian Dinars (JOD). Do not use £ or GBP. Always specify prices and calculations in JOD.`;
+Rule: Answer ONLY from the data above. Be precise and professional. All monetary figures are strictly in Jordanian Dinars (JOD). Do not use £ or GBP. Always specify prices and calculations in JOD.
+CRITICAL RULES:
+1. Do NOT invent, hallucinate, or guess any information. If the answer is not explicitly in the data above, you MUST say "I don't have that information."
+2. You MUST answer in Arabic if the user's question is in Arabic.
+3. Ensure 100% factual accuracy based solely on the provided context.`;
       } catch (dbError) {
         console.error('[AI] Data Merge Error:', dbError);
         businessContext = `You are the CaffAIne BI Assistant. System status: Operational. Please ask your business questions.`;
@@ -1496,7 +1517,7 @@ Rule: Answer ONLY from the data above. Be precise and professional. All monetary
       model: 'gpt-4o-mini', 
       messages: aiMessages, 
       max_tokens: 500,
-      temperature: 0.7
+      temperature: 0.0
     });
     return res.json({ reply: completion.choices[0]?.message?.content || "I'm a bit stuck! Reach us at hello@CaffAInecoffee.co.uk âک•" });
   } catch (error) {
