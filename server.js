@@ -1426,13 +1426,9 @@ app.post('/api/ai-chat', async (req, res) => {
           /* 16 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(created_at, '%H:%i') as time FROM orders WHERE DATE(created_at) = CURDATE() ORDER BY created_at DESC`),
           /* 17 */ promiseDb.query(`SELECT mi.name as product, ROUND(AVG(pr.rating),1) as rating, COUNT(pr.id) as count FROM menu_items mi LEFT JOIN product_reviews pr ON mi.id = pr.product_id GROUP BY mi.id HAVING count > 0`),
           /* 18 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(created_at, '%H:%i') as time FROM orders WHERE DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY) ORDER BY created_at DESC`),
-          /* 19 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i') as time FROM orders ORDER BY created_at DESC LIMIT 150`),
+          /* 19 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(created_at, '%Y-%m-%d') as date, DATE_FORMAT(created_at, '%H:%i') as time FROM orders ORDER BY created_at DESC`),
           /* 20 */ promiseDb.query(`SELECT COUNT(*) as month_orders, COALESCE(SUM(total_amount),0) as month_revenue FROM orders WHERE YEAR(created_at) = YEAR(CURDATE()) AND MONTH(created_at) = MONTH(CURDATE())`),
-          /* 21 */ promiseDb.query(`SELECT COUNT(*) as total_messages FROM contact_messages`),
-          /* 22 */ promiseDb.query(`SELECT COUNT(*) as d2_orders, COALESCE(SUM(total_amount),0) as d2_revenue FROM orders WHERE DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 2 DAY)`),
-          /* 23 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(created_at, '%H:%i') as time FROM orders WHERE DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 2 DAY) ORDER BY created_at DESC`),
-          /* 24 */ promiseDb.query(`SELECT COUNT(*) as d3_orders, COALESCE(SUM(total_amount),0) as d3_revenue FROM orders WHERE DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 3 DAY)`),
-          /* 25 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(created_at, '%H:%i') as time FROM orders WHERE DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 3 DAY) ORDER BY created_at DESC`)
+          /* 21 */ promiseDb.query(`SELECT COUNT(*) as total_messages FROM contact_messages`)
         ]);
 
         const getRes = (idx, def = []) => (results[idx] && results[idx].status === 'fulfilled' ? results[idx].value[0] : def);
@@ -1456,20 +1452,23 @@ app.post('/api/ai-chat', async (req, res) => {
         const todayOrders     = getRes(16);
         const productRatings  = getRes(17);
         const yesterdayOrders = getRes(18);
-        const recentOrdersDetail = getRes(19);
+        const recentOrdersDetail = getRes(19); // all orders last 15 days with date
         const thisMonthRow    = getRes(20, [{month_orders:0, month_revenue:0}])[0];
         const totalMessagesRow = getRes(21, [{total_messages:0}])[0];
-        const d2Row           = getRes(22, [{d2_orders:0, d2_revenue:0}])[0];
-        const d2Orders        = getRes(23);
-        const d3Row           = getRes(24, [{d3_orders:0, d3_revenue:0}])[0];
-        const d3Orders        = getRes(25);
 
-        // Calculate date labels for day-2 and day-3
-        const d2Date = new Date(); d2Date.setDate(d2Date.getDate() - 2);
-        const d3Date = new Date(); d3Date.setDate(d3Date.getDate() - 3);
-        const fmt = (d) => d.toLocaleDateString('en-CA'); // YYYY-MM-DD
-        const d2Label = fmt(d2Date);
-        const d3Label = fmt(d3Date);
+        // Group last-15-days orders by date for easy AI lookup
+        const ordersByDate = {};
+        recentOrdersDetail.forEach(o => {
+          if (!ordersByDate[o.date]) ordersByDate[o.date] = [];
+          ordersByDate[o.date].push(o);
+        });
+        const ordersPerDateText = Object.entries(ordersByDate)
+          .sort((a,b) => b[0].localeCompare(a[0]))
+          .map(([date, orders]) => {
+            const rev = orders.reduce((s, o) => s + parseFloat(o.total_amount || 0), 0);
+            const detail = orders.map(o => `${o.customer_name} JOD${o.total_amount} (${o.status}) at ${o.time}`).join(' | ');
+            return `[${date}] ${orders.length} orders | JOD${rev.toFixed(2)} revenue\n  ${detail}`;
+          }).join('\n');
 
         const lowStock = inventory.filter(i => i.stock_status === 'LOW');
         const okStock  = inventory.filter(i => i.stock_status === 'OK');
@@ -1485,13 +1484,8 @@ Orders Detail: ${todayOrders.map(o => `${o.customer_name} JOD${o.total_amount} (
 Revenue: JOD${parseFloat(yesterdayRow.yesterday_revenue).toFixed(2)} | Orders: ${yesterdayRow.yesterday_orders}
 Orders Detail: ${yesterdayOrders.map(o => `${o.customer_name} JOD${o.total_amount} (${o.status}) at ${o.time}`).join(' | ') || 'None'}
 
-=== DAY BEFORE YESTERDAY (${d2Label}) ===
-Revenue: JOD${parseFloat(d2Row.d2_revenue).toFixed(2)} | Orders: ${d2Row.d2_orders}
-Orders Detail: ${d2Orders.map(o => `${o.customer_name} JOD${o.total_amount} (${o.status}) at ${o.time}`).join(' | ') || 'None'}
-
-=== 3 DAYS AGO (${d3Label}) ===
-Revenue: JOD${parseFloat(d3Row.d3_revenue).toFixed(2)} | Orders: ${d3Row.d3_orders}
-Orders Detail: ${d3Orders.map(o => `${o.customer_name} JOD${o.total_amount} (${o.status}) at ${o.time}`).join(' | ') || 'None'}
+=== ALL ORDERS - FULL HISTORY (grouped by date — use this to answer ANY date question) ===
+${ordersPerDateText || 'No orders in last 15 days'}
 
 === THIS MONTH ===
 Revenue: JOD${parseFloat(thisMonthRow.month_revenue).toFixed(2)} | Orders: ${thisMonthRow.month_orders}
@@ -1500,7 +1494,6 @@ Revenue: JOD${parseFloat(thisMonthRow.month_revenue).toFixed(2)} | Orders: ${thi
 Total Revenue: JOD${allTime.total_revenue} | Total Orders: ${allTime.total_orders}
 Best Day Ever: ${bestDay ? `${bestDay.best_date}: JOD${bestDay.daily_rev}` : 'N/A'}
 By Status: ${orderStatuses.map(s => `${s.status}: ${s.count}`).join(', ')}
-Recent Orders List (Last 150): ${recentOrdersDetail.map(o => `${o.customer_name} JOD${o.total_amount} (${o.status}) at ${o.time}`).join(' | ') || 'None'}
 
 === TOP PRODUCTS ===
 ${topProducts.map((p,i) => `${i+1}. ${p.name} (${p.sold} sold)`).join(' | ')}
