@@ -24,7 +24,7 @@ export default function Checkout({ onClose, onBack }) {
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [offerError, setOfferError] = useState(null);
 
-  const [savedProfile, setSavedProfile] = useState(null);
+  const [savedProfiles, setSavedProfiles] = useState([]);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
   const formatPrice = (n) => {
@@ -46,24 +46,29 @@ export default function Checkout({ onClose, onBack }) {
       })
       .catch(err => console.error('Error fetching offers:', err));
 
-    // Load saved customer info
-    const savedName = localStorage.getItem('caffaine_customer_name');
-    const savedPhone = localStorage.getItem('caffaine_customer_phone');
-    const savedEmail = localStorage.getItem('caffaine_customer_email');
-    const savedCardNumber = localStorage.getItem('caffaine_customer_cardNumber');
-    const savedExpiry = localStorage.getItem('caffaine_customer_expiry');
-    const savedCvc = localStorage.getItem('caffaine_customer_cvc');
-
-    if (savedName) {
-      setSavedProfile({
-        name: savedName,
-        phone: savedPhone || '',
-        email: savedEmail || '',
-        cardNumber: savedCardNumber || '',
-        expiry: savedExpiry || '',
-        cvc: savedCvc || ''
-      });
-    }
+    // Load saved customer profiles (array)
+    try {
+      const raw = localStorage.getItem('caffaine_profiles');
+      if (raw) {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr) && arr.length > 0) setSavedProfiles(arr);
+      } else {
+        // Migrate old single-profile format
+        const savedName = localStorage.getItem('caffaine_customer_name');
+        if (savedName) {
+          const legacy = {
+            name: savedName,
+            phone: localStorage.getItem('caffaine_customer_phone') || '',
+            email: localStorage.getItem('caffaine_customer_email') || '',
+            cardNumber: localStorage.getItem('caffaine_customer_cardNumber') || '',
+            expiry: localStorage.getItem('caffaine_customer_expiry') || '',
+            cvc: localStorage.getItem('caffaine_customer_cvc') || ''
+          };
+          setSavedProfiles([legacy]);
+          localStorage.setItem('caffaine_profiles', JSON.stringify([legacy]));
+        }
+      }
+    } catch(e) {}
   }, []);
 
   const showOfferError = (msg) => {
@@ -302,13 +307,27 @@ export default function Checkout({ onClose, onBack }) {
       clearCart();
       setStep('success');
 
-      // Save customer info for next time locally (not in database)
-      localStorage.setItem('caffaine_customer_name', form.name);
-      localStorage.setItem('caffaine_customer_phone', form.phone);
-      localStorage.setItem('caffaine_customer_email', form.email);
-      localStorage.setItem('caffaine_customer_cardNumber', form.cardNumber);
-      localStorage.setItem('caffaine_customer_expiry', form.expiry);
-      localStorage.setItem('caffaine_customer_cvc', form.cvc);
+      // Save customer info — add to profiles array (no duplicates by name)
+      try {
+        const raw = localStorage.getItem('caffaine_profiles');
+        let profiles = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(profiles)) profiles = [];
+        const newProfile = {
+          name: form.name.trim(),
+          phone: form.phone.trim(),
+          email: form.email.trim(),
+          cardNumber: form.cardNumber,
+          expiry: form.expiry,
+          cvc: form.cvc
+        };
+        // Remove old entry with same name, then add updated one at top
+        profiles = profiles.filter(p => p.name.toLowerCase() !== newProfile.name.toLowerCase());
+        profiles.unshift(newProfile);
+        // Keep max 10 profiles
+        if (profiles.length > 10) profiles = profiles.slice(0, 10);
+        localStorage.setItem('caffaine_profiles', JSON.stringify(profiles));
+        setSavedProfiles(profiles);
+      } catch(e) {}
 
       // Submit feedback if a rating was given (only once)
       if (storeRating > 0 || storeComment.trim()) {
@@ -634,21 +653,33 @@ export default function Checkout({ onClose, onBack }) {
                   placeholder="e.g. John Doe" 
                   autoComplete="off"
                 />
-                {showProfileDropdown && savedProfile && (
+                {showProfileDropdown && savedProfiles.length > 0 && (
                   <div style={{
-                    position: 'absolute', top: '100%', left: 0, right: 0, 
-                    backgroundColor: '#fff', border: '1px solid #eee', 
-                    borderRadius: '12px', padding: '10px', marginTop: '5px',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)', zIndex: 10, cursor: 'pointer'
-                  }}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    setForm(f => ({ ...f, ...savedProfile }));
-                    setShowProfileDropdown(false);
+                    position: 'absolute', top: '100%', left: 0, right: 0,
+                    backgroundColor: '#fff', border: '1px solid #eee',
+                    borderRadius: '12px', padding: '8px', marginTop: '5px',
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)', zIndex: 10,
+                    maxHeight: '220px', overflowY: 'auto'
                   }}>
-                    <div style={{ fontSize: '0.8rem', color: '#c4a484', fontWeight: 'bold', marginBottom: '4px' }}>Saved Profile</div>
-                    <div style={{ color: '#2c1810', fontWeight: 'bold' }}>{savedProfile.name}</div>
-                    <div style={{ fontSize: '0.85rem', color: '#666' }}>{savedProfile.phone}</div>
+                    <div style={{ fontSize: '0.75rem', color: '#c4a484', fontWeight: 'bold', padding: '4px 8px 8px' }}>Saved Profiles</div>
+                    {savedProfiles.map((profile, idx) => (
+                      <div key={idx}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          setForm(f => ({ ...f, ...profile }));
+                          setShowProfileDropdown(false);
+                        }}
+                        style={{
+                          padding: '10px 12px', cursor: 'pointer', borderRadius: '8px',
+                          transition: 'background 0.2s'
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.background = 'rgba(196,164,132,0.1)'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                      >
+                        <div style={{ color: '#2c1810', fontWeight: 'bold', fontSize: '0.9rem' }}>{profile.name}</div>
+                        <div style={{ fontSize: '0.78rem', color: '#666' }}>{profile.phone}{profile.email ? ` • ${profile.email}` : ''}</div>
+                      </div>
+                    ))}
                   </div>
                 )}
                 {errors.name && <p className={styles.errorMsg}>{errors.name}</p>}
