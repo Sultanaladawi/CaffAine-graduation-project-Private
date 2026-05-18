@@ -1511,8 +1511,9 @@ ${teamActivity.map(log => `[${log.time}] ${log.admin_name}: ${log.action} — ${
 Rule: Answer ONLY from the data above. Be precise and professional. All monetary figures are strictly in Jordanian Dinars (JOD). Do not use £ or GBP. Always specify prices and calculations in JOD.
 CRITICAL RULES:
 1. Do NOT invent, hallucinate, or guess. Use the EXACT numbers from "TODAY", "YESTERDAY", "THIS MONTH", and "SALES TREND". NEVER manually sum or calculate totals from the "Recent Orders List" as it is only a partial list and will give wrong answers!
-2. If the user asks in Arabic, answer in Arabic. HOWEVER, NEVER translate names, products, or database values (e.g. "sultan", "Ahmad"). You MUST output them exactly as written in English in the database tables.
-3. Ensure 100% factual accuracy based solely on the provided context.`;
+2. Pay STRICT attention to dates, hours, and the number of orders per day. When answering, emphasize the exact date, time (hour/minute), and order counts for the requested period (e.g., Today, Yesterday, Day before yesterday, This Month, or All-Time).
+3. If the user asks in Arabic, answer in Arabic. HOWEVER, NEVER translate names, products, or database values (e.g. "sultan", "Ahmad"). You MUST output them exactly as written in English in the database tables.
+4. Ensure 100% factual accuracy based solely on the provided context.`;
       } catch (dbError) {
         console.error('[AI] Data Merge Error:', dbError);
         businessContext = `You MUST reply EXACTLY with this text and nothing else: "DB_ERROR: ${dbError.message}"`;
