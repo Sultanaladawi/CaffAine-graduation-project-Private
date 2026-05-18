@@ -1510,7 +1510,7 @@ ${teamActivity.map(log => `[${log.time}] ${log.admin_name}: ${log.action} — ${
 
 Rule: Answer ONLY from the data above. Be precise and professional. All monetary figures are strictly in Jordanian Dinars (JOD). Do not use £ or GBP. Always specify prices and calculations in JOD.
 CRITICAL RULES:
-1. Do NOT invent, hallucinate, or guess any information. If the answer is not explicitly in the data above, you MUST say "I don't have that information."
+1. Do NOT invent or guess any information. However, you HAVE daily sales data for the last 15 days in the "SALES TREND" section, and recent order details in the "Recent Orders List" section. If the user asks for sales on a specific date (e.g. May 16), calculate or read it from these sections. DO NOT refuse to answer if the data exists.
 2. You MUST answer in Arabic if the user's question is in Arabic.
 3. Ensure 100% factual accuracy based solely on the provided context.`;
       } catch (dbError) {
