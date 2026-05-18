@@ -248,7 +248,7 @@ const AIAssistant = () => {
                 {msg.type === 'user' ? <BsPerson color={theme.crema} size={20} /> : <BsCpu color={theme.espresso} size={20} />}
               </div>
               <div style={{ background: msg.type === 'user' ? theme.crema : theme.espresso, color: msg.type === 'user' ? theme.espresso : theme.latte, padding: '15px 20px', borderRadius: '18px', border: `1px solid ${theme.border}` }}>
-                <div style={{ fontSize: '0.95rem', whiteSpace: 'pre-wrap' }}>{msg.text}</div>
+                <div dir="auto" style={{ fontSize: '0.95rem', whiteSpace: 'pre-wrap' }}>{msg.text}</div>
                 
                 {msg.type === 'bot' && msg.text !== '...' && (
                   <button 
@@ -309,7 +309,7 @@ const AIAssistant = () => {
           >
             <BsMicFill color={isListening ? "#e74a3b" : theme.crema} size={20} className={isListening ? "animate-pulse" : ""} />
           </button>
-          <textarea value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())} style={{ flex: 1, background: 'transparent', border: 'none', color: '#fff', outline: 'none', padding: '10px', resize: 'none', fontSize: '0.95rem' }} placeholder="Ask about sales, stock or trends..." />
+          <textarea dir="auto" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())} style={{ flex: 1, background: 'transparent', border: 'none', color: '#fff', outline: 'none', padding: '10px', resize: 'none', fontSize: '0.95rem' }} placeholder="Ask about sales, stock or trends..." />
           <button onClick={handleSend} style={{ background: theme.crema, border: 'none', width: '50px', height: '50px', borderRadius: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <BsSendFill color={theme.espresso} size={20} />
           </button>
@@ -357,7 +357,7 @@ const AIAssistant = () => {
                   </div>
                   <span style={{ color: theme.crema, fontSize: '0.85rem', fontWeight: 'bold' }}>Customer</span>
                 </div>
-                <p style={{ color: theme.latte, fontSize: '0.85rem', margin: '0 0 10px 0', paddingLeft: '34px' }}>{q.user_msg}</p>
+                <p dir="auto" style={{ color: theme.latte, fontSize: '0.85rem', margin: '0 0 10px 0', paddingLeft: '34px' }}>{q.user_msg}</p>
                 
                 <div style={{ display: 'flex', gap: '10px', marginTop: '12px', borderTop: `1px dotted ${theme.border}`, paddingTop: '10px' }}>
                   <div style={{ background: theme.crema, width: '24px', height: '24px', borderRadius: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -365,7 +365,7 @@ const AIAssistant = () => {
                   </div>
                   <span style={{ color: theme.latte, fontSize: '0.75rem', fontStyle: 'italic' }}>Sophie's Reply:</span>
                 </div>
-                <p style={{ color: theme.latte, fontSize: '0.8rem', margin: '5px 0 0', paddingLeft: '34px', opacity: 0.8 }}>{q.ai_msg}</p>
+                <p dir="auto" style={{ color: theme.latte, fontSize: '0.8rem', margin: '5px 0 0', paddingLeft: '34px', opacity: 0.8 }}>{q.ai_msg}</p>
                 <div style={{ fontSize: '0.6rem', color: '#444', textAlign: 'right', marginTop: '8px' }}>
                   {new Date(q.created_at).toLocaleString()}
                 </div>
