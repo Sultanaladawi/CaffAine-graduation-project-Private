@@ -168,6 +168,17 @@ app.get('/api/ping', (req, res) => {
   res.json({ status: 'ok', message: 'Server is reaching here' });
 });
 
+app.get('/api/fix-db-times', async (req, res) => {
+  try {
+    const promiseDb = db.promise ? db.promise() : db;
+    const [r1] = await promiseDb.query("UPDATE orders SET created_at = DATE_ADD(created_at, INTERVAL 2 HOUR) WHERE created_at < '2026-05-18 00:00:00'");
+    const [r2] = await promiseDb.query("UPDATE contact_messages SET created_at = DATE_ADD(created_at, INTERVAL 2 HOUR) WHERE created_at < '2026-05-18 00:00:00'");
+    res.json({ success: true, orders_updated: r1.affectedRows, messages_updated: r2.affectedRows });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',

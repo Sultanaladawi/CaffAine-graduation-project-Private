@@ -209,9 +209,9 @@ const Messages = () => {
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {messages.length > 0 ? messages.map((msg) => (
             <div key={msg.id} className="premium-row" style={{ 
-              backgroundColor: msg.is_read ? colors.bean : 'rgba(196,164,132,0.1)', 
+              backgroundColor: colors.bean, 
               borderRadius: '20px', 
-              border: `1px solid ${msg.is_read ? colors.border : colors.crema}`,
+              border: `1px solid ${colors.border}`,
               padding: '25px',
               display: 'flex',
               flexDirection: 'column',
