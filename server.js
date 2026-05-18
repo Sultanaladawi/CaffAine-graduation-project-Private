@@ -1496,7 +1496,7 @@ CRITICAL RULES:
 3. Ensure 100% factual accuracy based solely on the provided context.`;
       } catch (dbError) {
         console.error('[AI] Data Merge Error:', dbError);
-        businessContext = `You are the CaffAIne BI Assistant. System status: Operational. Please ask your business questions.`;
+        businessContext = `You MUST reply EXACTLY with this text and nothing else: "DB_ERROR: ${dbError.message}"`;
       }
     } else {
       const [menuRes] = await promiseDb.query(`SELECT name, price_display FROM menu_items WHERE available = 1`);
