@@ -1415,7 +1415,9 @@ app.post('/api/ai-chat', async (req, res) => {
           /* 16 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(created_at, '%H:%i') as time FROM orders WHERE DATE(created_at) = CURDATE() ORDER BY created_at DESC`),
           /* 17 */ promiseDb.query(`SELECT mi.name as product, ROUND(AVG(pr.rating),1) as rating, COUNT(pr.id) as count FROM menu_items mi LEFT JOIN product_reviews pr ON mi.id = pr.product_id GROUP BY mi.id HAVING count > 0`),
           /* 18 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(created_at, '%H:%i') as time FROM orders WHERE DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY) ORDER BY created_at DESC`),
-          /* 19 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i') as time FROM orders ORDER BY created_at DESC LIMIT 150`)
+          /* 19 */ promiseDb.query(`SELECT customer_name, total_amount, status, order_type, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i') as time FROM orders ORDER BY created_at DESC LIMIT 150`),
+          /* 20 */ promiseDb.query(`SELECT COUNT(*) as month_orders, COALESCE(SUM(total_amount),0) as month_revenue FROM orders WHERE YEAR(created_at) = YEAR(CURDATE()) AND MONTH(created_at) = MONTH(CURDATE())`),
+          /* 21 */ promiseDb.query(`SELECT COUNT(*) as total_messages FROM contact_messages`)
         ]);
 
         const getRes = (idx, def = []) => (results[idx] && results[idx].status === 'fulfilled' ? results[idx].value[0] : def);
@@ -1440,6 +1442,8 @@ app.post('/api/ai-chat', async (req, res) => {
         const productRatings  = getRes(17);
         const yesterdayOrders = getRes(18);
         const recentOrdersDetail = getRes(19);
+        const thisMonthRow    = getRes(20, [{month_orders:0, month_revenue:0}])[0];
+        const totalMessagesRow = getRes(21, [{total_messages:0}])[0];
 
         const lowStock = inventory.filter(i => i.stock_status === 'LOW');
         const okStock  = inventory.filter(i => i.stock_status === 'OK');
@@ -1454,6 +1458,9 @@ Orders Detail: ${todayOrders.map(o => `${o.customer_name} JOD${o.total_amount} (
 === YESTERDAY ===
 Revenue: JOD${parseFloat(yesterdayRow.yesterday_revenue).toFixed(2)} | Orders: ${yesterdayRow.yesterday_orders}
 Orders Detail: ${yesterdayOrders.map(o => `${o.customer_name} JOD${o.total_amount} (${o.status}) at ${o.time}`).join(' | ') || 'None'}
+
+=== THIS MONTH ===
+Revenue: JOD${parseFloat(thisMonthRow.month_revenue).toFixed(2)} | Orders: ${thisMonthRow.month_orders}
 
 === ALL-TIME & HISTORY ===
 Total Revenue: JOD${allTime.total_revenue} | Total Orders: ${allTime.total_orders}
@@ -1479,7 +1486,7 @@ Ratings: ${productRatings.map(p => `${p.product}: ${p.rating}⭐️ (${p.count} 
 ${offers.filter(o => o.active == 1).map(o => `${o.product_name}: ${o.discount_percent}% OFF (${o.reason})`).join(' | ') || 'No active offers'}
 
 === MESSAGES & JOBS ===
-Recent Messages: ${messages.map(m => `[${m.date}] ${m.name}: "${m.message}"`).join(' | ') || 'None'}
+Recent Messages (Total ${totalMessagesRow.total_messages} messages): ${messages.map(m => `[${m.date}] ${m.name}: "${m.message}"`).join(' | ') || 'None'}
 Job Applications: ${applications.map(a => `${a.name} for ${a.position} (${a.status})`).join(' | ') || 'None'}
 Active Listings: ${activeJobs.map(j => `${j.title} (${j.type}) in ${j.location}`).join(', ') || 'None'}
 
