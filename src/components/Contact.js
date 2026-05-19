@@ -82,7 +82,7 @@ export default function Contact() {
                   <i className="fas fa-map-marker-alt" />
                   <div>
                     <strong>Location</strong>
-                    <p>{shopInfo.address}, {shopInfo.city}</p>
+                    <p>{shopInfo.address}</p>
                   </div>
                </div>
                <div className={styles.detailItem}>

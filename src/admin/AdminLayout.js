@@ -244,7 +244,7 @@ const AdminLayout = () => {
           }}>
             Caff<span style={{ color: 'var(--admin-accent)' }}>AIne</span>
           </h1>
-          <div style={{ fontSize: '0.7rem', color: 'var(--admin-accent)', letterSpacing: '3px', marginTop: '4px', opacity: 0.8 }}>COFFEE.</div>
+          <div style={{ fontSize: '0.7rem', color: 'var(--admin-accent)', letterSpacing: '3px', marginTop: '4px', opacity: 0.8 }}>COFFEE</div>
         </div>
 
         <nav style={{ marginTop: '20px', flexGrow: 1, overflowY: 'auto', paddingBottom: '20px' }}>

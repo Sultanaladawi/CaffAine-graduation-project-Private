@@ -121,7 +121,7 @@ function Tags({ tags = [], linkedTags = [] }) {
               e.currentTarget.style.boxShadow = cfg.glow ? `0 0 15px ${cfg.border}40` : '0 4px 10px rgba(0,0,0,0.2)';
             }}
           >
-            <span style={{ fontSize: '0.9rem', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}>{cfg.emoji}</span>
+            <span className={styles.emojiIcon} style={{ fontSize: '0.9rem' }}>{cfg.emoji}</span>
             <span style={{ position: 'relative', zIndex: 1 }}>{tag.trim()}</span>
           </span>
         );
@@ -473,10 +473,7 @@ export default function Menu() {
       <div ref={fullRef} className={`section-wrap ${styles.fullMenu} reveal ${fullVis ? 'vis' : ''}`}>
         
         {/* Search Bar - Modern & Glassy */}
-        <div style={{ 
-          maxWidth: '600px', margin: '15px auto 5px auto', position: 'relative',
-          padding: '0 15px'
-        }}>
+        <div className={styles.searchBarWrap}>
           <div style={{
             position: 'absolute', left: '30px', top: '50%', transform: 'translateY(-50%)',
             color: 'var(--espresso)', opacity: 0.6, pointerEvents: 'none', zIndex: 5
@@ -507,12 +504,10 @@ export default function Menu() {
             onFocus={(e) => {
               e.currentTarget.style.borderColor = 'var(--espresso)';
               e.currentTarget.style.boxShadow = '0 15px 35px rgba(196, 164, 132, 0.15)';
-              e.currentTarget.style.transform = 'translateY(-2px)';
             }}
             onBlur={(e) => {
               e.currentTarget.style.borderColor = 'rgba(196, 164, 132, 0.2)';
               e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.03)';
-              e.currentTarget.style.transform = 'translateY(0)';
             }}
           />
           

@@ -6,7 +6,7 @@
     "client": "react-scripts start",
     "server": "node server.js",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "build": "CI=false react-scripts build"
+    "build": "react-scripts build"
   },
   "dependencies": {
     "@studio-freight/lenis": "^1.0.42",
@@ -24,6 +24,7 @@
     "nodemon": "^3.1.14",
     "openai": "^6.34.0",
     "pdf-parse": "^2.4.5",
+    "pptxgenjs": "^4.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.6.0",

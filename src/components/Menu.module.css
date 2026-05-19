@@ -47,7 +47,7 @@
 .featuredGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.2rem;
+  gap: 1.5rem;
   margin-bottom: 4.5rem;
 }
 
@@ -245,6 +245,13 @@
   transform: scale(1.15);
 }
 
+.searchBarWrap {
+  max-width: 600px;
+  margin: 15px auto 5px auto;
+  position: relative;
+  padding: 0 15px;
+}
+
 .loader {
   text-align: center;
   padding: 3rem;
@@ -255,20 +262,121 @@
 
 @media (max-width: 768px) {
   .menu { padding: 4rem 0; }
-  .item {
-    padding: 1rem;
+
+  /* ── Featured Grid: 2 columns on mobile ── */
+  .featuredGrid {
+    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
+    padding: 0 1rem;
+    margin-bottom: 2.5rem;
   }
+
+  .featCard {
+    border-radius: 16px;
+  }
+
+  .featImg {
+    height: 140px;
+  }
+
+  .featBody {
+    padding: 0.85rem 0.95rem 1rem;
+  }
+
+  .featName {
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+    /* Allow wrapping on small cards */
+    white-space: normal;
+    line-height: 1.25;
+  }
+
+  .featFooter {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .featPrice {
+    font-size: 1rem;
+  }
+
+  .featAddBtn {
+    padding: 0.4rem 0.85rem;
+    font-size: 0.7rem;
+  }
+
+  /* ── Full Menu Items: no transform hover on touch ── */
+  .item {
+    padding: 0.9rem 1rem;
+    gap: 0.9rem;
+    /* Remove hover lift on mobile (touch devices) */
+  }
+
+  .item:hover {
+    transform: none;
+    box-shadow: none;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  /* Active tap feedback instead */
+  .item:active {
+    background: rgba(196, 164, 132, 0.1);
+    border-radius: 12px;
+  }
+
   .itemName {
     font-size: 0.9rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    line-height: 1.3;
   }
-  .featuredGrid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-    padding: 0 1.5rem;
+
+  .itemDesc {
+    font-size: 0.76rem;
+    line-height: 1.45;
+    /* Clamp description to 2 lines on mobile */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .itemPrice {
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+
+  .addBtnSmall {
+    width: 36px;
+    height: 36px;
+  }
+
+  /* ── Full menu container ── */
+  .fullMenu {
+    border-radius: 16px;
+    margin: 0 0.75rem;
+  }
+
+  /* ── Tab bar: pill style, horizontal scroll, compact ── */
+  .tabBar {
+    padding: 10px 10px 5px;
+    gap: 8px;
+    background: transparent;
+    border-bottom: none;
+  }
+
+  .tab {
+    padding: 0.55rem 1.1rem;
+    font-size: 0.75rem;
+  }
+
+  /* ── Search bar: full width, no translateY on focus (avoids iOS layout shift) ── */
+  .searchBarWrap {
+    max-width: 100%;
+    margin: 12px 10px 5px;
+    padding: 0;
   }
 }
 
@@ -519,4 +627,33 @@
 @keyframes skeletonPulse {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+/* ── Emoji rendering fix: force color emoji on all platforms ── */
+.emojiIcon {
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji',
+               'Android Emoji', EmojiSymbols, sans-serif !important;
+  font-style: normal;
+  display: inline-block;
+  line-height: 1;
+  /* Disable drop-shadow filter that hides emoji on some Android browsers */
+  filter: none !important;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: auto;
+}
+
+/* ── Extra small phones (< 400px): single column featured ── */
+@media (max-width: 400px) {
+  .featuredGrid {
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+  }
+
+  .featImg {
+    height: 160px;
+  }
+
+  .featName {
+    font-size: 1rem;
+  }
 }

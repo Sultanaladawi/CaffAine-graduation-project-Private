@@ -473,3 +473,17 @@ p {
     stroke-dashoffset: 0;
   }
 }
+
+/* Global Color Emoji Stack to prevent broken/square rendering on phones */
+.emojiIcon {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "Android Emoji", EmojiSymbols, -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 1.1em;
+  line-height: 1;
+  display: inline-block;
+  vertical-align: middle;
+  -webkit-text-fill-color: initial !important;
+  color: initial !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+

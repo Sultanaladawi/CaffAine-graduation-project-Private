@@ -1,10 +1,11 @@
 import { useReveal } from '../hooks/useReveal';
 import styles from './About.module.css';
+import { Coffee, Leaf, MapPin, ArrowRight } from 'lucide-react';
 
 const PILLARS = [
-  { icon: 'fa-mug-hot',       title: 'Specialty Only',  desc: 'We serve exclusively specialty-grade coffee, sourced from farms we know and trust.' },
-  { icon: 'fa-leaf',          title: 'Plant-Friendly',  desc: 'Extensive vegan and vegetarian menu options — no compromise on flavour.' },
-  { icon: 'fa-map-marker-alt',title: 'Heart of Al-Salt',   desc: 'Located at Al-Balqa Applied University — a calm refuge from the academic hustle.' },
+  { icon: <Coffee size={22} />,       title: 'Specialty Only',  desc: 'We serve exclusively specialty-grade coffee, sourced from farms we know and trust.' },
+  { icon: <Leaf size={22} />,          title: 'Plant-Friendly',  desc: 'Extensive vegan and vegetarian menu options — no compromise on flavour.' },
+  { icon: <MapPin size={22} />,title: 'Heart of Al-Salt',   desc: 'A city in Al-Balqa Governorate — located at Al-Balqa Applied University, a calm refuge from the academic hustle.' },
 ];
 
 export default function About() {
@@ -60,8 +61,8 @@ export default function About() {
               to be part of the city's growing independent food and drink scene.
             </p>
 
-            <a href="#contact" className="btn btn-outline" style={{ marginTop: '1.6rem' }}>
-              Visit Us <i className="fas fa-arrow-right" />
+            <a href="#contact" className="btn btn-outline" style={{ marginTop: '1.6rem', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+              Visit Us <ArrowRight size={16} />
             </a>
           </div>
         </div>
@@ -69,7 +70,7 @@ export default function About() {
         <div ref={pilRef} className={`${styles.pillars} reveal ${pilVis ? 'vis' : ''}`}>
           {PILLARS.map((p, i) => (
             <div key={p.title} className={styles.pillar} style={{ animationDelay: `${i * 150}ms` }}>
-              <div className={styles.pillarIcon}><i className={`fas ${p.icon}`} /></div>
+              <div className={styles.pillarIcon}>{p.icon}</div>
               <h3 className={styles.pillarTitle}>{p.title}</h3>
               <p className={styles.pillarDesc}>{p.desc}</p>
             </div>
@@ -78,4 +79,4 @@ export default function About() {
       </div>
     </section>
   );
-}
+}

@@ -1014,7 +1014,7 @@ const Products = () => {
       }}>
         <div>
           <div className="header-title" style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: colors.crema, lineHeight: 1 }}>
-            CaffAIne <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee.</span>
+            CaffAIne <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee</span>
           </div>
 
           <div className="page-badge">

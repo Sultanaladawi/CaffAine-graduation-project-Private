@@ -6,7 +6,7 @@ const slidesData = [
   {
     id: 1,
     type: 'title',
-    title: 'CaffAIne Coffee.',
+    title: 'CaffAIne Coffee',
     subtitle: 'Intelligent Management & E-Commerce for Specialty Coffee',
     content: (
       <div style={{ marginTop: '50px', fontSize: '1.4rem', color: '#666', lineHeight: '2' }}>

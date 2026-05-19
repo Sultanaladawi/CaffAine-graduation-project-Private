@@ -47,7 +47,7 @@ export default function Hero() {
           </div>
 
           <h1 className={`display ${styles.headline}`}>
-            Caff<em>AIne</em><br /><span style={{ fontStyle: 'italic', color: '#c4a484' }}>Coffee.</span>
+            Caff<em>AIne</em><br /><span style={{ fontStyle: 'italic', color: '#c4a484' }}>Coffee</span>
           </h1>
 
           <p className={styles.sub}>

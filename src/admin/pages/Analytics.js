@@ -210,7 +210,7 @@ const Analytics = () => {
       {/* Header */}
       <div style={{ position:'relative', zIndex:1, marginBottom:'20px' }}>
         <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:'2.8rem', color:'#c4a484', lineHeight:1 }}>
-          CaffAIne <span style={{ color:'#fff', fontStyle:'italic' }}>Coffee.</span>
+          CaffAIne <span style={{ color: '#fff', fontStyle: 'italic' }}>Coffee</span>
         </div>
         <div className="page-badge">
           <BarChart3 size={28} color="#c4a484" />
