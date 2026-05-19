@@ -165,6 +165,15 @@ const AdminLayout = () => {
     document.body.style.backgroundColor = "var(--admin-bg)";
     document.documentElement.style.backgroundColor = "var(--admin-bg)";
 
+    // Robust scroll-to-top on every navigation
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    const mainContent = document.querySelector('.admin-main') || document.querySelector('main');
+    if (mainContent) {
+      mainContent.scrollTop = 0;
+    }
+
     if (!loading && !admin && location.pathname.startsWith('/admin')) {
       navigate('/admin/login', { replace: true });
     }
