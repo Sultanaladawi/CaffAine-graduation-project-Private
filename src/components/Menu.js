@@ -17,13 +17,14 @@ import { useCart } from '../context/CartContext';
 import styles from './Menu.module.css';
 
 
-const renderCategoryIcon = (iconName, color, size = 18) => {
+const renderCategoryIcon = (iconName) => {
   const name = String(iconName || '').toLowerCase();
-  if (name.includes('coffee') || name.includes('mug') || name.includes('glass-martini')) return <Coffee size={size} color={color} />;
-  if (name.includes('soda') || name.includes('drink') || name.includes('wine') || name.includes('glass')) return <CupSoda size={size} color={color} />;
-  if (name.includes('utensils') || name.includes('food') || name.includes('bread')) return <Utensils size={size} color={color} />;
-  if (name.includes('cookie') || name.includes('sweet') || name.includes('cake') || name.includes('ice-cream')) return <Cookie size={size} color={color} />;
-  return <Coffee size={size} color={color} />;
+  const style = { fontSize: '1.2rem', display: 'inline-block', lineHeight: 1 };
+  if (name.includes('coffee') || name.includes('mug') || name.includes('glass-martini')) return <span className="emojiIcon" style={style}>☕</span>;
+  if (name.includes('soda') || name.includes('drink') || name.includes('wine') || name.includes('glass')) return <span className="emojiIcon" style={style}>🥤</span>;
+  if (name.includes('utensils') || name.includes('food') || name.includes('bread')) return <span className="emojiIcon" style={style}>🥪</span>;
+  if (name.includes('cookie') || name.includes('sweet') || name.includes('cake') || name.includes('ice-cream')) return <span className="emojiIcon" style={style}>🍰</span>;
+  return <span className="emojiIcon" style={style}>☕</span>;
 };
 
 function Tags({ tags = [], linkedTags = [] }) {

@@ -151,7 +151,7 @@ const Analytics = () => {
   ] : [];
 
   const years = [];
-  for (let y = 2024; y <= now.getFullYear(); y++) years.push(y);
+  for (let y = 2026; y <= now.getFullYear(); y++) years.push(y);
 
   const handleSort = (field) => {
     if (sortField === field) {

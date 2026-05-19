@@ -23,6 +23,12 @@
   overflow: hidden;
   box-shadow: 0 24px 60px var(--shadow-lg);
 }
+.imgMain img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 .imgAccent {
   position: absolute;
   bottom: 0; right: 0;
@@ -31,6 +37,12 @@
   overflow: hidden;
   box-shadow: 0 12px 36px var(--shadow-md);
   border: 6px solid var(--cream);
+}
+.imgAccent img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 .badge {
   position: absolute;
