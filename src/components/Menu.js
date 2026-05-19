@@ -1,8 +1,30 @@
 import { useState, useEffect } from 'react';
+import { 
+  Coffee, 
+  CupSoda, 
+  Utensils, 
+  Cookie, 
+  Mic, 
+  Square, 
+  Search, 
+  XCircle, 
+  Plus, 
+  PlusCircle 
+} from 'lucide-react';
 import { featuredItems } from '../data/shopData';
 import { useReveal } from '../hooks/useReveal';
 import { useCart } from '../context/CartContext';
 import styles from './Menu.module.css';
+
+
+const renderCategoryIcon = (iconName, color, size = 18) => {
+  const name = String(iconName || '').toLowerCase();
+  if (name.includes('coffee') || name.includes('mug') || name.includes('glass-martini')) return <Coffee size={size} color={color} />;
+  if (name.includes('soda') || name.includes('drink') || name.includes('wine') || name.includes('glass')) return <CupSoda size={size} color={color} />;
+  if (name.includes('utensils') || name.includes('food') || name.includes('bread')) return <Utensils size={size} color={color} />;
+  if (name.includes('cookie') || name.includes('sweet') || name.includes('cake') || name.includes('ice-cream')) return <Cookie size={size} color={color} />;
+  return <Coffee size={size} color={color} />;
+};
 
 function Tags({ tags = [], linkedTags = [] }) {
   const allTags = linkedTags.length > 0 ? linkedTags.map(t => t.name) : (Array.isArray(tags) ? tags : []);
@@ -478,7 +500,7 @@ export default function Menu() {
             position: 'absolute', left: '30px', top: '50%', transform: 'translateY(-50%)',
             color: 'var(--espresso)', opacity: 0.6, pointerEvents: 'none', zIndex: 5
           }}>
-            <i className="fas fa-search" />
+            <Search size={20} />
           </div>
           <input 
             type="text" 
@@ -523,7 +545,7 @@ export default function Menu() {
                   padding: '5px', fontSize: '1.1rem'
                 }}
               >
-                <i className="fas fa-times-circle" />
+                <XCircle size={20} />
               </button>
             )}
 
@@ -548,7 +570,7 @@ export default function Menu() {
                 boxShadow: listening ? '0 0 15px rgba(255,77,77,0.4)' : 'none'
               }}
             >
-              <i className={`fas ${listening ? 'fa-stop' : 'fa-microphone'}`} />
+              {listening ? <Square size={16} fill="#fff" style={{ color: '#fff' }} /> : <Mic size={16} style={{ color: '#fff' }} />}
             </button>
           </div>
         </div>
@@ -599,7 +621,7 @@ export default function Menu() {
                   }
                 }}
               >
-                <i className={`fas ${cat.icon || 'fa-coffee'}`} style={{ fontSize: '1rem', color: isActive ? '#fff' : catColor }} />
+                {renderCategoryIcon(cat.icon, isActive ? '#fff' : catColor, 18)}
                 <span style={{ letterSpacing: '0.5px' }}>{cat.label}</span>
               </button>
             );
@@ -695,7 +717,7 @@ export default function Menu() {
                           boxShadow: `0 6px 15px ${themeColor}40`
                         }}
                       >
-                        <i className="fas fa-plus" />
+                        <Plus size={16} style={{ color: '#fff' }} />
                       </button>
                     );
                   })()}
@@ -707,7 +729,7 @@ export default function Menu() {
               textAlign: 'center', padding: '60px 20px', color: 'rgba(44, 24, 16, 0.4)',
               backgroundColor: 'rgba(255,255,255,0.4)', borderRadius: '30px', border: '1px dashed rgba(196,164,132,0.3)'
             }}>
-              <i className="fas fa-mug-hot" style={{ fontSize: '3rem', marginBottom: '20px', display: 'block', opacity: 0.3 }} />
+              <Coffee size={60} style={{ margin: '0 auto 20px', display: 'block', opacity: 0.3, color: 'var(--espresso)' }} />
               <h3 style={{ fontSize: '1.2rem', fontWeight: '800', color: 'var(--espresso)' }}>No matches found</h3>
               <p style={{ fontSize: '0.9rem', marginTop: '5px' }}>Try searching for something else or browse categories.</p>
               {searchTerm && (
@@ -736,7 +758,7 @@ export default function Menu() {
                 letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '15px',
                 opacity: 0.6, display: 'flex', alignItems: 'center', gap: '10px'
               }}>
-                <i className="fas fa-plus-circle" /> Available Customizations
+                <PlusCircle size={16} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '6px' }} /> Available Customizations
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
                 {currentViewAddons.map(addon => (
@@ -775,7 +797,7 @@ export default function Menu() {
                       if (priceSpan) priceSpan.style.color = '#8c6a56';
                     }}
                   >
-                    <i className="fas fa-plus" style={{ fontSize: '0.7rem', opacity: 0.7 }} />
+                    <Plus size={12} style={{ opacity: 0.7 }} />
                     <span style={{ fontSize: '0.85rem', fontWeight: '700' }}>{addon.name}</span>
                     <span className="addon-price" style={{ 
                       fontSize: '0.8rem', fontWeight: '900', color: '#8c6a56', 

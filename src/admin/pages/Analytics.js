@@ -527,7 +527,6 @@ const Analytics = () => {
                     <thead>
                       <tr style={{ background: '#1b130e', borderBottom: '1px solid rgba(196, 164, 132, 0.25)' }}>
                         {[
-                          { key: 'product_id', label: 'ID' },
                           { key: 'item_name', label: 'Product Name' },
                           { key: 'unit_price', label: 'Unit Price' },
                           { key: 'total_sold', label: 'Total Sold' },
@@ -565,7 +564,7 @@ const Analytics = () => {
                     <tbody>
                       {filteredProducts.map((p, index) => (
                         <tr 
-                          key={p.product_id}
+                          key={p.item_name}
                           style={{
                             borderBottom: '1px solid rgba(196, 164, 132, 0.1)',
                             backgroundColor: index % 2 === 0 ? 'transparent' : 'rgba(196,164,132,0.02)',
@@ -574,9 +573,6 @@ const Analytics = () => {
                           onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(196,164,132,0.05)'}
                           onMouseLeave={e => e.currentTarget.style.backgroundColor = index % 2 === 0 ? 'transparent' : 'rgba(196,164,132,0.02)'}
                         >
-                          <td style={{ padding: '15px 20px', fontWeight: 'bold', color: 'rgba(255,255,255,0.4)' }}>
-                            #{p.product_id}
-                          </td>
                           <td style={{ padding: '15px 20px', fontWeight: 'bold', color: '#fff' }}>
                             {p.item_name}
                           </td>
