@@ -106,9 +106,9 @@ const Analytics = () => {
             setWeeklyData(buildWeeklyBars(data.dailySales || []));
         } else {
             setWeeklyData(data.dailySales.map(s => ({
-                day: new Date(s.date).toLocaleDateString('en-GB',{day:'2-digit',month:'short'}),
+                day: new Date(s.date).getDate().toString().padStart(2, '0'),
                 total: parseFloat(s.total),
-                fullDate: new Date(s.date).toLocaleDateString('en-GB',{day:'2-digit',month:'short'})
+                fullDate: new Date(s.date).toLocaleDateString('en-GB',{month:'short'})
               })));
         }
       }
@@ -323,8 +323,8 @@ const Analytics = () => {
           </div>
 
           {/* ── Bar Chart + Category Dominance ── */}
-          <div style={{ position:'relative', zIndex:1, display:'grid', gridTemplateColumns:'2fr 1fr', gap:'30px', marginBottom:'30px' }}>
-            <div style={{ background: 'rgba(255,255,255,0.015)', border: `1px solid ${theme.border}`, borderRadius: '35px', padding: '40px', minHeight: '380px', display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 1 }}>
+          <div style={{ position:'relative', zIndex:1, display:'grid', gridTemplateColumns:'2fr 1fr', gap:'16px', marginBottom:'30px' }}>
+            <div style={{ background: 'rgba(255,255,255,0.015)', border: `1px solid ${theme.border}`, borderRadius: '24px', padding: '24px 20px', minHeight: '380px', display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 1 }}>
               <div style={{ marginBottom: '35px' }}>
                 <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: '1.8rem', color: '#fff', margin: 0 }}>
                   {viewMode === 'monthly' ? `Daily Sales — ${MONTH_NAMES[selectedMonth-1]} ${selectedYear}` : viewMode === 'range' ? `Sales: ${rangeFrom} → ${rangeTo}` : 'Last 7 Days Sales'}
@@ -358,7 +358,7 @@ const Analytics = () => {
               </div>
             </div>
 
-            <div style={{ backgroundColor: theme.card, padding:'35px', borderRadius:'24px', border:`1px solid ${theme.border}`, boxShadow:'0 15px 45px rgba(0,0,0,0.3)', display:'flex', flexDirection:'column', alignItems:'center' }}>
+            <div style={{ backgroundColor: theme.card, padding:'24px 20px', borderRadius:'24px', border:`1px solid ${theme.border}`, boxShadow:'0 15px 45px rgba(0,0,0,0.3)', display:'flex', flexDirection:'column', alignItems:'center' }}>
               <h3 style={{ color:'#fff', marginBottom:'30px', fontFamily:'serif', fontSize:'1.5rem', alignSelf:'flex-start' }}>Category Dominance</h3>
               <div style={{ position:'relative', width:'180px', height:'180px', marginBottom:'30px' }}>
                 <div style={{ width:'100%', height:'100%', borderRadius:'50%', background:`conic-gradient(#c4a484 ${topCategory.percentage*3.6}deg, rgba(196,164,132,0.05) 0deg)`, display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 0 30px #c4a48422', transition:'all 1.5s cubic-bezier(0.4,0,0.2,1)' }}>
@@ -377,7 +377,7 @@ const Analytics = () => {
 
           {/* ── Top Selling Products ── */}
           <div style={{ position:'relative', zIndex:1 }}>
-            <div style={{ backgroundColor: theme.card, padding:'35px', borderRadius:'24px', border:`1px solid ${theme.border}`, boxShadow:'0 15px 45px rgba(0,0,0,0.3)' }}>
+            <div style={{ backgroundColor: theme.card, padding:'24px 20px', borderRadius:'24px', border:`1px solid ${theme.border}`, boxShadow:'0 15px 45px rgba(0,0,0,0.3)' }}>
               <h3 style={{ color:'#fff', marginBottom:'5px', fontFamily:'serif', fontSize:'1.5rem' }}>
                 Top Selling Products
               </h3>
@@ -387,7 +387,7 @@ const Analytics = () => {
               {topProducts.length === 0 ? (
                 <div style={{ textAlign:'center', color:'#555', padding:'40px', fontSize:'1rem' }}>No sales data for this period.</div>
               ) : (
-                <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(290px, 1fr))', gap:'20px' }}>
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))', gap:'20px' }}>
                   {topProducts.map((p, i) => (
                     <div key={i} className="premium-row" style={{ background:'rgba(255,255,255,0.02)', padding:'20px', borderRadius:'16px', border:`1px solid ${theme.border}`, display:'flex', alignItems:'center', gap:'15px' }}>
                       <div style={{ width:'42px', height:'42px', borderRadius:'50%', background: i===0 ? 'linear-gradient(135deg,#FFD700,#B8860B)' : i===1 ? 'linear-gradient(135deg,#C0C0C0,#888)' : i===2 ? 'linear-gradient(135deg,#CD7F32,#8B4513)' : 'rgba(196,164,132,0.1)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.1rem', fontWeight:'bold', color: i<3 ? '#000' : '#c4a484', flexShrink:0 }}>
