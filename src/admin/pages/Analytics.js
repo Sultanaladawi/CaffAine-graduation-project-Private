@@ -147,7 +147,7 @@ const Analytics = () => {
     { title: 'Total Orders',     value: stats.totalOrders||0, icon: ShoppingBag, color: '#c4a484', desc: 'Orders Count' },
     { title: 'Avg Order Value',  value: `${parseFloat(stats.avgOrderValue||0).toFixed(2)} JOD`, icon: TrendingUp, color: '#4facfe', desc: 'Per Transaction' },
     { title: 'Active Products',  value: stats.totalProducts || (allTime?.totalProducts||0), icon: BarChart3, color: '#f093fb', desc: 'In Menu' },
-    { title: 'Best Selling',     value: topProducts[0]?.item_name || 'N/A', icon: Zap, color: '#ff9a9e', desc: topProducts[0] ? `${topProducts[0].total_sold} sold · ${parseFloat(topProducts[0].revenue||0).toFixed(2)} JOD` : 'No data' },
+    { title: 'Best Selling',     value: topProducts[0]?.item_name || 'N/A', icon: Zap, color: '#ff9a9e', desc: topProducts[0] ? `${topProducts[0].total_sold} Sold` : 'No data' },
   ] : [];
 
   const years = [];
@@ -297,20 +297,41 @@ const Analytics = () => {
                     boxShadow: isBestSelling ? '0 15px 35px rgba(196,164,132,0.1)' : '0 10px 30px rgba(0,0,0,0.2)',
                     cursor: isBestSelling ? 'pointer' : 'default',
                     position: 'relative',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    minWidth: '0'
                   }}
                 >
-                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
-                    <div style={{ backgroundColor:`${c.color}15`, color:c.color, padding:'8px', borderRadius:'10px' }}>
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap: '8px' }}>
+                    <div style={{ backgroundColor:`${c.color}15`, color:c.color, padding:'8px', borderRadius:'10px', flexShrink: 0 }}>
                       <c.icon size={18} />
                     </div>
-                    <span style={{ color:'#38ef7d', fontSize:'0.65rem', fontWeight:'bold', display:'flex', alignItems:'center', gap:'2px' }}>
-                      <ArrowUpRight size={12} /> {c.desc}
+                    <span 
+                      title={c.desc}
+                      style={{ 
+                        color:'#38ef7d', 
+                        fontSize:'0.65rem', 
+                        fontWeight:'bold', 
+                        display:'flex', 
+                        alignItems:'center', 
+                        gap:'2px',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        maxWidth: '70%',
+                        flexShrink: 0
+                      }}
+                    >
+                      <ArrowUpRight size={12} style={{ flexShrink: 0 }} /> {c.desc}
                     </span>
                   </div>
-                  <div style={{ paddingBottom: isBestSelling ? '8px' : '0px' }}>
+                  <div style={{ paddingBottom: isBestSelling ? '18px' : '0px' }}>
                     <p style={{ color: theme.text, opacity:0.6, fontSize:'0.72rem', textTransform:'uppercase', letterSpacing:'0.5px', margin:0 }}>{c.title}</p>
                     <h3 style={{ color:'#fff', fontSize:'1.25rem', margin:'5px 0 0', fontWeight:'800', wordBreak:'break-word', lineHeight: '1.2' }}>{c.value}</h3>
+                    {isBestSelling && topProducts[0] && (
+                      <div style={{ fontSize: '0.72rem', color: '#38ef7d', fontWeight: 'bold', marginTop: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        JOD {parseFloat(topProducts[0].revenue||0).toFixed(2)} Rev
+                      </div>
+                    )}
                   </div>
                   {isBestSelling && (
                     <div style={{ position:'absolute', bottom:'4px', right:'10px', fontSize:'0.6rem', color:'#c4a484', fontWeight:'bold', display:'flex', alignItems:'center', gap:'2px' }}>
@@ -324,7 +345,7 @@ const Analytics = () => {
 
           {/* ── Bar Chart + Category Dominance ── */}
           <div style={{ position:'relative', zIndex:1, display:'grid', gridTemplateColumns:'2fr 1fr', gap:'16px', marginBottom:'30px' }}>
-            <div style={{ background: 'rgba(255,255,255,0.015)', border: `1px solid ${theme.border}`, borderRadius: '24px', padding: '24px 20px', minHeight: '380px', display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 1 }}>
+            <div style={{ background: 'rgba(255,255,255,0.015)', border: `1px solid ${theme.border}`, borderRadius: '24px', padding: '24px 20px', minHeight: '380px', display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 1, minWidth: '0' }}>
               <div style={{ marginBottom: '35px' }}>
                 <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: '1.8rem', color: '#fff', margin: 0 }}>
                   {viewMode === 'monthly' ? `Daily Sales — ${MONTH_NAMES[selectedMonth-1]} ${selectedYear}` : viewMode === 'range' ? `Sales: ${rangeFrom} → ${rangeTo}` : 'Last 7 Days Sales'}
@@ -358,7 +379,7 @@ const Analytics = () => {
               </div>
             </div>
 
-            <div style={{ backgroundColor: theme.card, padding:'24px 20px', borderRadius:'24px', border:`1px solid ${theme.border}`, boxShadow:'0 15px 45px rgba(0,0,0,0.3)', display:'flex', flexDirection:'column', alignItems:'center' }}>
+            <div style={{ backgroundColor: theme.card, padding:'24px 20px', borderRadius:'24px', border:`1px solid ${theme.border}`, boxShadow:'0 15px 45px rgba(0,0,0,0.3)', display:'flex', flexDirection:'column', alignItems:'center', minWidth: '0' }}>
               <h3 style={{ color:'#fff', marginBottom:'30px', fontFamily:'serif', fontSize:'1.5rem', alignSelf:'flex-start' }}>Category Dominance</h3>
               <div style={{ position:'relative', width:'180px', height:'180px', marginBottom:'30px' }}>
                 <div style={{ width:'100%', height:'100%', borderRadius:'50%', background:`conic-gradient(#c4a484 ${topCategory.percentage*3.6}deg, rgba(196,164,132,0.05) 0deg)`, display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 0 30px #c4a48422', transition:'all 1.5s cubic-bezier(0.4,0,0.2,1)' }}>
