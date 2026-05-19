@@ -648,83 +648,138 @@ export default function Menu() {
               </div>
             ))
           ) : itemsToShow.length > 0 ? (
-            itemsToShow.map((item) => (
-              <div key={item.id} className={styles.item} onClick={() => handleProductClick(item)} style={{ cursor: 'pointer' }}>
-                <div style={{ display: 'flex', gap: '20px', flex: 1 }}>
-                  <div className={styles.itemImageThumb} style={{
-                    width: '70px', height: '70px', borderRadius: '12px',
-                    overflow: 'hidden', flexShrink: 0, backgroundColor: 'rgba(0,0,0,0.05)'
-                  }}>
-                    <img src={getImageUrl(item)} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={handleImageError} />
-                  </div>
-                  <div className={styles.itemLeft}>
-                    <div className={styles.itemName}>{item.name}</div>
-                    <div className={styles.itemDesc}>{item.desc || item.description}</div>
-                    <Tags tags={item.tags} linkedTags={item.linkedTags} />
-                  </div>
-                </div>
-                <div className={styles.itemRight} onClick={e => e.stopPropagation()}>
-                  <div className={styles.itemPrice}>{item.displayPrice || item.price}</div>
-                  {(() => {
-                    const cartItem = items.find(i => String(i.id) === String(item.id));
-                    if (cartItem) {
-                      return (
+            itemsToShow.map((item) => {
+              const isOutOfStock = !!item.isOutOfStock;
+              return (
+                <div 
+                  key={item.id} 
+                  className={styles.item} 
+                  onClick={isOutOfStock ? null : () => handleProductClick(item)} 
+                  style={{ 
+                    cursor: isOutOfStock ? 'not-allowed' : 'pointer',
+                    opacity: isOutOfStock ? 0.75 : 1,
+                    filter: isOutOfStock ? 'grayscale(40%)' : 'none'
+                  }}
+                >
+                  <div style={{ display: 'flex', gap: '20px', flex: 1 }}>
+                    <div className={styles.itemImageThumb} style={{
+                      width: '70px', height: '70px', borderRadius: '12px',
+                      overflow: 'hidden', flexShrink: 0, backgroundColor: 'rgba(0,0,0,0.05)',
+                      position: 'relative'
+                    }}>
+                      <img src={getImageUrl(item)} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={handleImageError} />
+                      {isOutOfStock && (
                         <div style={{
-                          display: 'flex', alignItems: 'center', gap: '8px',
-                          background: `linear-gradient(135deg, ${themeColor}, #2c1810)`,
-                          borderRadius: '50px', padding: '4px 6px',
-                          boxShadow: `0 4px 15px ${themeColor}40`,
-                          animation: 'fadeIn 0.3s ease'
+                          position: 'absolute', inset: 0,
+                          backgroundColor: 'rgba(20, 18, 16, 0.6)',
+                          backdropFilter: 'blur(2px)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center'
                         }}>
-                          <button
-                            onClick={() => cartItem.qty <= 1 ? removeItem(cartItem.id) : setQty(cartItem.id, cartItem.qty - 1)}
-                            style={{
-                              width: '28px', height: '28px', borderRadius: '50%',
-                              border: 'none', background: 'rgba(255,255,255,0.15)',
-                              color: '#fff', fontWeight: '900', fontSize: '1.1rem',
-                              cursor: 'pointer', display: 'flex', alignItems: 'center',
-                              justifyContent: 'center', transition: 'background 0.2s',
-                              lineHeight: 1
-                            }}
-                            onMouseEnter={e => e.currentTarget.style.background='rgba(255,255,255,0.3)'}
-                            onMouseLeave={e => e.currentTarget.style.background='rgba(255,255,255,0.15)'}
-                          >−</button>
                           <span style={{
-                            color: '#fff', fontWeight: '900', fontSize: '0.95rem',
-                            minWidth: '18px', textAlign: 'center'
-                          }}>{cartItem.qty}</span>
-                          <button
-                            onClick={() => setQty(cartItem.id, cartItem.qty + 1)}
-                            style={{
-                              width: '28px', height: '28px', borderRadius: '50%',
-                              border: 'none', background: 'rgba(255,255,255,0.15)',
-                              color: '#fff', fontWeight: '900', fontSize: '1.1rem',
-                              cursor: 'pointer', display: 'flex', alignItems: 'center',
-                              justifyContent: 'center', transition: 'background 0.2s',
-                              lineHeight: 1
-                            }}
-                            onMouseEnter={e => e.currentTarget.style.background='rgba(255,255,255,0.3)'}
-                            onMouseLeave={e => e.currentTarget.style.background='rgba(255,255,255,0.15)'}
-                          >+</button>
+                            color: '#fff', fontSize: '0.55rem', fontWeight: '900',
+                            letterSpacing: '0.5px', textTransform: 'uppercase',
+                            background: 'rgba(196,164,132,0.9)', padding: '3px 8px', borderRadius: '6px',
+                            boxShadow: '0 2px 10px rgba(0,0,0,0.3)'
+                          }}>Out</span>
                         </div>
+                      )}
+                    </div>
+                    <div className={styles.itemLeft}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+                        <div className={styles.itemName}>{item.name}</div>
+                        {isOutOfStock && (
+                          <span style={{
+                            fontSize: '0.62rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px',
+                            color: '#8c6a56', background: 'rgba(196,164,132,0.15)',
+                            border: '1px solid rgba(196,164,132,0.3)',
+                            padding: '3px 10px', borderRadius: '50px'
+                          }}>Sold Out</span>
+                        )}
+                      </div>
+                      <div className={styles.itemDesc}>{item.desc || item.description}</div>
+                      <Tags tags={item.tags} linkedTags={item.linkedTags} />
+                    </div>
+                  </div>
+                  <div className={styles.itemRight} onClick={e => e.stopPropagation()}>
+                    <div className={styles.itemPrice}>{item.displayPrice || item.price}</div>
+                    {(() => {
+                      if (isOutOfStock) {
+                        return (
+                          <button 
+                            className={styles.addBtnSmall} 
+                            disabled
+                            style={{ 
+                              background: 'rgba(196, 164, 132, 0.05)',
+                              border: '1px solid rgba(196, 164, 132, 0.15)',
+                              color: 'rgba(196, 164, 132, 0.3)',
+                              cursor: 'not-allowed',
+                              boxShadow: 'none'
+                            }}
+                          >
+                            <Plus size={16} style={{ color: 'rgba(196, 164, 132, 0.3)' }} />
+                          </button>
+                        );
+                      }
+                      const cartItem = items.find(i => String(i.id) === String(item.id));
+                      if (cartItem) {
+                        return (
+                          <div style={{
+                            display: 'flex', alignItems: 'center', gap: '8px',
+                            background: `linear-gradient(135deg, ${themeColor}, #2c1810)`,
+                            borderRadius: '50px', padding: '4px 6px',
+                            boxShadow: `0 4px 15px ${themeColor}40`,
+                            animation: 'fadeIn 0.3s ease'
+                          }}>
+                            <button
+                              onClick={() => cartItem.qty <= 1 ? removeItem(cartItem.id) : setQty(cartItem.id, cartItem.qty - 1)}
+                              style={{
+                                width: '28px', height: '28px', borderRadius: '50%',
+                                border: 'none', background: 'rgba(255,255,255,0.15)',
+                                color: '#fff', fontWeight: '900', fontSize: '1.1rem',
+                                cursor: 'pointer', display: 'flex', alignItems: 'center',
+                                justifyContent: 'center', transition: 'background 0.2s',
+                                lineHeight: 1
+                              }}
+                              onMouseEnter={e => e.currentTarget.style.background='rgba(255,255,255,0.3)'}
+                              onMouseLeave={e => e.currentTarget.style.background='rgba(255,255,255,0.15)'}
+                            >−</button>
+                            <span style={{
+                              color: '#fff', fontWeight: '900', fontSize: '0.95rem',
+                              minWidth: '18px', textAlign: 'center'
+                            }}>{cartItem.qty}</span>
+                            <button
+                              onClick={() => setQty(cartItem.id, cartItem.qty + 1)}
+                              style={{
+                                width: '28px', height: '28px', borderRadius: '50%',
+                                border: 'none', background: 'rgba(255,255,255,0.15)',
+                                color: '#fff', fontWeight: '900', fontSize: '1.1rem',
+                                cursor: 'pointer', display: 'flex', alignItems: 'center',
+                                justifyContent: 'center', transition: 'background 0.2s',
+                                lineHeight: 1
+                              }}
+                              onMouseEnter={e => e.currentTarget.style.background='rgba(255,255,255,0.3)'}
+                              onMouseLeave={e => e.currentTarget.style.background='rgba(255,255,255,0.15)'}
+                            >+</button>
+                          </div>
+                        );
+                      }
+                      return (
+                        <button 
+                          className={styles.addBtnSmall} 
+                          onClick={(e) => { e.stopPropagation(); handleProductClick(item); }}
+                          style={{ 
+                            background: `linear-gradient(135deg, ${themeColor}, #2c1810)`,
+                            boxShadow: `0 6px 15px ${themeColor}40`
+                          }}
+                        >
+                          <Plus size={16} style={{ color: '#fff' }} />
+                        </button>
                       );
-                    }
-                    return (
-                      <button 
-                        className={styles.addBtnSmall} 
-                        onClick={(e) => { e.stopPropagation(); handleProductClick(item); }}
-                        style={{ 
-                          background: `linear-gradient(135deg, ${themeColor}, #2c1810)`,
-                          boxShadow: `0 6px 15px ${themeColor}40`
-                        }}
-                      >
-                        <Plus size={16} style={{ color: '#fff' }} />
-                      </button>
-                    );
-                  })()}
+                    })()}
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           ) : (
             <div style={{ 
               textAlign: 'center', padding: '60px 20px', color: 'rgba(44, 24, 16, 0.4)',
@@ -817,17 +872,51 @@ export default function Menu() {
 
 function FeaturedCard({ item, onAdd, getImageUrl, handleImageError }) {
   const imgUrl = item.image ? item.image : (item.isDbItem ? getImageUrl(item) : '/images/coffee-beans.png');
+  const isOutOfStock = !!item.isOutOfStock;
   return (
-    <div className={styles.featCard} onClick={onAdd} style={{ cursor: 'pointer' }}>
-      <div className={styles.featImg}>
+    <div 
+      className={styles.featCard} 
+      onClick={isOutOfStock ? null : onAdd} 
+      style={{ 
+        cursor: isOutOfStock ? 'not-allowed' : 'pointer',
+        opacity: isOutOfStock ? 0.75 : 1,
+        filter: isOutOfStock ? 'grayscale(40%)' : 'none'
+      }}
+    >
+      <div className={styles.featImg} style={{ position: 'relative' }}>
         <img src={imgUrl} alt={item.name} onError={handleImageError} />
-        {item.tag && <span className={styles.featBadge}>{item.tag}</span>}
+        {item.tag && !isOutOfStock && <span className={styles.featBadge}>{item.tag}</span>}
+        {isOutOfStock && (
+          <span className={styles.featBadge} style={{ 
+            background: 'rgba(20, 18, 16, 0.85)', 
+            backdropFilter: 'blur(4px)',
+            color: '#c4a484',
+            border: '1px solid rgba(196,164,132,0.3)',
+            boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
+            textTransform: 'uppercase',
+            fontWeight: '900',
+            letterSpacing: '1px'
+          }}>Sold Out</span>
+        )}
       </div>
       <div className={styles.featBody}>
         <h3 className={styles.featName}>{item.name}</h3>
         <div className={styles.featFooter}>
           <span className={styles.featPrice}>{item.displayPrice || item.price}</span>
-          <button className={styles.featAddBtn} onClick={(e) => { e.stopPropagation(); onAdd(); }}>View</button>
+          <button 
+            className={styles.featAddBtn} 
+            onClick={(e) => { e.stopPropagation(); if (!isOutOfStock) onAdd(); }}
+            disabled={isOutOfStock}
+            style={isOutOfStock ? {
+              background: 'rgba(196, 164, 132, 0.05)',
+              border: '1px solid rgba(196, 164, 132, 0.15)',
+              color: 'rgba(196, 164, 132, 0.3)',
+              cursor: 'not-allowed',
+              boxShadow: 'none'
+            } : {}}
+          >
+            {isOutOfStock ? 'Sold Out' : 'View'}
+          </button>
         </div>
       </div>
     </div>

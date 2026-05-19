@@ -608,10 +608,12 @@ app.get('/api/dashboard-stats', async (req, res) => {
     else if (mode === 'manual_closed') currentState = 'closed';
 
     const [topProducts] = await promiseDb.query(`
-      SELECT oi.item_name, SUM(oi.quantity) as total_sold, SUM(oi.quantity * oi.price) as revenue 
-      FROM order_items oi 
-      GROUP BY oi.item_name 
-      ORDER BY total_sold DESC 
+      SELECT mi.name as item_name, SUM(oi.quantity) as total_sold, SUM(oi.quantity * oi.price) as revenue
+      FROM order_items oi
+      JOIN menu_items mi ON (oi.product_id = mi.id OR oi.item_name = mi.name)
+      WHERE oi.item_name NOT IN (SELECT name FROM addons)
+      GROUP BY mi.id, mi.name
+      ORDER BY total_sold DESC
       LIMIT 6
     `);
 
@@ -657,13 +659,15 @@ app.get('/api/analytics-monthly', async (req, res) => {
 
     // Top products this month (name, units sold, revenue)
     const [topProducts] = await promiseDb.query(
-      `SELECT oi.item_name,
+      `SELECT mi.name as item_name,
               SUM(oi.quantity) as total_sold,
               SUM(oi.quantity * oi.price) as revenue
        FROM order_items oi
        JOIN orders o ON oi.order_id = o.id
+       JOIN menu_items mi ON (oi.product_id = mi.id OR oi.item_name = mi.name)
        WHERE YEAR(o.created_at)=? AND MONTH(o.created_at)=?
-       GROUP BY oi.item_name
+         AND oi.item_name NOT IN (SELECT name FROM addons)
+       GROUP BY mi.id, mi.name
        ORDER BY total_sold DESC
        LIMIT 6`,
       [year, month]
@@ -729,13 +733,15 @@ app.get('/api/analytics-range', async (req, res) => {
     );
 
     const [topProducts] = await promiseDb.query(
-      `SELECT oi.item_name,
+      `SELECT mi.name as item_name,
               SUM(oi.quantity) as total_sold,
               SUM(oi.quantity * oi.price) as revenue
        FROM order_items oi
        JOIN orders o ON oi.order_id = o.id
+       JOIN menu_items mi ON (oi.product_id = mi.id OR oi.item_name = mi.name)
        WHERE DATE(o.created_at) BETWEEN ? AND ?
-       GROUP BY oi.item_name
+         AND oi.item_name NOT IN (SELECT name FROM addons)
+       GROUP BY mi.id, mi.name
        ORDER BY total_sold DESC
        LIMIT 6`,
       [from, to]
