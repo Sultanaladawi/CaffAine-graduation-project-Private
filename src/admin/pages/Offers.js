@@ -259,7 +259,7 @@ const Offers = () => {
                     style={inputStyle} 
                     value={formData.end_date} 
                     onChange={e => setFormData({...formData, end_date: e.target.value})} 
-                    onFocus={(e) => e.target.placeholder = "e.g. 2024-12-31"}
+                    onFocus={(e) => e.target.placeholder = "e.g. 2026-12-31"}
                     required
                   />
                 </div>
