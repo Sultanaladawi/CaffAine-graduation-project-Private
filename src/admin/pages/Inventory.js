@@ -380,16 +380,25 @@ const Inventory = () => {
           </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
-            <table width="100%" style={{ borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ backgroundColor: 'rgba(45, 41, 38, 0.8)' }}>
-                    <th style={{ padding: '25px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', color: colors.crema }}>Inventory No.</th>
-                    <th style={{ padding: '25px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', color: colors.crema }}>Material Name</th>
-                    <th style={{ padding: '25px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', color: colors.crema }}>Quantity</th>
-                    <th style={{ padding: '25px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', color: colors.crema }}>Unit</th>
-                    <th style={{ padding: '25px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', color: colors.crema }}>Threshold</th>
-                    <th style={{ padding: '25px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', color: colors.crema }}>Status</th>
-                    <th style={{ padding: '25px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', color: colors.crema }}>Actions</th>
+            <table width="100%" style={{ borderCollapse: 'separate', borderSpacing: '0 10px', textAlign: 'left', tableLayout: 'fixed' }}>
+              <colgroup>
+                <col style={{ width: '15%' }} />
+                <col style={{ width: '25%' }} />
+                <col style={{ width: '12%' }} />
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '13%' }} />
+                <col style={{ width: '15%' }} />
+                <col style={{ width: '10%' }} />
+              </colgroup>
+              <thead style={{ backgroundColor: 'rgba(45, 41, 38, 0.7)' }}>
+                <tr>
+                    <th style={{ padding: '20px 25px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', color: colors.crema, fontWeight: '700' }}>Inventory No.</th>
+                    <th style={{ padding: '20px 25px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', color: colors.crema, fontWeight: '700' }}>Material Name</th>
+                    <th style={{ padding: '20px 25px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', color: colors.crema, fontWeight: '700' }}>Quantity</th>
+                    <th style={{ padding: '20px 25px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', color: colors.crema, fontWeight: '700' }}>Unit</th>
+                    <th style={{ padding: '20px 25px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', color: colors.crema, fontWeight: '700' }}>Threshold</th>
+                    <th style={{ padding: '20px 25px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', color: colors.crema, fontWeight: '700' }}>Status</th>
+                    <th style={{ padding: '20px 25px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', color: colors.crema, fontWeight: '700' }}>Actions</th>
                   </tr>
               </thead>
               <tbody>
@@ -398,19 +407,20 @@ const Inventory = () => {
                   const inventoryNo = `INV-${String(item.id).padStart(3, '0')}`;
                   return (
                     <tr key={item.id} className="premium-row" style={{ 
-                      borderBottom: `1px solid ${colors.border}`, 
-                      backgroundColor: isLow ? 'rgba(231, 74, 59, 0.03)' : 'transparent'
+                      background: isLow ? 'rgba(231, 74, 59, 0.05)' : 'rgba(255, 255, 255, 0.03)',
+                      borderRadius: '12px',
+                      transition: 'all 0.3s ease'
                     }}>
-                      <td style={{ padding: '25px' }}>
+                      <td style={{ padding: '18px 25px' }}>
                         <span title={inventoryNo} style={{ display: 'inline-block', padding: '6px 14px', borderRadius: '8px', background: 'linear-gradient(135deg, #c7a57a 0%, #a47c4f 100%)', color: colors.espresso, fontWeight: 900, letterSpacing: '1px', boxShadow: '0 4px 10px rgba(196, 164, 132, 0.3)', whiteSpace: 'nowrap' }}>{inventoryNo}</span>
                       </td>
-                      <td style={{ padding: '25px' }}>
+                      <td style={{ padding: '18px 25px' }}>
                         <strong style={cellTextStyle}>{item.item_name}</strong>
                       </td>
-                      <td style={{ padding: '25px', color: isLow ? '#ff4d4d' : cellTextStyle.color, fontWeight: cellTextStyle.fontWeight, fontSize: cellTextStyle.fontSize }}>
+                      <td style={{ padding: '18px 25px', color: isLow ? '#ff4d4d' : cellTextStyle.color, fontWeight: cellTextStyle.fontWeight, fontSize: cellTextStyle.fontSize }}>
                         {item.quantity}
                       </td>
-                      <td style={{ padding: '25px' }}>
+                      <td style={{ padding: '18px 25px' }}>
                         <span style={{ 
                           fontSize: '0.75rem', color: colors.latte, 
                           backgroundColor: 'rgba(255, 255, 255, 0.05)', 
@@ -421,8 +431,8 @@ const Inventory = () => {
                           {item.unit || '-'}
                         </span>
                       </td>
-                      <td style={{ padding: '25px', color: cellTextStyle.color, fontSize: cellTextStyle.fontSize }}>{item.min_threshold}</td>
-                      <td style={{ padding: '25px' }}>
+                      <td style={{ padding: '18px 25px', color: cellTextStyle.color, fontSize: cellTextStyle.fontSize }}>{item.min_threshold}</td>
+                      <td style={{ padding: '18px 25px' }}>
                         {item.quantity <= 0 ? (
                           <span style={{ 
                             color: '#ff4d4d', background: 'linear-gradient(135deg, rgba(255, 77, 77, 0.15), rgba(255, 77, 77, 0.05))', border: '1px solid rgba(255, 77, 77, 0.3)',
@@ -440,7 +450,7 @@ const Inventory = () => {
                           }}>ADEQUATE</span>
                         )}
                       </td>
-                      <td style={{ padding: '25px' }}>
+                      <td style={{ padding: '18px 25px' }}>
                         <div style={{ display: 'flex', gap: '20px' }}>
                           <BsPencilSquare size={20} style={{ cursor: 'pointer', color: '#888', transition: '0.3s' }} onClick={() => openEditModal(item)} title="Edit" />
                           <BsTrash size={20} style={{ cursor: 'pointer', color: '#e74a3b', transition: '0.3s' }} onClick={() => handleDelete(item.id)} title="Delete" />

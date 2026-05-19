@@ -278,7 +278,7 @@ const Analytics = () => {
       ) : (
         <>
           {/* ── 5 Stat Cards ── */}
-          <div style={{ position:'relative', zIndex:1, display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:'20px', marginBottom:'30px' }}>
+          <div style={{ position:'relative', zIndex:1, display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:'12px', marginBottom:'30px' }}>
             {cards.map((c, i) => {
               const isBestSelling = c.title === 'Best Selling';
               return (
@@ -288,12 +288,12 @@ const Analytics = () => {
                   onClick={isBestSelling ? () => setShowAllSoldModal(true) : undefined}
                   style={{ 
                     backgroundColor: theme.card, 
-                    padding:'25px', 
-                    borderRadius:'20px', 
+                    padding:'16px 14px', 
+                    borderRadius:'16px', 
                     border: isBestSelling ? '1px solid rgba(196,164,132,0.45)' : `1px solid ${theme.border}`, 
                     display:'flex', 
                     flexDirection:'column', 
-                    gap:'15px', 
+                    gap:'10px', 
                     boxShadow: isBestSelling ? '0 15px 35px rgba(196,164,132,0.1)' : '0 10px 30px rgba(0,0,0,0.2)',
                     cursor: isBestSelling ? 'pointer' : 'default',
                     position: 'relative',
@@ -301,20 +301,20 @@ const Analytics = () => {
                   }}
                 >
                   <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
-                    <div style={{ backgroundColor:`${c.color}15`, color:c.color, padding:'12px', borderRadius:'12px' }}>
-                      <c.icon size={24} />
+                    <div style={{ backgroundColor:`${c.color}15`, color:c.color, padding:'8px', borderRadius:'10px' }}>
+                      <c.icon size={18} />
                     </div>
-                    <span style={{ color:'#38ef7d', fontSize:'0.75rem', fontWeight:'bold', display:'flex', alignItems:'center', gap:'4px' }}>
-                      <ArrowUpRight size={14} /> {c.desc}
+                    <span style={{ color:'#38ef7d', fontSize:'0.65rem', fontWeight:'bold', display:'flex', alignItems:'center', gap:'2px' }}>
+                      <ArrowUpRight size={12} /> {c.desc}
                     </span>
                   </div>
-                  <div style={{ paddingBottom: isBestSelling ? '10px' : '0px' }}>
-                    <p style={{ color: theme.text, opacity:0.6, fontSize:'0.8rem', textTransform:'uppercase', letterSpacing:'1px', margin:0 }}>{c.title}</p>
-                    <h3 style={{ color:'#fff', fontSize:'1.7rem', margin:'5px 0 0', fontWeight:'800', wordBreak:'break-word' }}>{c.value}</h3>
+                  <div style={{ paddingBottom: isBestSelling ? '8px' : '0px' }}>
+                    <p style={{ color: theme.text, opacity:0.6, fontSize:'0.72rem', textTransform:'uppercase', letterSpacing:'0.5px', margin:0 }}>{c.title}</p>
+                    <h3 style={{ color:'#fff', fontSize:'1.25rem', margin:'5px 0 0', fontWeight:'800', wordBreak:'break-word', lineHeight: '1.2' }}>{c.value}</h3>
                   </div>
                   {isBestSelling && (
-                    <div style={{ position:'absolute', bottom:'8px', right:'15px', fontSize:'0.7rem', color:'#c4a484', fontWeight:'bold', display:'flex', alignItems:'center', gap:'2px' }}>
-                      View Full List →
+                    <div style={{ position:'absolute', bottom:'4px', right:'10px', fontSize:'0.6rem', color:'#c4a484', fontWeight:'bold', display:'flex', alignItems:'center', gap:'2px' }}>
+                      Full List →
                     </div>
                   )}
                 </div>
