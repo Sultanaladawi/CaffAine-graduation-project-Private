@@ -994,6 +994,59 @@ app.get('/api/order-items/:orderId', async (req, res) => {
   }
 });
 
+app.get('/api/today-feature', async (req, res) => {
+  try {
+    const promiseDb = db.promise();
+    // 1. Try to get the top-selling product
+    const [topProducts] = await promiseDb.query(`
+      SELECT mi.name, mi.description, c.name as category_name, SUM(oi.quantity) as total_sold
+      FROM order_items oi
+      JOIN menu_items mi ON (oi.product_id = mi.id OR oi.item_name = mi.name)
+      LEFT JOIN categories c ON mi.category_id = c.id
+      GROUP BY mi.id, mi.name, mi.description, c.name
+      ORDER BY total_sold DESC
+      LIMIT 1
+    `);
+
+    if (topProducts && topProducts.length > 0) {
+      const top = topProducts[0];
+      return res.status(200).json({
+        name: top.name,
+        sub: top.description || `${top.category_name} · Specialty`
+      });
+    }
+
+    // 2. If no sales exist, get the first available product
+    const [firstProducts] = await promiseDb.query(`
+      SELECT mi.name, mi.description, c.name as category_name
+      FROM menu_items mi
+      LEFT JOIN categories c ON mi.category_id = c.id
+      WHERE mi.available = 1
+      LIMIT 1
+    `);
+
+    if (firstProducts && firstProducts.length > 0) {
+      const first = firstProducts[0];
+      return res.status(200).json({
+        name: first.name,
+        sub: first.description || `${first.category_name} · Specialty`
+      });
+    }
+
+    // 3. Fallback
+    res.status(200).json({
+      name: "Ethiopian Yirgacheffe",
+      sub: "Pour-over · Single origin"
+    });
+  } catch (err) {
+    console.error('Error fetching today feature:', err);
+    res.status(200).json({
+      name: "Ethiopian Yirgacheffe",
+      sub: "Pour-over · Single origin"
+    });
+  }
+});
+
 app.get('/api/products', async (req, res) => {
   try {
     const promiseDb = db.promise();

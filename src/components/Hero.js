@@ -1,9 +1,33 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './Hero.module.css';
 
 export default function Hero() {
   const imgRef   = useRef(null);
   const heroRef  = useRef(null);
+  const [feature, setFeature] = useState({
+    name: "Ethiopian Yirgacheffe",
+    sub: "Pour-over · Single origin"
+  });
+
+  useEffect(() => {
+    async function fetchFeature() {
+      try {
+        const res = await fetch('/api/today-feature');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.name) {
+            setFeature({
+              name: data.name,
+              sub: data.sub || "Specialty Coffee"
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch today feature:", err);
+      }
+    }
+    fetchFeature();
+  }, []);
 
   useEffect(() => {
     const hero = heroRef.current;
@@ -87,8 +111,8 @@ export default function Hero() {
 
         <div className={`${styles.heroBadge} ${styles.vis}`}>
           <div className={styles.heroBadgeLabel}>Today's Feature</div>
-          <div className={styles.heroBadgeName}>Ethiopian Yirgacheffe</div>
-          <div className={styles.heroBadgeSub}>Pour-over · Single origin</div>
+          <div className={styles.heroBadgeName}>{feature.name}</div>
+          <div className={styles.heroBadgeSub}>{feature.sub}</div>
         </div>
       </div>
     </section>
