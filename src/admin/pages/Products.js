@@ -1090,14 +1090,14 @@ const Products = () => {
             <div className="desktop-table" style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 10px', color: colors.latte, textAlign: 'left', tableLayout: 'fixed' }}>
                 <colgroup>
-                  <col style={{ width: '10%' }} />
-                  <col style={{ width: '18%' }} />
-                  <col style={{ width: '12%' }} />
-                  <col style={{ width: '10%' }} />
-                  <col style={{ width: '16%' }} />
                   <col style={{ width: '14%' }} />
+                  <col style={{ width: '20%' }} />
                   <col style={{ width: '11%' }} />
                   <col style={{ width: '9%' }} />
+                  <col style={{ width: '15%' }} />
+                  <col style={{ width: '13%' }} />
+                  <col style={{ width: '10%' }} />
+                  <col style={{ width: '8%' }} />
                 </colgroup>
                 <thead style={{ backgroundColor: 'rgba(45, 41, 38, 0.7)' }}>
                   <tr>
@@ -1124,10 +1124,10 @@ const Products = () => {
                       borderRadius: '12px',
                       transition: 'all 0.3s ease'
                     }}>
-                    <td style={{ padding: '16px 12px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{ cursor: 'grab', opacity: 0.3 }}><GripVertical size={14} /></div>
-                        <span style={{ display: 'inline-block', whiteSpace: 'nowrap', padding: '6px 14px', borderRadius: '8px', background: 'linear-gradient(135deg, #c7a57a 0%, #a47c4f 100%)', color: colors.espresso, fontWeight: 900, letterSpacing: '1px', boxShadow: '0 4px 10px rgba(196, 164, 132, 0.3)' }}>
+                    <td style={{ padding: '16px 6px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <div style={{ cursor: 'grab', opacity: 0.3, flexShrink: 0 }}><GripVertical size={14} /></div>
+                        <span style={{ display: 'inline-block', whiteSpace: 'nowrap', padding: '6px 10px', borderRadius: '8px', background: 'linear-gradient(135deg, #c7a57a 0%, #a47c4f 100%)', color: colors.espresso, fontWeight: 900, letterSpacing: '0.5px', boxShadow: '0 4px 10px rgba(196, 164, 132, 0.3)', flexShrink: 0 }}>
                           PRD-{String(index + 1).padStart(3, '0')}
                         </span>
                       </div>
