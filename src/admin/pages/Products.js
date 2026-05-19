@@ -1090,14 +1090,14 @@ const Products = () => {
             <div className="desktop-table" style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 10px', color: colors.latte, textAlign: 'left', tableLayout: 'fixed' }}>
                 <colgroup>
-                  <col style={{ width: '140px' }} />
-                  <col style={{ width: '22%' }} />
-                  <col style={{ width: '12%' }} />
-                  <col style={{ width: '9%' }} />
-                  <col style={{ width: '16%' }} />
-                  <col style={{ width: '15%' }} />
+                  <col style={{ width: '90px' }} />
+                  <col style={{ width: '24%' }} />
+                  <col style={{ width: '13%' }} />
                   <col style={{ width: '10%' }} />
-                  <col style={{ width: '8%' }} />
+                  <col style={{ width: '15%' }} />
+                  <col style={{ width: '14%' }} />
+                  <col style={{ width: '12%' }} />
+                  <col style={{ width: '12%' }} />
                 </colgroup>
                 <thead style={{ backgroundColor: 'rgba(45, 41, 38, 0.7)' }}>
                   <tr>
