@@ -21,9 +21,11 @@ const renderCategoryIcon = (iconName) => {
   const name = String(iconName || '').toLowerCase();
   const style = { fontSize: '1.2rem', display: 'inline-block', lineHeight: 1 };
   if (name.includes('coffee') || name.includes('mug') || name.includes('glass-martini')) return <span className="emojiIcon" style={style}>☕</span>;
+  if (name.includes('snowflake') || name.includes('cold') || name.includes('iced') || name.includes('ice') || name.includes('smoothie')) return <span className="emojiIcon" style={style}>🧊</span>;
+  if (name.includes('leaf') || name.includes('tea')) return <span className="emojiIcon" style={style}>🍵</span>;
   if (name.includes('soda') || name.includes('drink') || name.includes('wine') || name.includes('glass')) return <span className="emojiIcon" style={style}>🥤</span>;
-  if (name.includes('utensils') || name.includes('food') || name.includes('bread')) return <span className="emojiIcon" style={style}>🥪</span>;
-  if (name.includes('cookie') || name.includes('sweet') || name.includes('cake') || name.includes('ice-cream')) return <span className="emojiIcon" style={style}>🍰</span>;
+  if (name.includes('utensils') || name.includes('food') || name.includes('bread') || name.includes('sandwich')) return <span className="emojiIcon" style={style}>🥪</span>;
+  if (name.includes('cookie') || name.includes('sweet') || name.includes('cake') || name.includes('ice-cream') || name.includes('dessert')) return <span className="emojiIcon" style={style}>🍰</span>;
   return <span className="emojiIcon" style={style}>☕</span>;
 };
 
@@ -622,8 +624,8 @@ export default function Menu() {
                   }
                 }}
               >
-                {renderCategoryIcon(cat.icon, isActive ? '#fff' : catColor, 18)}
-                <span style={{ letterSpacing: '0.5px' }}>{cat.label}</span>
+                {renderCategoryIcon(cat.name || cat.label || cat.icon)}
+                <span style={{ letterSpacing: '0.5px' }}>{cat.name || cat.label}</span>
               </button>
             );
           })}
