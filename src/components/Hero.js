@@ -5,8 +5,8 @@ export default function Hero() {
   const imgRef   = useRef(null);
   const heroRef  = useRef(null);
   const [feature, setFeature] = useState({
-    name: "Ethiopian Yirgacheffe",
-    sub: "Pour-over · Single origin"
+    name: "Pour-Over Filter Coffee",
+    sub: "Drip Coffee · Specialty"
   });
 
   useEffect(() => {
