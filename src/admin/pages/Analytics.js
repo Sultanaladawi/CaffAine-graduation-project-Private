@@ -55,7 +55,7 @@ const Analytics = () => {
       color: categoryColors[nameKey] || '#c4a484',
       icon: categoryIcons[nameKey] || '☕'
     };
-  });
+  }).sort((a, b) => b.count - a.count);
 
   useEffect(() => {
     if (categoriesData.length > 0 && activeCatIndex >= categoriesData.length) {
@@ -238,7 +238,13 @@ const Analytics = () => {
         .bar-wrapper { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; gap:10px; position:relative; cursor:pointer; }
         .bar-tooltip { position:absolute; top:-30px; background:#c4a484; color:#070504; padding:5px 12px; border-radius:10px; font-size:0.75rem; font-weight:900; opacity:0; transition:0.3s; pointer-events:none; z-index:10; white-space:nowrap; }
         .bar-wrapper:hover .bar-tooltip { opacity:1; transform:translateY(-10px); }
-        .bar-fill { transition:all 0.5s cubic-bezier(0.23,1,0.32,1); }
+        .bar-fill { transition:all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .bar-wrapper:hover .bar-fill {
+          transform: translateY(-8px) scaleX(1.05);
+          background: linear-gradient(180deg, #D4AF37, #c4a484) !important;
+          box-shadow: 0 10px 25px rgba(212, 175, 55, 0.45) !important;
+          border: 1px solid rgba(212, 175, 55, 0.6) !important;
+        }
         .filter-btn { padding:10px 20px; border-radius:12px; border:1px solid rgba(196,164,132,0.3); background:rgba(196,164,132,0.05); color:#c4a484; font-weight:700; font-size:0.85rem; cursor:pointer; transition:0.25s; }
         .filter-btn.active { background:#c4a484; color:#070504; border-color:#c4a484; }
         .filter-btn:hover:not(.active) { background:rgba(196,164,132,0.15); }
@@ -475,7 +481,6 @@ const Analytics = () => {
 
               {categoriesData.length > 0 && categoriesData[activeCatIndex] ? (() => {
                 const activeCat = categoriesData[activeCatIndex];
-                const isBestSeller = activeCatIndex === categoriesData.reduce((bestIdx, c, idx, arr) => c.count > arr[bestIdx].count ? idx : bestIdx, 0);
 
                 return (
                   <>
@@ -500,25 +505,64 @@ const Analytics = () => {
                     <div style={{ textAlign:'center' }}>
                       <p style={{ color:'#fff', fontSize:'1.25rem', fontWeight:'bold', margin:0, fontFamily:'serif' }}>{activeCat.name}</p>
                       
-                      {isBestSeller ? (
-                        <div style={{ 
-                          display: 'inline-flex', 
-                          alignItems: 'center', 
-                          gap: '6px', 
-                          marginTop: '8px', 
-                          background: 'rgba(212,175,55,0.1)', 
-                          border: '1px solid rgba(212,175,55,0.2)',
-                          padding: '4px 12px', 
-                          borderRadius: '20px'
-                        }}>
-                          <i className="fas fa-crown" style={{ color: '#D4AF37', fontSize: '0.75rem' }} />
-                          <span style={{ color: '#D4AF37', fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Best Seller (100% Verified)</span>
-                        </div>
-                      ) : (
-                        <p style={{ color: theme.text, fontSize:'0.85rem', opacity:0.6, marginTop:'8px', margin: 0 }}>
+                      <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                        {activeCatIndex === 0 ? (
+                          <div style={{ 
+                            display: 'inline-flex', 
+                            alignItems: 'center', 
+                            gap: '6px', 
+                            background: 'rgba(212,175,55,0.15)', 
+                            border: '1px solid rgba(212,175,55,0.3)',
+                            padding: '6px 14px', 
+                            borderRadius: '20px',
+                            boxShadow: '0 0 15px rgba(212,175,55,0.15)'
+                          }}>
+                            <span style={{ color: '#D4AF37', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '0.5px' }}>المركز الأول 🥇 الأكثر مبيعاً</span>
+                          </div>
+                        ) : activeCatIndex === 1 ? (
+                          <div style={{ 
+                            display: 'inline-flex', 
+                            alignItems: 'center', 
+                            gap: '6px', 
+                            background: 'rgba(192,192,192,0.15)', 
+                            border: '1px solid rgba(192,192,192,0.3)',
+                            padding: '6px 14px', 
+                            borderRadius: '20px',
+                            boxShadow: '0 0 15px rgba(192,192,192,0.1)'
+                          }}>
+                            <span style={{ color: '#C0C0C0', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '0.5px' }}>المركز الثاني 🥈</span>
+                          </div>
+                        ) : activeCatIndex === 2 ? (
+                          <div style={{ 
+                            display: 'inline-flex', 
+                            alignItems: 'center', 
+                            gap: '6px', 
+                            background: 'rgba(205,127,50,0.15)', 
+                            border: '1px solid rgba(205,127,50,0.3)',
+                            padding: '6px 14px', 
+                            borderRadius: '20px',
+                            boxShadow: '0 0 15px rgba(205,127,50,0.1)'
+                          }}>
+                            <span style={{ color: '#CD7F32', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '0.5px' }}>المركز الثالث 🥉</span>
+                          </div>
+                        ) : (
+                          <div style={{ 
+                            display: 'inline-flex', 
+                            alignItems: 'center', 
+                            gap: '6px', 
+                            background: 'rgba(255,255,255,0.03)', 
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            padding: '4px 12px', 
+                            borderRadius: '20px'
+                          }}>
+                            <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', fontWeight: 'bold' }}>المركز {activeCatIndex + 1} 🎖️</span>
+                          </div>
+                        )}
+                        
+                        <p style={{ color: theme.text, fontSize:'0.85rem', opacity:0.6, margin: 0 }}>
                           {activeCat.count} Items Sold
                         </p>
-                      )}
+                      </div>
                     </div>
                   </>
                 );

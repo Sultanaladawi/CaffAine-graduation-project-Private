@@ -125,9 +125,16 @@ const Dashboard = () => {
         .stat-card:hover { transform: translateY(-5px); border-color: ${theme.accent}66; background: rgba(196, 164, 132, 0.05); box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
         
         .chart-container { background: rgba(255,255,255,0.015); border: 1px solid ${theme.border}; border-radius: 35px; padding: 40px; position: relative; z-index: 1; }
-        .bar-wrapper { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 10px; position: relative; }
-        .bar-tooltip { position: absolute; top: -30px; background: ${theme.accent}; color: #070504; padding: 5px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 900; opacity: 0; transition: 0.3s; pointer-events: none; }
+        .bar-wrapper { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 10px; position: relative; cursor: pointer; }
+        .bar-tooltip { position: absolute; top: -30px; background: ${theme.accent}; color: #070504; padding: 5px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 900; opacity: 0; transition: 0.3s; pointer-events: none; white-space: nowrap; z-index: 10; }
         .bar-wrapper:hover .bar-tooltip { opacity: 1; transform: translateY(-10px); }
+        .bar-fill { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .bar-wrapper:hover .bar-fill {
+          transform: translateY(-8px) scaleX(1.05);
+          background: linear-gradient(180deg, #D4AF37, #c4a484) !important;
+          box-shadow: 0 10px 25px rgba(212, 175, 55, 0.45) !important;
+          border: 1px solid rgba(212, 175, 55, 0.6) !important;
+        }
         .terminal-box { background: #0d0806; border: 1px solid ${theme.border}; border-radius: 25px; padding: 25px; font-family: 'Inter', monospace; font-size: 0.8rem; color: #aaa; }
         
         .page-badge { background: #1b130e; border: 1px solid ${theme.border}; padding: 12px 25px; border-radius: 18px; display: inline-flex; align-items: center; gap: 12px; margin: 20px 0; }
@@ -245,20 +252,20 @@ const Dashboard = () => {
           </div>
           <div style={{ height: '280px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '20px' }}>
             {stats.dailySales.map((d, i) => (
-              <div key={i} className="bar-wrapper">
-                <div className="bar-tooltip">JOD {d.total.toFixed(2)}</div>
-                <div style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 900, opacity: d.total > 0 ? 0.9 : 0, marginBottom: '5px' }}>JOD {d.total.toFixed(0)}</div>
-                <div style={{ 
-                  width: '100%', height: `${(d.total / maxSales) * 100}%`, minHeight: d.total > 0 ? '8px' : '4px',
-                  background: d.isToday ? `linear-gradient(180deg, ${theme.accent}, #8c6a56)` : `linear-gradient(180deg, rgba(196,164,132,0.1), rgba(196,164,132,0.3))`,
-                  borderRadius: '12px', transition: '1s cubic-bezier(0.23, 1, 0.32, 1)',
-                  boxShadow: d.isToday && d.total > 0 ? `0 0 25px ${theme.accent}44` : 'none', border: d.isToday ? `1px solid ${theme.accent}66` : 'none'
-                }} />
-                <div style={{ fontSize: '0.75rem', fontWeight: 900, color: d.isToday ? theme.accent : 'rgba(255,255,255,0.4)', textAlign: 'center', marginTop: '10px' }}>
-                  {d.day}
-                  <div style={{ fontSize: '0.55rem', opacity: 0.5 }}>{d.fullDate}</div>
+                <div key={i} className="bar-wrapper">
+                  <div className="bar-tooltip">JOD {d.total.toFixed(2)}</div>
+                  <div style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 900, opacity: d.total > 0 ? 0.9 : 0, marginBottom: '5px' }}>JOD {d.total.toFixed(0)}</div>
+                  <div className="bar-fill" style={{ 
+                    width: '100%', height: `${(d.total / maxSales) * 100}%`, minHeight: d.total > 0 ? '8px' : '4px',
+                    background: d.isToday ? `linear-gradient(180deg, ${theme.accent}, #8c6a56)` : `linear-gradient(180deg, rgba(196,164,132,0.1), rgba(196,164,132,0.3))`,
+                    borderRadius: '12px', transition: '1s cubic-bezier(0.23, 1, 0.32, 1)',
+                    boxShadow: d.isToday && d.total > 0 ? `0 0 25px ${theme.accent}44` : 'none', border: d.isToday ? `1px solid ${theme.accent}66` : 'none'
+                  }} />
+                  <div style={{ fontSize: '0.75rem', fontWeight: 900, color: d.isToday ? theme.accent : 'rgba(255,255,255,0.4)', textAlign: 'center', marginTop: '10px' }}>
+                    {d.day}
+                    <div style={{ fontSize: '0.55rem', opacity: 0.5 }}>{d.fullDate}</div>
+                  </div>
                 </div>
-              </div>
             ))}
           </div>
         </div>
