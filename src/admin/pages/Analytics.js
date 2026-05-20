@@ -517,7 +517,7 @@ const Analytics = () => {
                             borderRadius: '20px',
                             boxShadow: '0 0 15px rgba(212,175,55,0.15)'
                           }}>
-                            <span style={{ color: '#D4AF37', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '0.5px' }}>المركز الأول 🥇 الأكثر مبيعاً</span>
+                            <span style={{ color: '#D4AF37', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '0.5px' }}>🥇 1st Place — Best Seller</span>
                           </div>
                         ) : activeCatIndex === 1 ? (
                           <div style={{ 
@@ -530,7 +530,7 @@ const Analytics = () => {
                             borderRadius: '20px',
                             boxShadow: '0 0 15px rgba(192,192,192,0.1)'
                           }}>
-                            <span style={{ color: '#C0C0C0', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '0.5px' }}>المركز الثاني 🥈</span>
+                            <span style={{ color: '#C0C0C0', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '0.5px' }}>🥈 2nd Place</span>
                           </div>
                         ) : activeCatIndex === 2 ? (
                           <div style={{ 
@@ -543,7 +543,7 @@ const Analytics = () => {
                             borderRadius: '20px',
                             boxShadow: '0 0 15px rgba(205,127,50,0.1)'
                           }}>
-                            <span style={{ color: '#CD7F32', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '0.5px' }}>المركز الثالث 🥉</span>
+                            <span style={{ color: '#CD7F32', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '0.5px' }}>🥉 3rd Place</span>
                           </div>
                         ) : (
                           <div style={{ 
@@ -555,7 +555,7 @@ const Analytics = () => {
                             padding: '4px 12px', 
                             borderRadius: '20px'
                           }}>
-                            <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', fontWeight: 'bold' }}>المركز {activeCatIndex + 1} 🎖️</span>
+                            <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', fontWeight: 'bold' }}>🎖️ Rank #{activeCatIndex + 1}</span>
                           </div>
                         )}
                         
