@@ -178,11 +178,11 @@ const AIAssistant = () => {
   };
 
   return (
-    <div className="dashboard-fade-in" style={{ 
+    <div className="dashboard-fade-in ai-assistant-container" style={{ 
       color: theme.latte, 
       backgroundColor: theme.espresso, 
       minHeight: '100vh', 
-      padding: '40px 10px 40px 5px',
+      padding: '40px',
       position: 'relative',
       display: 'flex', gap: '25px'
     }}>
@@ -199,7 +199,6 @@ const AIAssistant = () => {
         @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 50px) scale(1.1); } }
         .page-badge { background: #1b130e; border: 1px solid ${theme.border}; padding: 12px 25px; border-radius: 18px; display: inline-flex; align-items: center; gap: 12px; margin: 20px 0; }
         .page-badge span { font-family: 'Inter', sans-serif; font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: -0.5px; }
-        /* Premium Row Hover Animation */
         .premium-row {
           transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
           cursor: pointer;
@@ -210,6 +209,26 @@ const AIAssistant = () => {
           box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
           position: relative;
           z-index: 10;
+        }
+        .ai-sidebar {
+          position: sticky;
+          top: 40px;
+          z-index: 1;
+          flex: 1;
+          height: calc(100vh - 80px);
+        }
+        @media (max-width: 768px) {
+          .ai-assistant-container {
+            flex-direction: column !important;
+            padding: 20px !important;
+          }
+          .ai-sidebar {
+            position: static !important;
+            height: 400px !important;
+            flex: none !important;
+            width: 100% !important;
+          }
+          .page-badge span { font-size: 1.4rem !important; }
         }
       `}</style>
       
@@ -316,12 +335,7 @@ const AIAssistant = () => {
         </div>
       </div>
 
-      <div style={{ 
-        position: 'sticky', 
-        top: '40px', 
-        zIndex: 1, 
-        flex: 1, 
-        height: 'calc(100vh - 80px)', // Fixed height based on viewport
+      <div className="ai-sidebar" style={{ 
         background: 'rgba(255,255,255,0.02)', 
         borderRadius: '20px', 
         border: `1px solid rgba(255,255,255,0.06)`, 

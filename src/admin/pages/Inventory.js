@@ -203,11 +203,11 @@ const Inventory = () => {
   };
 
   return (
-    <div className="dashboard-fade-in" style={{ 
+    <div className="dashboard-fade-in inventory-container" style={{ 
       color: colors.latte, 
       backgroundColor: colors.espresso, 
       minHeight: '100vh', 
-      padding: '40px 10px 40px 5px',
+      padding: '40px',
       position: 'relative',
       overflow: 'hidden'
     }}>
@@ -222,6 +222,10 @@ const Inventory = () => {
         @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 50px) scale(1.1); } }
         .page-badge { background: #1b130e; border: 1px solid ${colors.border}; padding: 12px 25px; border-radius: 18px; display: inline-flex; align-items: center; gap: 12px; margin: 20px 0; }
         .page-badge span { font-family: 'Inter', sans-serif; font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: -0.5px; }
+        @media (max-width: 768px) {
+          .inventory-container { padding: 20px !important; }
+          .page-badge span { font-size: 1.4rem !important; }
+        }
         .inventory-header {
           display: flex;
           justify-content: space-between;

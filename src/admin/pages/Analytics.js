@@ -239,7 +239,7 @@ const Analytics = () => {
     });
 
   return (
-    <div className="dashboard-fade-in" style={{ color: theme.text, backgroundColor: theme.espresso, minHeight: '100vh', padding: '40px 10px 40px 5px', position: 'relative' }}>
+    <div className="dashboard-fade-in analytics-container" style={{ color: theme.text, backgroundColor: theme.espresso, minHeight: '100vh', padding: '40px', position: 'relative' }}>
       {/* Background */}
       <div style={{ position: 'fixed', top:0, left:0, right:0, bottom:0, zIndex:0, overflow:'hidden', pointerEvents:'none' }}>
         <div style={{ position:'absolute', top:0, left:0, right:0, bottom:0, background:'radial-gradient(circle at 50% -20%, #2a1b10 0%, #070504 70%)' }} />
@@ -270,6 +270,45 @@ const Analytics = () => {
         .filter-select { padding:10px 14px; border-radius:10px; border:1px solid rgba(196,164,132,0.3); background:#0d0806; color:#fff; font-weight:600; font-size:0.9rem; cursor:pointer; }
         .filter-date { padding:10px 14px; border-radius:10px; border:1px solid rgba(196,164,132,0.3); background:#0d0806; color:#fff; font-weight:600; font-size:0.9rem; }
         .filter-date::-webkit-calendar-picker-indicator { filter:invert(1); }
+
+        .analytics-cards-grid {
+          position: relative;
+          z-index: 1;
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          gap: 12px;
+          margin-bottom: 30px;
+        }
+        .analytics-charts-grid {
+          position: relative;
+          z-index: 1;
+          display: grid;
+          grid-template-columns: 2fr 1fr;
+          gap: 16px;
+          margin-bottom: 30px;
+        }
+        @media (max-width: 1024px) {
+          .analytics-cards-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .analytics-charts-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+        @media (max-width: 768px) {
+          .analytics-container {
+            padding: 20px !important;
+          }
+          .analytics-cards-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .analytics-charts-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .page-badge span {
+            font-size: 1.4rem !important;
+          }
+        }
       `}</style>
 
       {/* Header */}
@@ -343,7 +382,7 @@ const Analytics = () => {
       ) : (
         <>
           {/* ── 5 Stat Cards ── */}
-          <div style={{ position:'relative', zIndex:1, display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:'12px', marginBottom:'30px' }}>
+          <div className="analytics-cards-grid">
             {cards.map((c, i) => {
               const isBestSelling = c.title === 'Best Selling';
               return (
@@ -409,7 +448,7 @@ const Analytics = () => {
           </div>
 
           {/* ── Bar Chart + Category Dominance ── */}
-          <div style={{ position:'relative', zIndex:1, display:'grid', gridTemplateColumns:'2fr 1fr', gap:'16px', marginBottom:'30px' }}>
+          <div className="analytics-charts-grid">
             <div style={{ background: 'rgba(255,255,255,0.015)', border: `1px solid ${theme.border}`, borderRadius: '24px', padding: '24px 20px', minHeight: '380px', display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 1, minWidth: '0' }}>
               <div style={{ marginBottom: '35px' }}>
                 <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: '1.8rem', color: '#fff', margin: 0 }}>
