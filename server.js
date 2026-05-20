@@ -286,6 +286,11 @@ app.post('/api/orders', async (req, res) => {
       const quantity = parseInt(item.qty, 10);
       if (isNaN(productId)) continue;
 
+      const [[menuItem]] = await conn.query("SELECT available, name FROM menu_items WHERE id = ?", [productId]);
+      if (menuItem && menuItem.available == 0) {
+        throw new Error(`Sorry, ${menuItem.name} is currently out of stock.`);
+      }
+
       const [ingredients] = await conn.query(`
         SELECT i.item_name, i.quantity as stock_qty, r.quantity_required
         FROM recipes r
