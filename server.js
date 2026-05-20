@@ -679,7 +679,7 @@ app.get('/api/analytics-monthly', async (req, res) => {
               SUM(oi.quantity * oi.price) as revenue
        FROM order_items oi
        JOIN orders o ON oi.order_id = o.id
-       \${MENU_ITEM_JOIN_CONDITION}
+       ${MENU_ITEM_JOIN_CONDITION}
        WHERE YEAR(o.created_at)=? AND MONTH(o.created_at)=?
          AND oi.item_name NOT IN (SELECT name FROM addons)
        GROUP BY mi.id, mi.name
@@ -698,13 +698,13 @@ app.get('/api/analytics-monthly', async (req, res) => {
 
     // Category stats for that month
     const [categoryStats] = await promiseDb.query(
-      `SELECT COALESCE(c.\${categoryNameColumn}, 'Other') as name, SUM(oi.quantity) as count 
+      `SELECT COALESCE(c.${categoryNameColumn}, 'Other') as name, SUM(oi.quantity) as count 
        FROM order_items oi 
-       \${MENU_ITEM_JOIN_CONDITION} 
+       ${MENU_ITEM_JOIN_CONDITION} 
        JOIN orders o ON oi.order_id = o.id
        LEFT JOIN categories c ON mi.category_id = c.id 
        WHERE YEAR(o.created_at)=? AND MONTH(o.created_at)=?
-       GROUP BY COALESCE(c.\${categoryNameColumn}, 'Other')`,
+       GROUP BY COALESCE(c.${categoryNameColumn}, 'Other')`,
       [year, month]
     );
 
@@ -753,7 +753,7 @@ app.get('/api/analytics-range', async (req, res) => {
               SUM(oi.quantity * oi.price) as revenue
        FROM order_items oi
        JOIN orders o ON oi.order_id = o.id
-       \${MENU_ITEM_JOIN_CONDITION}
+       ${MENU_ITEM_JOIN_CONDITION}
        WHERE DATE(o.created_at) BETWEEN ? AND ?
          AND oi.item_name NOT IN (SELECT name FROM addons)
        GROUP BY mi.id, mi.name
@@ -764,13 +764,13 @@ app.get('/api/analytics-range', async (req, res) => {
 
     // Category stats for that range
     const [categoryStats] = await promiseDb.query(
-      `SELECT COALESCE(c.\${categoryNameColumn}, 'Other') as name, SUM(oi.quantity) as count 
+      `SELECT COALESCE(c.${categoryNameColumn}, 'Other') as name, SUM(oi.quantity) as count 
        FROM order_items oi 
-       \${MENU_ITEM_JOIN_CONDITION} 
+       ${MENU_ITEM_JOIN_CONDITION} 
        JOIN orders o ON oi.order_id = o.id
        LEFT JOIN categories c ON mi.category_id = c.id 
        WHERE DATE(o.created_at) BETWEEN ? AND ?
-       GROUP BY COALESCE(c.\${categoryNameColumn}, 'Other')`,
+       GROUP BY COALESCE(c.${categoryNameColumn}, 'Other')`,
       [from, to]
     );
 
@@ -1031,7 +1031,7 @@ app.get('/api/today-feature', async (req, res) => {
     const [topProducts] = await promiseDb.query(`
       SELECT mi.name, mi.description, c.name as category_name, SUM(oi.quantity) as total_sold
       FROM order_items oi
-      \${MENU_ITEM_JOIN_CONDITION}
+      ${MENU_ITEM_JOIN_CONDITION}
       LEFT JOIN categories c ON mi.category_id = c.id
       WHERE oi.item_name NOT IN (SELECT name FROM addons)
       GROUP BY mi.id, mi.name, mi.description, c.name
@@ -1491,7 +1491,7 @@ app.post('/api/ai-chat', async (req, res) => {
           /* 1 */ promiseDb.query(`SELECT COUNT(*) as today_orders, COALESCE(SUM(total_amount),0) as today_revenue FROM orders WHERE DATE(created_at) = CURDATE()`),
           /* 2 */ promiseDb.query(`SELECT COUNT(*) as yesterday_orders, COALESCE(SUM(total_amount),0) as yesterday_revenue FROM orders WHERE DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)`),
           /* 3 */ promiseDb.query(`SELECT status, COUNT(*) as count FROM orders GROUP BY status`),
-          /* 4 */ promiseDb.query(`SELECT mi.name, SUM(oi.quantity) as sold FROM order_items oi \${MENU_ITEM_JOIN_CONDITION} GROUP BY mi.id ORDER BY sold DESC LIMIT 8`),
+          /* 4 */ promiseDb.query(`SELECT mi.name, SUM(oi.quantity) as sold FROM order_items oi ${MENU_ITEM_JOIN_CONDITION} GROUP BY mi.id ORDER BY sold DESC LIMIT 8`),
           /* 5 */ promiseDb.query(`SELECT DATE(created_at) as best_date, SUM(total_amount) as daily_rev FROM orders GROUP BY DATE(created_at) ORDER BY daily_rev DESC LIMIT 1`),
           /* 6 */ promiseDb.query(`SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as date, COUNT(*) as orders, COALESCE(SUM(total_amount),0) as revenue FROM orders WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 15 DAY) GROUP BY DATE(created_at) ORDER BY date DESC`),
           /* 7 */ promiseDb.query(`SELECT item_name, quantity, unit, min_threshold, CASE WHEN quantity <= min_threshold THEN 'LOW' ELSE 'OK' END as stock_status FROM inventory ORDER BY stock_status DESC, item_name`),
