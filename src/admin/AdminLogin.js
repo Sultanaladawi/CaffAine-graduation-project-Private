@@ -171,7 +171,7 @@ export default function AdminLogin() {
             <ShieldCheck size={38} strokeWidth={1.5} />
           </div>
           <h1 style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.2rem', color: '#fff', margin: '0 0 8px 0', lineHeight: 1 }}>
-            Caff<span style={{ color: colors.latte, fontStyle: 'italic' }}>AIne.</span>
+            Caff<span style={{ color: colors.latte, fontStyle: 'italic' }}>AIne</span>
           </h1>
           <p style={{ color: 'rgba(255,255,255,0.15)', fontSize: '0.65rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '4px' }}>
             Restricted Terminal
