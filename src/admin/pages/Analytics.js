@@ -239,7 +239,7 @@ const Analytics = () => {
     });
 
   return (
-    <div className="dashboard-fade-in" style={{ color: theme.latte, backgroundColor: theme.espresso, minHeight: '100vh', padding: '40px 10px 40px 5px', position: 'relative' }}>
+    <div className="dashboard-fade-in" style={{ color: theme.text, backgroundColor: theme.espresso, minHeight: '100vh', padding: '40px 10px 40px 5px', position: 'relative' }}>
       {/* Background */}
       <div style={{ position: 'fixed', top:0, left:0, right:0, bottom:0, zIndex:0, overflow:'hidden', pointerEvents:'none' }}>
         <div style={{ position:'absolute', top:0, left:0, right:0, bottom:0, background:'radial-gradient(circle at 50% -20%, #2a1b10 0%, #070504 70%)' }} />

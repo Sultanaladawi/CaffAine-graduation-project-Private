@@ -222,6 +222,33 @@ const Inventory = () => {
         @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 50px) scale(1.1); } }
         .page-badge { background: #1b130e; border: 1px solid ${colors.border}; padding: 12px 25px; border-radius: 18px; display: inline-flex; align-items: center; gap: 12px; margin: 20px 0; }
         .page-badge span { font-family: 'Inter', sans-serif; font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: -0.5px; }
+        .inventory-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 20px;
+          margin-bottom: 40px;
+          flex-wrap: wrap;
+        }
+        .inventory-buttons {
+          display: flex;
+          gap: 15px;
+        }
+        @media (max-width: 768px) {
+          .inventory-header {
+            flex-direction: column;
+            align-items: stretch;
+          }
+          .inventory-buttons {
+            width: 100%;
+            justify-content: space-between;
+          }
+          .inventory-buttons button {
+            flex: 1;
+            padding: 10px 15px !important;
+            font-size: 0.9rem !important;
+          }
+        }
       `}</style>
       {showModal && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', backdropFilter: 'blur(5px)' }}>
@@ -285,14 +312,10 @@ const Inventory = () => {
         </div>
       )}
 
-      <div style={{ 
+      <div className="inventory-header" style={{ 
         position: 'relative',
         zIndex: 1,
-        width: '100%', 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'flex-start', 
-        marginBottom: '40px'
+        width: '100%'
       }}>
         <div>
           <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.8rem', color: colors.crema, lineHeight: 1 }}>
@@ -308,7 +331,7 @@ const Inventory = () => {
             CaffAIne | Raw Materials & Stock Level Management
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '15px' }}>
+        <div className="inventory-buttons">
           <button 
             onClick={exportPDF}
             style={{ 
@@ -380,7 +403,7 @@ const Inventory = () => {
           </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
-            <table width="100%" style={{ borderCollapse: 'separate', borderSpacing: '0 10px', textAlign: 'left', tableLayout: 'fixed' }}>
+            <table width="100%" style={{ borderCollapse: 'separate', borderSpacing: '0 10px', textAlign: 'left', tableLayout: 'fixed', minWidth: '850px' }}>
               <colgroup>
                 <col style={{ width: '15%' }} />
                 <col style={{ width: '25%' }} />
