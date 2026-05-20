@@ -379,20 +379,112 @@ const Analytics = () => {
               </div>
             </div>
 
-            <div style={{ backgroundColor: theme.card, padding:'24px 20px', borderRadius:'24px', border:`1px solid ${theme.border}`, boxShadow:'0 15px 45px rgba(0,0,0,0.3)', display:'flex', flexDirection:'column', alignItems:'center', minWidth: '0' }}>
-              <h3 style={{ color:'#fff', marginBottom:'30px', fontFamily:'serif', fontSize:'1.5rem', alignSelf:'flex-start' }}>Category Dominance</h3>
-              <div style={{ position:'relative', width:'180px', height:'180px', marginBottom:'30px' }}>
-                <div style={{ width:'100%', height:'100%', borderRadius:'50%', background:`conic-gradient(#c4a484 ${topCategory.percentage*3.6}deg, rgba(196,164,132,0.05) 0deg)`, display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 0 30px #c4a48422', transition:'all 1.5s cubic-bezier(0.4,0,0.2,1)' }}>
-                  <div style={{ width:'140px', height:'140px', borderRadius:'50%', backgroundColor: theme.card, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', boxShadow:'inset 0 0 20px rgba(0,0,0,0.5)' }}>
-                    <span style={{ color:'#fff', fontSize:'2.5rem', fontWeight:'900', lineHeight:'1' }}>{topCategory.percentage}%</span>
-                    <span style={{ color:'#c4a484', fontSize:'0.65rem', fontWeight:'bold', textTransform:'uppercase', letterSpacing:'1px', marginTop:'5px' }}>Market Share</span>
+            <div style={{ backgroundColor: theme.card, padding:'24px 20px', borderRadius:'24px', border:`1px solid ${theme.border}`, boxShadow:'0 15px 45px rgba(0,0,0,0.3)', display:'flex', flexDirection:'column', alignItems:'center', minWidth: '0', position: 'relative' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', marginBottom: '20px' }}>
+                <h3 style={{ color:'#fff', margin: 0, fontFamily:'serif', fontSize:'1.4rem' }}>Category Dominance</h3>
+                {/* Arrow controllers */}
+                {categoriesData.length > 0 && (
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button 
+                      onClick={() => {
+                        setActiveCatIndex(prev => (prev === 0 ? categoriesData.length - 1 : prev - 1));
+                      }}
+                      style={{
+                        background: 'rgba(255,255,255,0.03)',
+                        border: `1px solid ${theme.border}`,
+                        color: '#c4a484',
+                        borderRadius: '50%',
+                        width: '32px',
+                        height: '32px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(196,164,132,0.1)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'}
+                    >
+                      <i className="fas fa-chevron-left" style={{ fontSize: '0.85rem' }} />
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setActiveCatIndex(prev => (prev === categoriesData.length - 1 ? 0 : prev + 1));
+                      }}
+                      style={{
+                        background: 'rgba(255,255,255,0.03)',
+                        border: `1px solid ${theme.border}`,
+                        color: '#c4a484',
+                        borderRadius: '50%',
+                        width: '32px',
+                        height: '32px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(196,164,132,0.1)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'}
+                    >
+                      <i className="fas fa-chevron-right" style={{ fontSize: '0.85rem' }} />
+                    </button>
                   </div>
-                </div>
+                )}
               </div>
-              <div style={{ textAlign:'center' }}>
-                <p style={{ color:'#fff', fontSize:'1.2rem', fontWeight:'bold', margin:0, fontFamily:'serif' }}>{topCategory.name}</p>
-                <p style={{ color: theme.text, fontSize:'0.85rem', opacity:0.6, marginTop:'5px' }}>Highest Selling Category</p>
-              </div>
+
+              {categoriesData.length > 0 && categoriesData[activeCatIndex] ? (() => {
+                const activeCat = categoriesData[activeCatIndex];
+                const isBestSeller = activeCatIndex === categoriesData.reduce((bestIdx, c, idx, arr) => c.count > arr[bestIdx].count ? idx : bestIdx, 0);
+
+                return (
+                  <>
+                    <div style={{ position:'relative', width:'180px', height:'180px', marginBottom:'25px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div style={{ 
+                        width:'100%', height:'100%', borderRadius:'50%', 
+                        background:`conic-gradient(${activeCat.color} ${activeCat.percentage*3.6}deg, rgba(255,255,255,0.03) 0deg)`, 
+                        display:'flex', alignItems:'center', justifyContent:'center', 
+                        boxShadow:`0 0 35px ${activeCat.color}15`, 
+                        transition:'all 1s cubic-bezier(0.4,0,0.2,1)' 
+                      }}>
+                        <div style={{ width:'140px', height:'140px', borderRadius:'50%', backgroundColor: theme.card, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', boxShadow:'inset 0 0 20px rgba(0,0,0,0.5)' }}>
+                          <span style={{ color:'#fff', fontSize:'2.5rem', fontWeight:'900', lineHeight:'1' }}>{activeCat.percentage}%</span>
+                          <span style={{ color:'#c4a484', fontSize:'0.65rem', fontWeight:'bold', textTransform:'uppercase', letterSpacing:'1px', marginTop:'5px' }}>Market Share</span>
+                        </div>
+                      </div>
+                      <div style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '1.5rem', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.3))' }}>
+                        {activeCat.icon}
+                      </div>
+                    </div>
+                    
+                    <div style={{ textAlign:'center' }}>
+                      <p style={{ color:'#fff', fontSize:'1.25rem', fontWeight:'bold', margin:0, fontFamily:'serif' }}>{activeCat.name}</p>
+                      
+                      {isBestSeller ? (
+                        <div style={{ 
+                          display: 'inline-flex', 
+                          alignItems: 'center', 
+                          gap: '6px', 
+                          marginTop: '8px', 
+                          background: 'rgba(212,175,55,0.1)', 
+                          border: '1px solid rgba(212,175,55,0.2)',
+                          padding: '4px 12px', 
+                          borderRadius: '20px'
+                        }}>
+                          <i className="fas fa-crown" style={{ color: '#D4AF37', fontSize: '0.75rem' }} />
+                          <span style={{ color: '#D4AF37', fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Best Seller (100% Verified)</span>
+                        </div>
+                      ) : (
+                        <p style={{ color: theme.text, fontSize:'0.85rem', opacity:0.6, marginTop:'8px', margin: 0 }}>
+                          {activeCat.count} Items Sold
+                        </p>
+                      )}
+                    </div>
+                  </>
+                );
+              })() : (
+                <div style={{ color: '#555', padding: '40px' }}>Loading category data...</div>
+              )}
             </div>
           </div>
 
