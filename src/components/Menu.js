@@ -23,8 +23,8 @@ const renderCategoryIcon = (iconName) => {
   if (name.includes('coffee') || name.includes('mug') || name.includes('glass-martini')) return <span className="emojiIcon" style={style}>☕</span>;
   if (name.includes('snowflake') || name.includes('cold') || name.includes('iced') || name.includes('ice') || name.includes('smoothie')) return <span className="emojiIcon" style={style}>🧊</span>;
   if (name.includes('leaf') || name.includes('tea')) return <span className="emojiIcon" style={style}>🍵</span>;
-  if (name.includes('soda') || name.includes('drink') || name.includes('wine') || name.includes('glass')) return <span className="emojiIcon" style={style}>🥤</span>;
-  if (name.includes('utensils') || name.includes('food') || name.includes('bread') || name.includes('sandwich')) return <span className="emojiIcon" style={style}>🥪</span>;
+  if (name.includes('soda') || name.includes('drink') || name.includes('wine') || name.includes('glass')) return <span className="emojiIcon" style={style}>🍹</span>;
+  if (name.includes('utensils') || name.includes('food') || name.includes('bread') || name.includes('sandwich')) return <span className="emojiIcon" style={style}>🍔</span>;
   if (name.includes('cookie') || name.includes('sweet') || name.includes('cake') || name.includes('ice-cream') || name.includes('dessert')) return <span className="emojiIcon" style={style}>🍰</span>;
   return <span className="emojiIcon" style={style}>☕</span>;
 };
