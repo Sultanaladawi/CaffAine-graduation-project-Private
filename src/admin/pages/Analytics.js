@@ -22,6 +22,46 @@ const Analytics = () => {
   const [sortField, setSortField]               = useState('total_sold');
   const [sortDirection, setSortDirection]       = useState('desc');
   const [modalSearch, setModalSearch]           = useState('');
+  const [activeCatIndex, setActiveCatIndex]     = useState(0);
+
+  const categoryColors = {
+    'coffee': '#c4a484',
+    'drinks': '#4facfe',
+    'food': '#ff9a9e',
+    'sweets': '#f093fb',
+    'other': '#a1a1a1',
+    'uncategorized': '#a1a1a1'
+  };
+
+  const categoryIcons = {
+    'coffee': '☕',
+    'drinks': '🍹',
+    'food': '🍔',
+    'sweets': '🍰',
+    'other': '📦',
+    'uncategorized': '📦'
+  };
+
+  const rawCategoryStats = stats?.categoryStats || [];
+  const totalCount = rawCategoryStats.reduce((acc, c) => acc + (parseInt(c.count) || 0), 0);
+  const categoriesData = rawCategoryStats.map(c => {
+    const count = parseInt(c.count) || 0;
+    const percentage = totalCount > 0 ? Math.round((count / totalCount) * 100) : 0;
+    const nameKey = (c.name || 'Other').trim().toLowerCase();
+    return {
+      name: c.name || 'Other',
+      count: count,
+      percentage: percentage,
+      color: categoryColors[nameKey] || '#c4a484',
+      icon: categoryIcons[nameKey] || '☕'
+    };
+  });
+
+  useEffect(() => {
+    if (categoriesData.length > 0 && activeCatIndex >= categoriesData.length) {
+      setActiveCatIndex(0);
+    }
+  }, [categoriesData.length, activeCatIndex]);
 
   const theme = {
     crema: 'var(--admin-accent)',
