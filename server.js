@@ -395,6 +395,14 @@ app.post('/api/orders', async (req, res) => {
   } catch (err) {
     console.error('[Server] CRITICAL Order Error:', err.message);
     await conn.rollback();
+    const isOutOfStock = err.message.includes('out of stock') || err.message.includes('Insufficient stock');
+    if (isOutOfStock) {
+      return res.status(409).json({
+        success: false,
+        outOfStock: true,
+        error: err.message
+      });
+    }
     res.status(500).json({ error: err.message || 'Internal Server Error' });
   } finally {
     conn.release();

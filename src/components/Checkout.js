@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import styles from './Checkout.module.css';
+import { Coffee, AlertTriangle } from 'lucide-react';
 
 export default function Checkout({ onClose, onBack }) {
   const { items, totalPrice, clearCart } = useCart();
@@ -17,6 +18,7 @@ export default function Checkout({ onClose, onBack }) {
   const [errors, setErrors] = useState({});
   const [storeRating, setStoreRating] = useState(5);
   const [storeComment, setStoreComment] = useState('');
+  const [outOfStockError, setOutOfStockError] = useState(null);
 
   // Offers State
   const [offers, setOffers] = useState([]);
@@ -282,16 +284,24 @@ export default function Checkout({ onClose, onBack }) {
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to save order');
       const result = await response.json();
+      if (!response.ok) {
+        if (response.status === 409 && result.outOfStock) {
+          setOutOfStockError(result.error);
+          return 'outofstock';
+        }
+        throw new Error(result.error || 'Failed to save order');
+      }
+
       if (result.success) {
         setOrderId(result.orderId);
         setTimeRemaining(120);
+        return 'success';
       }
-      return result.success;
+      return 'error';
     } catch (error) {
       console.error('API Error:', error);
-      return false;
+      return 'error';
     }
   }
   async function handleSubmit(e) {
@@ -301,9 +311,9 @@ export default function Checkout({ onClose, onBack }) {
     setStep('processing');
 
     await new Promise(r => setTimeout(r, 1500));
-    const success = await saveOrderToBackend();
+    const resultStatus = await saveOrderToBackend();
 
-    if (success) {
+    if (resultStatus === 'success') {
       clearCart();
       setStep('success');
 
@@ -341,6 +351,8 @@ export default function Checkout({ onClose, onBack }) {
           })
         }).catch(err => console.error('Feedback error:', err));
       }
+    } else if (resultStatus === 'outofstock') {
+      setStep('outofstock');
     } else {
       setStep('error');
     }
@@ -412,6 +424,137 @@ export default function Checkout({ onClose, onBack }) {
               Return to Menu
             </button>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (step === 'outofstock') {
+    return (
+      <div style={{
+        position: 'fixed', inset: 0, zIndex: 9999,
+        backgroundColor: 'rgba(10, 6, 4, 0.97)',
+        backdropFilter: 'blur(20px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: '#ffffff', textAlign: 'center', padding: '30px',
+        animation: 'fadeIn 0.5s ease'
+      }}>
+        <div style={{ maxWidth: '500px', width: '100%', direction: 'rtl' }}>
+          {/* Elegant Shimmering Bar */}
+          <div style={{
+            height: '4px',
+            background: 'linear-gradient(90deg, #c4a484, #5a3500, #c4a484)',
+            borderRadius: '2px',
+            marginBottom: '30px'
+          }} />
+
+          {/* Animated Gold Coffee Cup */}
+          <div style={{ 
+            color: '#c4a484', 
+            marginBottom: '25px', 
+            display: 'flex', 
+            justifyContent: 'center',
+            animation: 'float 3s ease-in-out infinite' 
+          }}>
+            <Coffee size={85} strokeWidth={1} />
+          </div>
+
+          <style>{`
+            @keyframes float {
+              0% { transform: translateY(0px); }
+              50% { transform: translateY(-10px); }
+              100% { transform: translateY(0px); }
+            }
+          `}</style>
+
+          <h2 style={{ 
+            fontFamily: "'DM Serif Display', serif", 
+            fontSize: '2.5rem', 
+            marginBottom: '20px', 
+            color: '#ffffff',
+            fontWeight: 'normal',
+            letterSpacing: '0.5px'
+          }}>
+            نعتذر.. الصنف غير متوفر حالياً
+          </h2>
+
+          <p style={{ 
+            fontSize: '1.1rem', 
+            lineHeight: '1.75', 
+            opacity: 0.9, 
+            marginBottom: '35px', 
+            fontWeight: '300',
+            color: '#f3ece5'
+          }}>
+            لأننا نحرص في <strong>CaffAine</strong> على تقديم قهوتنا ومخبوزاتنا طازجة ومعدة بكل حب، يبدو أن أحد الأصناف التي اخترتها قد <strong>نفد من المخزون للتو</strong>. 
+            <br />
+            <span style={{ fontSize: '0.95rem', opacity: 0.8, display: 'block', marginTop: '10px' }}>
+              (لقد قمت بإضافة الصنف إلى سلتك قبل نفاده، ونأسف جداً لعدم تمكننا من تلبيته حالياً).
+            </span>
+          </p>
+
+          {/* Details Card */}
+          <div style={{ 
+            padding: '25px', 
+            border: '1px solid rgba(196, 164, 132, 0.25)', 
+            borderRadius: '22px', 
+            backgroundColor: 'rgba(196, 164, 132, 0.06)',
+            boxShadow: '0 15px 35px rgba(0,0,0,0.6)',
+            marginBottom: '35px',
+            textAlign: 'right'
+          }}>
+            <p style={{ 
+              fontWeight: '900', 
+              textTransform: 'uppercase', 
+              fontSize: '0.85rem', 
+              letterSpacing: '2px', 
+              marginBottom: '12px', 
+              color: '#c4a484',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <AlertTriangle size={16} /> تفاصيل المخزون:
+            </p>
+            <div style={{ 
+              fontSize: '1rem', 
+              color: '#ffffff', 
+              lineHeight: '1.6',
+              fontWeight: '500',
+              fontStyle: 'italic',
+              background: 'rgba(0,0,0,0.2)',
+              padding: '12px 15px',
+              borderRadius: '12px',
+              borderRight: '4px solid #c4a484'
+            }}>
+              {outOfStockError || 'عذراً، الصنف المطلوب غير متوفر.'}
+            </div>
+          </div>
+
+          {/* Action Button */}
+          <button 
+            onClick={() => {
+              setStep('form');
+              if (onBack) onBack(); // Go back to cart so they can edit it!
+            }} 
+            style={{
+              width: '100%', 
+              padding: '18px', 
+              borderRadius: '18px',
+              background: 'linear-gradient(135deg, #c4a484, #8b6c4c)', 
+              color: '#0a0604', 
+              border: 'none',
+              fontWeight: '900', 
+              fontSize: '1.1rem', 
+              cursor: 'pointer',
+              boxShadow: '0 10px 25px rgba(196, 164, 132, 0.25)',
+              transition: 'all 0.3s'
+            }}
+            onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+            onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+          >
+            تعديل السلة والمحاولة مرة أخرى
+          </button>
         </div>
       </div>
     );
