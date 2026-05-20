@@ -796,13 +796,20 @@ app.get('/api/analytics-all-sold-products', async (req, res) => {
     const promiseDb = db.promise();
     const { from, to, year, month, mode } = req.query;
     let query = `
-      SELECT mi.name as item_name, AVG(oi.price) as unit_price,
-             SUM(oi.quantity) as total_sold,
-             SUM(oi.quantity * oi.price) as revenue
-      FROM order_items oi
-      JOIN orders o ON oi.order_id = o.id
-      \${MENU_ITEM_JOIN_CONDITION}
-      WHERE oi.item_name NOT IN (SELECT name FROM addons)
+      SELECT mi.name as item_name, 
+             COALESCE(AVG(oi.price), mi.price_num) as unit_price,
+             COALESCE(SUM(oi.quantity), 0) as total_sold,
+             COALESCE(SUM(oi.quantity * oi.price), 0) as revenue
+      FROM menu_items mi
+      LEFT JOIN order_items oi ON (
+        (TRIM(SUBSTRING_INDEX(oi.item_name, ' (+', 1)) = mi.name
+         OR TRIM(SUBSTRING_INDEX(oi.item_name, ' (+', 1)) = TRIM(mi.name)
+         OR REPLACE(TRIM(SUBSTRING_INDEX(oi.item_name, ' (+', 1)), '_', ' ') = mi.name
+         OR (TRIM(SUBSTRING_INDEX(oi.item_name, ' (+', 1)) = 'Hot Chocolate' AND mi.name = 'British Hot Chocolate')
+         OR (TRIM(SUBSTRING_INDEX(oi.item_name, ' (+', 1)) = 'Pour-Over Filter' AND mi.name = 'Pour-Over Filter Coffee'))
+        AND (oi.item_name NOT IN (SELECT name FROM addons) OR oi.item_name IS NULL)
+      )
+      LEFT JOIN orders o ON oi.order_id = o.id
     `;
     const params = [];
     if (mode === 'monthly') {
