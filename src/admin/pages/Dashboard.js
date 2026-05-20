@@ -131,9 +131,9 @@ const Dashboard = () => {
         .bar-fill { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .bar-wrapper:hover .bar-fill {
           transform: translateY(-8px) scaleX(1.05);
-          background: linear-gradient(180deg, #D4AF37, #c4a484) !important;
-          box-shadow: 0 10px 25px rgba(212, 175, 55, 0.45) !important;
-          border: 1px solid rgba(212, 175, 55, 0.6) !important;
+          background: linear-gradient(180deg, #c4a484, #8c6a56) !important;
+          box-shadow: 0 10px 28px rgba(196, 164, 132, 0.5) !important;
+          border: 1px solid rgba(196, 164, 132, 0.7) !important;
         }
         .terminal-box { background: #0d0806; border: 1px solid ${theme.border}; border-radius: 25px; padding: 25px; font-family: 'Inter', monospace; font-size: 0.8rem; color: #aaa; }
         

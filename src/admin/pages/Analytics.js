@@ -241,9 +241,9 @@ const Analytics = () => {
         .bar-fill { transition:all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .bar-wrapper:hover .bar-fill {
           transform: translateY(-8px) scaleX(1.05);
-          background: linear-gradient(180deg, #D4AF37, #c4a484) !important;
-          box-shadow: 0 10px 25px rgba(212, 175, 55, 0.45) !important;
-          border: 1px solid rgba(212, 175, 55, 0.6) !important;
+          background: linear-gradient(180deg, #c4a484, #8c6a56) !important;
+          box-shadow: 0 10px 28px rgba(196, 164, 132, 0.5) !important;
+          border: 1px solid rgba(196, 164, 132, 0.7) !important;
         }
         .filter-btn { padding:10px 20px; border-radius:12px; border:1px solid rgba(196,164,132,0.3); background:rgba(196,164,132,0.05); color:#c4a484; font-weight:700; font-size:0.85rem; cursor:pointer; transition:0.25s; }
         .filter-btn.active { background:#c4a484; color:#070504; border-color:#c4a484; }
