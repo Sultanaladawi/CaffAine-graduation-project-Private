@@ -439,7 +439,7 @@ export default function Checkout({ onClose, onBack }) {
         color: '#ffffff', textAlign: 'center', padding: '30px',
         animation: 'fadeIn 0.5s ease'
       }}>
-        <div style={{ maxWidth: '500px', width: '100%', direction: 'rtl' }}>
+        <div style={{ maxWidth: '500px', width: '100%', direction: 'ltr' }}>
           {/* Elegant Shimmering Bar */}
           <div style={{
             height: '4px',
@@ -475,7 +475,7 @@ export default function Checkout({ onClose, onBack }) {
             fontWeight: 'normal',
             letterSpacing: '0.5px'
           }}>
-            نعتذر.. الصنف غير متوفر حالياً
+            Selection Sold Out
           </h2>
 
           <p style={{ 
@@ -486,10 +486,10 @@ export default function Checkout({ onClose, onBack }) {
             fontWeight: '300',
             color: '#f3ece5'
           }}>
-            لأننا نحرص في <strong>CaffAine</strong> على تقديم قهوتنا ومخبوزاتنا طازجة ومعدة بكل حب، يبدو أن أحد الأصناف التي اخترتها قد <strong>نفد من المخزون للتو</strong>. 
+            Because we handcraft our brews and bake our pastries fresh daily to guarantee the finest experience, it seems an item in your order has <strong>just sold out</strong>.
             <br />
             <span style={{ fontSize: '0.95rem', opacity: 0.8, display: 'block', marginTop: '10px' }}>
-              (لقد قمت بإضافة الصنف إلى سلتك قبل نفاده، ونأسف جداً لعدم تمكننا من تلبيته حالياً).
+              (You added this item to your cart before it went out of stock. We sincerely apologize for any inconvenience caused.)
             </span>
           </p>
 
@@ -501,7 +501,7 @@ export default function Checkout({ onClose, onBack }) {
             backgroundColor: 'rgba(196, 164, 132, 0.06)',
             boxShadow: '0 15px 35px rgba(0,0,0,0.6)',
             marginBottom: '35px',
-            textAlign: 'right'
+            textAlign: 'left'
           }}>
             <p style={{ 
               fontWeight: '900', 
@@ -514,7 +514,7 @@ export default function Checkout({ onClose, onBack }) {
               alignItems: 'center',
               gap: '8px'
             }}>
-              <AlertTriangle size={16} /> تفاصيل المخزون:
+              <AlertTriangle size={16} /> INVENTORY DETAILS:
             </p>
             <div style={{ 
               fontSize: '1rem', 
@@ -525,9 +525,9 @@ export default function Checkout({ onClose, onBack }) {
               background: 'rgba(0,0,0,0.2)',
               padding: '12px 15px',
               borderRadius: '12px',
-              borderRight: '4px solid #c4a484'
+              borderLeft: '4px solid #c4a484'
             }}>
-              {outOfStockError || 'عذراً، الصنف المطلوب غير متوفر.'}
+              {outOfStockError || 'We apologize, but the requested item is currently unavailable.'}
             </div>
           </div>
 
@@ -553,7 +553,7 @@ export default function Checkout({ onClose, onBack }) {
             onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
             onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
           >
-            تعديل السلة والمحاولة مرة أخرى
+            Adjust Cart & Try Again
           </button>
         </div>
       </div>
