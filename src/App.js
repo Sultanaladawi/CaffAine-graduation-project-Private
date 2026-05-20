@@ -18,6 +18,7 @@ import Cart               from './components/Cart';
 import Checkout           from './components/Checkout';
 import Presentation       from './components/Presentation';
 import LoadingScreen      from './components/LoadingScreen';
+import MobileNav         from './components/MobileNav';
 
 import { AdminProvider }  from './admin/AdminContext';
 import AdminRoute         from './admin/AdminRoute';
@@ -87,6 +88,7 @@ function PublicSite() {
       </main>
 
       <Footer />
+      <MobileNav onCartOpen={() => { setCartOpen(true); setCheckoutOpen(false); }} />
       <Chatbot />
 
       {cartOpen && (
