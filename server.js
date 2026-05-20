@@ -781,21 +781,23 @@ app.get('/api/analytics-all-sold-products', async (req, res) => {
     const promiseDb = db.promise();
     const { from, to, year, month, mode } = req.query;
     let query = `
-      SELECT oi.item_name, AVG(oi.price) as unit_price,
+      SELECT mi.name as item_name, AVG(oi.price) as unit_price,
              SUM(oi.quantity) as total_sold,
              SUM(oi.quantity * oi.price) as revenue
       FROM order_items oi
       JOIN orders o ON oi.order_id = o.id
+      JOIN menu_items mi ON (oi.product_id = mi.id OR oi.item_name = mi.name)
+      WHERE oi.item_name NOT IN (SELECT name FROM addons)
     `;
     const params = [];
     if (mode === 'monthly') {
-      query += ` WHERE YEAR(o.created_at) = ? AND MONTH(o.created_at) = ?`;
+      query += ` AND YEAR(o.created_at) = ? AND MONTH(o.created_at) = ?`;
       params.push(parseInt(year) || new Date().getFullYear(), parseInt(month) || (new Date().getMonth() + 1));
     } else if (mode === 'range') {
-      query += ` WHERE DATE(o.created_at) BETWEEN ? AND ?`;
+      query += ` AND DATE(o.created_at) BETWEEN ? AND ?`;
       params.push(from || '2000-01-01', to || new Date().toISOString().split('T')[0]);
     }
-    query += ` GROUP BY oi.item_name ORDER BY total_sold DESC`;
+    query += ` GROUP BY mi.id, mi.name ORDER BY total_sold DESC`;
     const [results] = await promiseDb.query(query, params);
     res.json(results);
   } catch (err) {
