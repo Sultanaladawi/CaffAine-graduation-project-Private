@@ -1009,6 +1009,7 @@ app.get('/api/today-feature', async (req, res) => {
       FROM order_items oi
       JOIN menu_items mi ON (oi.product_id = mi.id OR oi.item_name = mi.name)
       LEFT JOIN categories c ON mi.category_id = c.id
+      WHERE oi.item_name NOT IN (SELECT name FROM addons)
       GROUP BY mi.id, mi.name, mi.description, c.name
       ORDER BY total_sold DESC
       LIMIT 1
