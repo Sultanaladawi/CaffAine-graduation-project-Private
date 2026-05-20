@@ -179,8 +179,9 @@ app.get('/api/fix-db-times', async (req, res) => {
   }
 });
 
+const dbHost = process.env.DB_HOST || 'localhost';
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
+  host: dbHost,
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || process.env.DB_PASS || '',
   database: process.env.DB_NAME || 'graduation_project',
@@ -189,9 +190,7 @@ const pool = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0,
   dateStrings: true,
-ssl: {
-    rejectUnauthorized: false
-  }
+  ssl: (dbHost !== 'localhost' && dbHost !== '127.0.0.1') ? { rejectUnauthorized: false } : false
 });
 
 // Force all MySQL connections to use Jordan Time (Asia/Amman = UTC+3)
@@ -1037,12 +1036,12 @@ app.get('/api/today-feature', async (req, res) => {
     const promiseDb = db.promise();
     // 1. Try to get the top-selling product
     const [topProducts] = await promiseDb.query(`
-      SELECT mi.name, mi.description, c.name as category_name, SUM(oi.quantity) as total_sold
+      SELECT mi.name, mi.description, c.${categoryNameColumn} as category_name, SUM(oi.quantity) as total_sold
       FROM order_items oi
       ${MENU_ITEM_JOIN_CONDITION}
       LEFT JOIN categories c ON mi.category_id = c.id
       WHERE oi.item_name NOT IN (SELECT name FROM addons)
-      GROUP BY mi.id, mi.name, mi.description, c.name
+      GROUP BY mi.id, mi.name, mi.description, c.${categoryNameColumn}
       ORDER BY total_sold DESC
       LIMIT 1
     `);
@@ -1051,13 +1050,13 @@ app.get('/api/today-feature', async (req, res) => {
       const top = topProducts[0];
       return res.status(200).json({
         name: top.name,
-        sub: top.description || `${top.category_name} · Specialty`
+        sub: `${top.category_name} · Specialty`
       });
     }
 
     // 2. If no sales exist, get the first available product
     const [firstProducts] = await promiseDb.query(`
-      SELECT mi.name, mi.description, c.name as category_name
+      SELECT mi.name, mi.description, c.${categoryNameColumn} as category_name
       FROM menu_items mi
       LEFT JOIN categories c ON mi.category_id = c.id
       WHERE mi.available = 1
@@ -1068,7 +1067,7 @@ app.get('/api/today-feature', async (req, res) => {
       const first = firstProducts[0];
       return res.status(200).json({
         name: first.name,
-        sub: first.description || `${first.category_name} · Specialty`
+        sub: `${first.category_name} · Specialty`
       });
     }
 

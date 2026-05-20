@@ -34,10 +34,11 @@ const Analytics = () => {
   };
 
   const categoryIcons = {
-    'coffee': '☕',
-    'drinks': '🍹',
-    'food': '🍔',
-    'sweets': '🍰',
+    'coffee & espresso': '☕',
+    'cold drinks & ice cream': '🍹',
+    'food & pastries': '🥐',
+    'sweets & cakes': '🍰',
+    'tea & infusions': '🫖',
     'other': '📦',
     'uncategorized': '📦'
   };
@@ -48,12 +49,30 @@ const Analytics = () => {
     const count = parseInt(c.count) || 0;
     const percentage = totalCount > 0 ? Math.round((count / totalCount) * 100) : 0;
     const nameKey = (c.name || 'Other').trim().toLowerCase();
+    
+    // Find matching icon even if partial match
+    let icon = '📦';
+    if (nameKey.includes('coffee')) icon = '☕';
+    else if (nameKey.includes('cold') || nameKey.includes('drink')) icon = '🍹';
+    else if (nameKey.includes('food') || nameKey.includes('pastries')) icon = '🥐';
+    else if (nameKey.includes('sweet') || nameKey.includes('cake')) icon = '🍰';
+    else if (nameKey.includes('tea')) icon = '🫖';
+
+    // Find matching color
+    let color = '#c4a484';
+    if (nameKey.includes('coffee')) color = '#c4a484';
+    else if (nameKey.includes('cold') || nameKey.includes('drink')) color = '#4facfe';
+    else if (nameKey.includes('food') || nameKey.includes('pastries')) color = '#ff9a9e';
+    else if (nameKey.includes('sweet') || nameKey.includes('cake')) color = '#f093fb';
+    else if (nameKey.includes('tea')) color = '#a8e6cf';
+    else color = '#a1a1a1';
+
     return {
       name: c.name || 'Other',
       count: count,
       percentage: percentage,
-      color: categoryColors[nameKey] || '#c4a484',
-      icon: categoryIcons[nameKey] || '☕'
+      color: color,
+      icon: icon
     };
   }).sort((a, b) => b.count - a.count);
 
