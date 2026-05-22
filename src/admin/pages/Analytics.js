@@ -339,11 +339,11 @@ const Analytics = () => {
       {/* ── Filter Bar ── */}
       <div style={{ position:'relative', zIndex:1, background:'rgba(255,255,255,0.02)', border:'1px solid rgba(196,164,132,0.12)', borderRadius:'20px', padding:'20px 25px', marginBottom:'25px', display:'flex', flexWrap:'wrap', gap:'15px', alignItems:'center' }}>
         <Calendar size={20} color="#c4a484" />
-        <span style={{ color:'rgba(255,255,255,0.5)', fontWeight:'700', fontSize:'0.85rem', textTransform:'uppercase', letterSpacing:'1px' }}>عرض حسب:</span>
+        <span style={{ color:'rgba(255,255,255,0.5)', fontWeight:'700', fontSize:'0.85rem', textTransform:'uppercase', letterSpacing:'1px' }}>View By:</span>
 
-        <button className={`filter-btn${viewMode==='monthly'?' active':''}`} onClick={() => setViewMode('monthly')}>شهري</button>
-        <button className={`filter-btn${viewMode==='range'?' active':''}`}   onClick={() => setViewMode('range')}>نطاق تاريخ</button>
-        <button className={`filter-btn${viewMode==='alltime'?' active':''}`} onClick={() => setViewMode('alltime')}>كل الوقت</button>
+        <button className={`filter-btn${viewMode==='monthly'?' active':''}`} onClick={() => setViewMode('monthly')}>Monthly</button>
+        <button className={`filter-btn${viewMode==='range'?' active':''}`}   onClick={() => setViewMode('range')}>Date Range</button>
+        <button className={`filter-btn${viewMode==='alltime'?' active':''}`} onClick={() => setViewMode('alltime')}>All Time</button>
 
         {viewMode === 'monthly' && (
           <>
@@ -359,22 +359,22 @@ const Analytics = () => {
         {viewMode === 'range' && (
           <>
             <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-start', gap:'3px' }}>
-              <span style={{ fontSize:'0.7rem', color:'rgba(196,164,132,0.8)', fontWeight:'600' }}>من:</span>
+              <span style={{ fontSize:'0.7rem', color:'rgba(196,164,132,0.8)', fontWeight:'600' }}>From:</span>
               <input type="date" lang="en" className="filter-date" value={rangeFrom} onChange={e => setRangeFrom(e.target.value)} />
             </div>
             <span style={{ color:'#c4a484', fontWeight:'700' }}>→</span>
             <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-start', gap:'3px' }}>
-              <span style={{ fontSize:'0.7rem', color:'rgba(196,164,132,0.8)', fontWeight:'600' }}>إلى:</span>
+              <span style={{ fontSize:'0.7rem', color:'rgba(196,164,132,0.8)', fontWeight:'600' }}>To:</span>
               <input type="date" lang="en" className="filter-date" value={rangeTo}   onChange={e => setRangeTo(e.target.value)}   />
             </div>
             {rangeFrom && rangeTo && (
               <button className="filter-btn active" style={{ display:'flex', alignItems:'center', gap:'6px' }} onClick={fetchStats}>
-                <Search size={14} /> تطبيق
+                <Search size={14} /> Apply
               </button>
             )}
             {(rangeFrom || rangeTo) && (
               <button className="filter-btn" style={{ display:'flex', alignItems:'center', gap:'6px' }} onClick={() => { setRangeFrom(''); setRangeTo(''); }}>
-                <X size={14} /> مسح
+                <X size={14} /> Clear
               </button>
             )}
           </>
