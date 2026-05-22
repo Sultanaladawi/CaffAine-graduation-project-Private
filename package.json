@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "scripts": {
     "start": "node server.js",
-    "client": "react-scripts start",
+    "client": "cross-env GENERATE_SOURCEMAP=false react-scripts start",
     "server": "node server.js",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "build": "react-scripts build"
+    "build": "cross-env GENERATE_SOURCEMAP=false react-scripts build"
   },
   "dependencies": {
     "@studio-freight/lenis": "^1.0.42",
@@ -32,7 +32,8 @@
     "react-scripts": "5.0.1"
   },
   "devDependencies": {
-    "@types/node": "^25.6.0"
+    "@types/node": "^25.6.0",
+    "cross-env": "^10.1.0"
   },
   "browserslist": {
     "production": [
