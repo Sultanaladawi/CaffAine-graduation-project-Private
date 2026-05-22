@@ -150,7 +150,6 @@ export default function Chatbot() {
       const reply = await callAI(t);
       const aiMsg = { id: Date.now() + 1, role: 'sophie', text: reply };
       setMsgs(prev => [...prev, aiMsg]);
-      speakText(reply);
       
       console.log('[Chatbot] Syncing message to DB...');
       fetch('/api/messages', {
