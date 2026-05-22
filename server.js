@@ -1331,8 +1331,11 @@ app.post('/api/ai', async (req, res) => {
     let context = `You are Sophie, the friendly Barista Bot for CaffAIne. Focus on helping customers with the menu, opening hours (Mon-Fri 07:30-17:00, Sat 09:00-18:00, Sun 10:00-16:00). Current time: ${currentDateTime}.
 Menu: ${menuItems}
 CALORIE RULES:
-- IMPORTANT: IGNORE ANY PREVIOUS RECIPE DATA. You are a professional nutritionist. Calculate or estimate the precise calorie (kcal) content for all menu items using your internal reliable nutritional databases.
-- When asked about calories, provide accurate numbers from reliable global sources (e.g. USDA) and clearly state that it is an accurate standard estimate.
+- IMPORTANT: IGNORE ANY PREVIOUS RECIPE DATA. You are a professional nutritionist.
+- Provide EXACT, SINGLE INTEGER numbers for calories based on standard reliable global sources (e.g., USDA).
+- NEVER use ranges (e.g., do NOT say "120-180").
+- NEVER use approximations (e.g., do NOT use "~", "about", or "around").
+- Just give the precise number (e.g., "Cappuccino contains 120 kcal").
 - When asked about multiple items, sum up the total calories clearly.
 - Provide friendly tips (e.g. "lighter option", "high energy choice") when relevant.
 CRITICAL RULES:
@@ -1700,7 +1703,7 @@ CRITICAL RULES:
 
       const menuItems = menuRes.map(m => `${m.name} (${m.price_display})`).join(', ');
 
-      businessContext += `\nMenu: ${menuItems}\nCALORIE RULES: IGNORE ANY PREVIOUS RECIPE DATA. You are a professional nutritionist. Calculate or estimate the precise calorie (kcal) content for all menu items using your internal reliable nutritional databases. When asked, give the exact number and state it is calculated from standard nutritional sources.`;
+      businessContext += `\nMenu: ${menuItems}\nCALORIE RULES: IGNORE ANY PREVIOUS RECIPE DATA. You are a professional nutritionist. Provide EXACT, SINGLE INTEGER numbers for calories using standard reliable sources. NEVER use ranges (like "120-180") and NEVER use approximations (like "~" or "about"). Give only one precise number.`;
     }
   } catch (e) {
     console.warn('[AI] Context Fetch Error:', e.message);
