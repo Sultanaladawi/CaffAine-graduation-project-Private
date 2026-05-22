@@ -360,12 +360,28 @@ const Analytics = () => {
           <>
             <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-start', gap:'3px' }}>
               <span style={{ fontSize:'0.7rem', color:'rgba(196,164,132,0.8)', fontWeight:'600' }}>From:</span>
-              <input type="date" lang="en" dir="ltr" className="filter-date" value={rangeFrom} onChange={e => setRangeFrom(e.target.value)} />
+              <input 
+                type={rangeFrom ? "date" : "text"} 
+                placeholder="mm/dd/yyyy"
+                onFocus={(e) => (e.target.type = "date")}
+                onBlur={(e) => { if (!e.target.value) e.target.type = "text"; }}
+                className="filter-date" 
+                value={rangeFrom} 
+                onChange={e => setRangeFrom(e.target.value)} 
+              />
             </div>
             <span style={{ color:'#c4a484', fontWeight:'700' }}>→</span>
             <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-start', gap:'3px' }}>
               <span style={{ fontSize:'0.7rem', color:'rgba(196,164,132,0.8)', fontWeight:'600' }}>To:</span>
-              <input type="date" lang="en" dir="ltr" className="filter-date" value={rangeTo}   onChange={e => setRangeTo(e.target.value)}   />
+              <input 
+                type={rangeTo ? "date" : "text"} 
+                placeholder="mm/dd/yyyy"
+                onFocus={(e) => (e.target.type = "date")}
+                onBlur={(e) => { if (!e.target.value) e.target.type = "text"; }}
+                className="filter-date" 
+                value={rangeTo}   
+                onChange={e => setRangeTo(e.target.value)}   
+              />
             </div>
             {rangeFrom && rangeTo && (
               <button className="filter-btn active" style={{ display:'flex', alignItems:'center', gap:'6px' }} onClick={fetchStats}>
