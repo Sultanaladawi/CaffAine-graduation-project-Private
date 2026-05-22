@@ -268,7 +268,7 @@ const Analytics = () => {
         .filter-btn.active { background:#c4a484; color:#070504; border-color:#c4a484; }
         .filter-btn:hover:not(.active) { background:rgba(196,164,132,0.15); }
         .filter-select { padding:10px 14px; border-radius:10px; border:1px solid rgba(196,164,132,0.3); background:#0d0806; color:#fff; font-weight:600; font-size:0.9rem; cursor:pointer; }
-        .filter-date { padding:10px 14px; border-radius:10px; border:1px solid rgba(196,164,132,0.3); background:#0d0806; color:#fff; font-weight:600; font-size:0.9rem; }
+        .filter-date { padding:10px 14px; border-radius:10px; border:1px solid rgba(196,164,132,0.3); background:#0d0806; color:#fff; font-weight:600; font-size:0.9rem; direction:ltr; unicode-bidi:plaintext; }
         .filter-date::-webkit-calendar-picker-indicator { filter:invert(1); }
 
         .analytics-cards-grid {
