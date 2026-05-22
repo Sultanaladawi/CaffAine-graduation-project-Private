@@ -533,6 +533,59 @@ db.query(`CREATE TABLE IF NOT EXISTS admin_logs (id INT AUTO_INCREMENT PRIMARY K
 db.query(`CREATE TABLE IF NOT EXISTS ai_assistant_logs (id INT AUTO_INCREMENT PRIMARY KEY, admin_query TEXT, ai_response TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`, (err) => { if (err) console.error('Ensure ai_assistant_logs table error:', err); });
 db.query("UPDATE addons SET price = 0.50 WHERE price = 0", (err) => { if (err) console.error('Update addon prices error:', err); });
 
+// --- Calorie Migration: add calories_per_unit to inventory if missing ---
+db.query("SHOW COLUMNS FROM inventory LIKE 'calories_per_unit'", (err, results) => {
+  if (!err && results.length === 0) {
+    db.query("ALTER TABLE inventory ADD COLUMN calories_per_unit DECIMAL(8,2) DEFAULT 0", (alterErr) => {
+      if (!alterErr) {
+        console.log('[Migration] Added calories_per_unit column to inventory.');
+        // Seed intelligent default calorie values based on common ingredient names
+        const calorieDefaults = [
+          // Dairy
+          { keyword: 'milk',          cal: 0.61  }, // kcal per ml
+          { keyword: 'cream',         cal: 3.40  }, // kcal per ml
+          { keyword: 'oat milk',      cal: 0.45  },
+          { keyword: 'soy milk',      cal: 0.33  },
+          { keyword: 'almond milk',   cal: 0.15  },
+          { keyword: 'butter',        cal: 7.17  }, // kcal per gram
+          // Coffee & Tea
+          { keyword: 'espresso',      cal: 0.02  }, // kcal per ml brewed
+          { keyword: 'coffee',        cal: 0.02  },
+          { keyword: 'tea',           cal: 0.01  },
+          // Sweeteners
+          { keyword: 'sugar',         cal: 3.87  }, // kcal per gram
+          { keyword: 'syrup',         cal: 2.60  },
+          { keyword: 'honey',         cal: 3.04  },
+          { keyword: 'vanilla',       cal: 2.88  },
+          { keyword: 'caramel',       cal: 3.80  },
+          { keyword: 'chocolate',     cal: 5.46  },
+          { keyword: 'cocoa',         cal: 2.28  },
+          // Proteins & Fats
+          { keyword: 'egg',           cal: 1.43  }, // kcal per gram
+          { keyword: 'flour',         cal: 3.64  },
+          { keyword: 'oat',           cal: 3.89  },
+          { keyword: 'almond',        cal: 5.79  },
+          { keyword: 'protein',       cal: 4.00  },
+          // Flavours & Syrups
+          { keyword: 'matcha',        cal: 2.30  },
+          { keyword: 'hazelnut',      cal: 6.28  },
+          { keyword: 'cinnamon',      cal: 2.47  },
+          { keyword: 'ginger',        cal: 0.80  },
+        ];
+        calorieDefaults.forEach(({ keyword, cal }) => {
+          db.query(
+            `UPDATE inventory SET calories_per_unit = ? WHERE calories_per_unit = 0 AND LOWER(item_name) LIKE ?`,
+            [cal, `%${keyword}%`]
+          );
+        });
+        console.log('[Migration] Seeded default calorie values for inventory items.');
+      } else {
+        console.error('[Migration] Failed to add calories_per_unit:', alterErr.message);
+      }
+    });
+  }
+});
+
 db.query("SHOW COLUMNS FROM categories", (err, columns) => {
   if (!err) {
     const names = columns.map(c => c.Field);
@@ -1256,19 +1309,43 @@ app.post('/api/ai', async (req, res) => {
     const now = new Date();
     const currentDateTime = now.toLocaleString('en-GB', { timeZone: 'Asia/Amman' });
     
-    // Fetch menu to prevent hallucinations
+    // Fetch menu with calorie data from recipes + inventory
     const promiseDb = db.promise();
-    const [menuRes] = await promiseDb.query(`SELECT name, price_display FROM menu_items WHERE available = 1`);
-    const menuItems = menuRes.map(m => `${m.name} (${m.price_display})`).join(', ');
+    const [menuRes] = await promiseDb.query(`SELECT id, name, price_display FROM menu_items WHERE available = 1`);
+
+    // Build calorie data per menu item from recipes × calories_per_unit
+    const calorieMap = {};
+    try {
+      const [recipeCalories] = await promiseDb.query(`
+        SELECT m.id, m.name,
+               ROUND(SUM(r.quantity_required * COALESCE(i.calories_per_unit, 0)), 0) as total_calories
+        FROM menu_items m
+        JOIN recipes r ON r.menu_item_id = m.id
+        JOIN inventory i ON i.id = r.inventory_id
+        WHERE m.available = 1
+        GROUP BY m.id, m.name
+      `);
+      recipeCalories.forEach(row => {
+        calorieMap[row.id] = row.total_calories;
+      });
+    } catch(e) { /* recipes table may be empty – silently skip */ }
+
+    const menuItems = menuRes.map(m => {
+      const cal = calorieMap[m.id];
+      return cal && cal > 0
+        ? `${m.name} (${m.price_display}, ~${cal} kcal)`
+        : `${m.name} (${m.price_display})`;
+    }).join(', ');
 
     let context = `You are Sophie, the friendly Barista Bot for CaffAIne. Focus on helping customers with the menu, opening hours (Mon-Fri 07:30-17:00, Sat 09:00-18:00, Sun 10:00-16:00). Current time: ${currentDateTime}.
-Menu: ${menuItems}
-CALORIE CALCULATION / ESTIMATION RULE:
-- You are equipped to calculate or estimate calories for our menu items when asked. 
-- General calorie estimates: Espresso/Americano (5-15 kcal), Cappuccino/Latte (120-180 kcal), Cortado/Flat White (50-120 kcal), Mocha/Hot Chocolate (250-350 kcal), Sweets/Cakes (250-450 kcal), Sandwiches/Food (300-500 kcal).
-- Provide friendly calorie calculations and helpful suggestions when customers inquire.
+Menu (with calorie data where available): ${menuItems}
+CALORIE RULES:
+- Use the exact kcal values shown in the menu above (calculated from actual recipes and ingredients).
+- If an item shows no kcal value, you may give a reasonable estimate but clearly state it is an estimate.
+- When asked about multiple items, sum up the total calories clearly.
+- Provide friendly tips (e.g. "lighter option", "high energy choice") when relevant.
 CRITICAL RULES:
-1. Do NOT invent, hallucinate, or guess any information other than providing reasonable calorie estimations if asked. If you don't know, simply apologize.
+1. Do NOT invent, hallucinate, or guess information. Calorie values in the menu are exact; use them.
 2. You MUST answer in Arabic if the user's question is in Arabic.
 3. Only recommend items from the Menu above.`;
 
@@ -1628,9 +1705,31 @@ CRITICAL RULES:
         businessContext = `You MUST reply EXACTLY with this text and nothing else: "DB_ERROR: ${dbError.message}"`;
       }
     } else {
-      const [menuRes] = await promiseDb.query(`SELECT name, price_display FROM menu_items WHERE available = 1`);
-      const menuItems = menuRes.map(m => `${m.name} (${m.price_display})`).join(', ');
-      businessContext += `\nMenu: ${menuItems}`;
+      const [menuRes] = await promiseDb.query(`SELECT id, name, price_display FROM menu_items WHERE available = 1`);
+
+      // Build calorie data per menu item from recipes × calories_per_unit
+      const calorieMapChat = {};
+      try {
+        const [recipeCalories] = await promiseDb.query(`
+          SELECT m.id,
+                 ROUND(SUM(r.quantity_required * COALESCE(i.calories_per_unit, 0)), 0) as total_calories
+          FROM menu_items m
+          JOIN recipes r ON r.menu_item_id = m.id
+          JOIN inventory i ON i.id = r.inventory_id
+          WHERE m.available = 1
+          GROUP BY m.id
+        `);
+        recipeCalories.forEach(row => { calorieMapChat[row.id] = row.total_calories; });
+      } catch(e) { /* silently skip if recipes empty */ }
+
+      const menuItems = menuRes.map(m => {
+        const cal = calorieMapChat[m.id];
+        return cal && cal > 0
+          ? `${m.name} (${m.price_display}, ~${cal} kcal)`
+          : `${m.name} (${m.price_display})`;
+      }).join(', ');
+
+      businessContext += `\nMenu (with calorie data calculated from actual recipes): ${menuItems}\nCALORIE RULES: Use the exact kcal values shown above. Sum them when asked about multiple items. If no kcal shown, give a reasonable estimate and say it is an estimate.`;
     }
   } catch (e) {
     console.warn('[AI] Context Fetch Error:', e.message);
