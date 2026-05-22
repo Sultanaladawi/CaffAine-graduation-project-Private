@@ -672,7 +672,11 @@ app.get('/api/dashboard-stats', async (req, res) => {
     const [[sales]] = await promiseDb.query("SELECT COALESCE(SUM(total_amount),0) as total FROM orders");
     const [lowStockItems] = await promiseDb.query("SELECT item_name, quantity, min_threshold FROM inventory WHERE quantity <= min_threshold");
     const [dailySales] = await promiseDb.query(`SELECT DATE(created_at) as date, SUM(total_amount) as total FROM orders WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) GROUP BY DATE(created_at) ORDER BY DATE(created_at) ASC`);
-    const [categoryStats] = await promiseDb.query(`SELECT COALESCE(c.${categoryNameColumn}, 'Other') as name, SUM(oi.quantity) as count FROM order_items oi ${MENU_ITEM_JOIN_CONDITION} LEFT JOIN categories c ON mi.category_id = c.id GROUP BY COALESCE(c.${categoryNameColumn}, 'Other')`);
+    // Dynamically detect category column name to avoid 'Unknown column' errors
+    const [catCols] = await promiseDb.query("SHOW COLUMNS FROM categories");
+    const catColNames = catCols.map(c => c.Field);
+    const resolvedCatCol = catColNames.includes('label') ? 'label' : (catColNames.includes('name') ? 'name' : catColNames[1] || 'name');
+    const [categoryStats] = await promiseDb.query(`SELECT COALESCE(c.${resolvedCatCol}, 'Other') as name, SUM(oi.quantity) as count FROM order_items oi ${MENU_ITEM_JOIN_CONDITION} LEFT JOIN categories c ON mi.category_id = c.id GROUP BY COALESCE(c.${resolvedCatCol}, 'Other')`);
     const [[todayStats]] = await promiseDb.query("SELECT COUNT(*) as count, COALESCE(SUM(total_amount),0) as revenue FROM orders WHERE DATE(created_at) = CURDATE()");
     const [[yesterdayStats]] = await promiseDb.query("SELECT COUNT(*) as count, COALESCE(SUM(total_amount),0) as revenue FROM orders WHERE DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)");
     const [[statusSetting]] = await promiseDb.query("SELECT value FROM site_settings WHERE `key` = 'store_status'");
@@ -757,14 +761,18 @@ app.get('/api/analytics-monthly', async (req, res) => {
     );
 
     // Category stats for that month
+    // Dynamically detect category column name to avoid 'Unknown column' errors
+    const [catColsM] = await promiseDb.query("SHOW COLUMNS FROM categories");
+    const catColNamesM = catColsM.map(c => c.Field);
+    const resolvedCatColM = catColNamesM.includes('label') ? 'label' : (catColNamesM.includes('name') ? 'name' : catColNamesM[1] || 'name');
     const [categoryStats] = await promiseDb.query(
-      `SELECT COALESCE(c.${categoryNameColumn}, 'Other') as name, SUM(oi.quantity) as count 
+      `SELECT COALESCE(c.${resolvedCatColM}, 'Other') as name, SUM(oi.quantity) as count 
        FROM order_items oi 
        ${MENU_ITEM_JOIN_CONDITION} 
        JOIN orders o ON oi.order_id = o.id
        LEFT JOIN categories c ON mi.category_id = c.id 
        WHERE YEAR(o.created_at)=? AND MONTH(o.created_at)=?
-       GROUP BY COALESCE(c.${categoryNameColumn}, 'Other')`,
+       GROUP BY COALESCE(c.${resolvedCatColM}, 'Other')`,
       [year, month]
     );
 
