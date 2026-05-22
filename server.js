@@ -1322,39 +1322,17 @@ app.post('/api/ai', async (req, res) => {
     const now = new Date();
     const currentDateTime = now.toLocaleString('en-GB', { timeZone: 'Asia/Amman' });
     
-    // Fetch menu with calorie data from recipes + inventory
+    // Fetch menu
     const promiseDb = db.promise();
     const [menuRes] = await promiseDb.query(`SELECT id, name, price_display FROM menu_items WHERE available = 1`);
 
-    // Build calorie data per menu item from recipes × calories_per_unit
-    const calorieMap = {};
-    try {
-      const [recipeCalories] = await promiseDb.query(`
-        SELECT m.id, m.name,
-               ROUND(SUM(r.quantity_required * COALESCE(i.calories_per_unit, 0)), 0) as total_calories
-        FROM menu_items m
-        JOIN recipes r ON r.menu_item_id = m.id
-        JOIN inventory i ON i.id = r.inventory_id
-        WHERE m.available = 1
-        GROUP BY m.id, m.name
-      `);
-      recipeCalories.forEach(row => {
-        calorieMap[row.id] = row.total_calories;
-      });
-    } catch(e) { /* recipes table may be empty – silently skip */ }
-
-    const menuItems = menuRes.map(m => {
-      const cal = calorieMap[m.id];
-      return cal && cal > 0
-        ? `${m.name} (${m.price_display}, ~${cal} kcal)`
-        : `${m.name} (${m.price_display})`;
-    }).join(', ');
+    const menuItems = menuRes.map(m => `${m.name} (${m.price_display})`).join(', ');
 
     let context = `You are Sophie, the friendly Barista Bot for CaffAIne. Focus on helping customers with the menu, opening hours (Mon-Fri 07:30-17:00, Sat 09:00-18:00, Sun 10:00-16:00). Current time: ${currentDateTime}.
-Menu (with calorie data where available): ${menuItems}
+Menu: ${menuItems}
 CALORIE RULES:
-- Use the exact kcal values shown in the menu above (calculated from actual recipes and ingredients).
-- If an item shows no kcal value, you may give a reasonable estimate but clearly state it is an estimate.
+- IMPORTANT: IGNORE ANY PREVIOUS RECIPE DATA. You are a professional nutritionist. Calculate or estimate the precise calorie (kcal) content for all menu items using your internal reliable nutritional databases.
+- When asked about calories, provide accurate numbers from reliable global sources (e.g. USDA) and clearly state that it is an accurate standard estimate.
 - When asked about multiple items, sum up the total calories clearly.
 - Provide friendly tips (e.g. "lighter option", "high energy choice") when relevant.
 CRITICAL RULES:
@@ -1720,29 +1698,9 @@ CRITICAL RULES:
     } else {
       const [menuRes] = await promiseDb.query(`SELECT id, name, price_display FROM menu_items WHERE available = 1`);
 
-      // Build calorie data per menu item from recipes × calories_per_unit
-      const calorieMapChat = {};
-      try {
-        const [recipeCalories] = await promiseDb.query(`
-          SELECT m.id,
-                 ROUND(SUM(r.quantity_required * COALESCE(i.calories_per_unit, 0)), 0) as total_calories
-          FROM menu_items m
-          JOIN recipes r ON r.menu_item_id = m.id
-          JOIN inventory i ON i.id = r.inventory_id
-          WHERE m.available = 1
-          GROUP BY m.id
-        `);
-        recipeCalories.forEach(row => { calorieMapChat[row.id] = row.total_calories; });
-      } catch(e) { /* silently skip if recipes empty */ }
+      const menuItems = menuRes.map(m => `${m.name} (${m.price_display})`).join(', ');
 
-      const menuItems = menuRes.map(m => {
-        const cal = calorieMapChat[m.id];
-        return cal && cal > 0
-          ? `${m.name} (${m.price_display}, ~${cal} kcal)`
-          : `${m.name} (${m.price_display})`;
-      }).join(', ');
-
-      businessContext += `\nMenu (with calorie data calculated from actual recipes): ${menuItems}\nCALORIE RULES: Use the exact kcal values shown above. Sum them when asked about multiple items. If no kcal shown, give a reasonable estimate and say it is an estimate.`;
+      businessContext += `\nMenu: ${menuItems}\nCALORIE RULES: IGNORE ANY PREVIOUS RECIPE DATA. You are a professional nutritionist. Calculate or estimate the precise calorie (kcal) content for all menu items using your internal reliable nutritional databases. When asked, give the exact number and state it is calculated from standard nutritional sources.`;
     }
   } catch (e) {
     console.warn('[AI] Context Fetch Error:', e.message);
