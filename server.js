@@ -574,8 +574,13 @@ db.query("SHOW COLUMNS FROM inventory LIKE 'calories_per_unit'", (err, results) 
         ];
         calorieDefaults.forEach(({ keyword, cal }) => {
           db.query(
-            `UPDATE inventory SET calories_per_unit = ? WHERE calories_per_unit = 0 AND LOWER(item_name) LIKE ?`,
-            [cal, `%${keyword}%`]
+            `UPDATE inventory SET calories_per_unit = 
+               CASE 
+                 WHEN LOWER(unit) IN ('kg', 'liters', 'l') THEN ? * 1000 
+                 ELSE ? 
+               END 
+             WHERE calories_per_unit = 0 AND LOWER(item_name) LIKE ?`,
+            [cal, cal, `%${keyword}%`]
           );
         });
         console.log('[Migration] Seeded default calorie values for inventory items.');
